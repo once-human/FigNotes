@@ -1,7 +1,7 @@
 {
     "name": "FigNotes",
     "id": "1609651859060867823",
-    "api": "1.80.0",
+    "api": "1.0.0",
     "main": "dist/code.js",
     "ui": "src/ui.html",
     "editorType": [

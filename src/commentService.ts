@@ -9,8 +9,8 @@ export class CommentService {
             for (const commentObj of rawComments) {
                 // Usually REST API gives `client_meta.node_id` or similar for location
                 const nodeId = commentObj.client_meta?.node_id || commentObj.file_key /* fallback */ || null;
-                const page = await this.findPage(nodeId);
-                const frame = await this.findFrame(nodeId);
+                const page = this.findPage(nodeId);
+                const frame = this.findFrame(nodeId);
 
                 tasks.push({
                     commentId: commentObj.id,
@@ -35,11 +35,10 @@ export class CommentService {
         }
     }
 
-    private static async findPage(nodeId: string | null): Promise<PageNode | null> {
+    private static findPage(nodeId: string | null): PageNode | null {
         if (!nodeId) return null;
         try {
-            // Using Async version for dynamic-page support
-            let node = await figma.getNodeByIdAsync(nodeId);
+            let node = figma.getNodeById(nodeId);
             while (node && node.type !== "PAGE") {
                 node = node.parent as BaseNode;
             }
@@ -49,11 +48,10 @@ export class CommentService {
         }
     }
 
-    private static async findFrame(nodeId: string | null): Promise<FrameNode | null> {
+    private static findFrame(nodeId: string | null): FrameNode | null {
         if (!nodeId) return null;
         try {
-            // Using Async version for dynamic-page support
-            let node = await figma.getNodeByIdAsync(nodeId);
+            let node = figma.getNodeById(nodeId);
             while (node && node.type !== "FRAME" && node.type !== "PAGE") {
                 node = node.parent as BaseNode;
             }
