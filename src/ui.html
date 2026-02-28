@@ -450,9 +450,9 @@
                 <label for="aiEnabledToggle" style="font-size:12px;">Enable AI Intelligence Layer</label>
             </div>
             <div style="font-size:11px; color:var(--text-muted); margin-top: 8px;">
-                Advanced: Manual File URL (leave empty for current file)
+                Figma File Configuration
             </div>
-            <input type="text" id="urlInput" placeholder="Figma File URL (Optional)"
+            <input type="text" id="urlInput" placeholder="Figma File URL"
                 style="padding:8px; border:1px solid var(--border); border-radius:4px;">
             <button class="btn-primary" onclick="saveSettings()" style="background:var(--accent);">Save & Sync</button>
         </div>
@@ -533,7 +533,6 @@
 
     <script>
         let config = { pat: '', fileUrl: '', groq: '', aiEnabled: false };
-        let autoFileKey = '';
         let latestData = null;
         let filters = {
             assignedToMe: false,
@@ -549,7 +548,6 @@
         window.onmessage = (event) => {
             const { type, payload } = event.data.pluginMessage;
             if (type === 'init') {
-                autoFileKey = payload.fileKey;
                 parent.postMessage({ pluginMessage: { type: 'get-settings' } }, '*');
             } else if (type === 'settings-loaded') {
                 config = payload;
@@ -558,7 +556,7 @@
                 document.getElementById('aiEnabledToggle').checked = config.aiEnabled || false;
                 document.getElementById('urlInput').value = config.fileUrl || '';
 
-                if (config.pat) triggerSync();
+                if (config.pat && config.fileUrl) triggerSync();
                 else switchTab('settings');
             } else if (type === 'sync-complete') {
                 latestData = payload;
@@ -606,15 +604,11 @@
         }
 
         async function triggerSync() {
-            if (!config.pat) return;
+            if (!config.pat || !config.fileUrl) return;
 
-            let fileKey = autoFileKey;
-            if (config.fileUrl) {
-                const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-                if (match) fileKey = match;
-            }
-
-            if (!fileKey) return alert("Could not detect file key. Please enter URL manually in settings.");
+            const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            if (!match) return alert("Invalid or missing Figma URL in settings.");
+            const fileKey = match;
 
             document.getElementById('workboardContent').innerHTML = '<div style="padding:20px; text-align:center; font-size:12px; color:var(--text-muted); animation: pulse 2s infinite;">Syncing with Figma...</div>';
 
