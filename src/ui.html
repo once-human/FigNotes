@@ -12,6 +12,7 @@
             --text-muted: #888888;
             --border: #F0F0F0;
             --radius-main: 12px;
+            --radius-sm: 8px;
 
             /* Blue Theme */
             --accent-blue: #0070F6;
@@ -81,7 +82,7 @@
 
         .header-actions {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
         }
 
@@ -95,6 +96,7 @@
             cursor: pointer;
             transition: all 0.2s;
             opacity: 0.6;
+            color: var(--text-main);
         }
 
         .icon-btn:hover {
@@ -111,10 +113,13 @@
         .primary-tabs {
             display: flex;
             padding: 0 16px;
-            gap: 20px;
+            gap: 16px;
         }
 
         .p-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
             padding: 12px 0;
             font-size: 13px;
             font-weight: 700;
@@ -123,7 +128,6 @@
             border-bottom: 3px solid transparent;
             transition: var(--transition-type) 0.3s;
             opacity: 0.7;
-            white-space: nowrap;
         }
 
         .p-tab.active {
@@ -132,46 +136,72 @@
             opacity: 1;
         }
 
-        .secondary-toggle {
+        /* --- Compact Control Row --- */
+        .control-row {
             display: flex;
             padding: 12px 16px;
             background: #FAFAFA;
             border-bottom: 1px solid var(--border);
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .status-toggle {
+            display: flex;
+            gap: 4px;
+            padding: 3px;
+            background: #EEE;
+            border-radius: 100px;
         }
 
         .s-toggle {
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 100px;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
-            border: 1px solid var(--border);
-            background: white;
+            border: none;
+            background: transparent;
             color: var(--text-muted);
             transition: all 0.2s;
         }
 
         .s-toggle.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
+            background: white;
+            color: var(--accent);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        /* --- Progress & Filters --- */
+        .filter-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid var(--border);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* --- Progress Bar --- */
         .progress-box {
-            padding: 12px 16px;
+            padding: 10px 16px;
             background: white;
         }
 
         .progress-stats {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
-            font-weight: 700;
-            margin-bottom: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            margin-bottom: 4px;
             color: var(--text-muted);
+            text-transform: uppercase;
         }
 
         .progress-bar-bg {
@@ -187,47 +217,17 @@
             transition: width 0.6s var(--transition-type);
         }
 
-        .effort-filters {
-            display: flex;
-            padding: 12px 16px;
-            gap: 8px;
-            background: white;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .effort-chip {
-            flex: 1;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 800;
-            text-align: center;
-            border: 1px solid var(--border);
-            background: #F9F9F9;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .effort-chip.active {
-            background: var(--accent-soft);
-            color: var(--accent);
-            border-color: var(--accent-outline);
-        }
-
-        /* --- Content --- */
+        /* --- Content & Cards --- */
         .viewport {
             flex: 1;
             overflow-y: auto;
             padding-bottom: 140px;
             background: inherit;
-            scroll-behavior: smooth;
             scrollbar-width: thin;
         }
 
         .pinned-section {
-            padding: 16px;
+            padding: 12px 16px;
             background: var(--accent-soft);
             border-bottom: 1px solid var(--accent-outline);
             margin-bottom: 8px;
@@ -239,8 +239,10 @@
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: var(--accent);
-            margin-bottom: 12px;
-            display: block;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .task-card {
@@ -252,7 +254,6 @@
             transition: all 0.3s var(--transition-type);
             cursor: pointer;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-            position: relative;
         }
 
         .task-card:hover {
@@ -296,17 +297,17 @@
 
         .card-efforts {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             margin-bottom: 16px;
         }
 
         .effort-btn {
             flex: 1;
-            padding: 8px;
+            padding: 6px;
             text-align: center;
             font-size: 10px;
-            font-weight: 700;
-            border-radius: 8px;
+            font-weight: 800;
+            border-radius: 6px;
             border: 1px solid var(--border);
             cursor: pointer;
             transition: all 0.2s;
@@ -327,7 +328,11 @@
 
         .btn-work {
             flex: 1;
-            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px;
             border: none;
             border-radius: 8px;
             background: var(--accent-soft);
@@ -349,7 +354,10 @@
         }
 
         .btn-resolve {
-            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
             border: 1px solid var(--border);
             border-radius: 8px;
             background: white;
@@ -372,8 +380,8 @@
             height: 60px;
             pointer-events: none;
             z-index: 500;
-            overflow: visible;
             display: none;
+            overflow: visible;
         }
 
         body.theme-pink #cat-container {
@@ -386,9 +394,7 @@
             height: 60px;
             cursor: pointer;
             pointer-events: auto;
-            user-select: none;
             will-change: transform, left;
-            transition: left 0.1s linear;
         }
 
         .cat-svg {
@@ -403,68 +409,64 @@
         }
 
         .cat-legs-walking {
-            animation: leg-wiggle 0.4s infinite alternate ease-in-out;
+            animation: leg-wiggle 0.35s infinite alternate ease-in-out;
         }
 
         .cat-tail {
             transform-origin: left bottom;
-            animation: tail-flick 2s infinite ease-in-out;
+            animation: tail-flick 3s infinite ease-in-out;
         }
 
         .cat-head {
             transform-origin: center center;
-            transition: transform 0.1s ease;
-        }
-
-        @keyframes jump {
-
-            0%,
-            100% {
-                transform: translateY(0) scale(1, 1);
-            }
-
-            40% {
-                transform: translateY(-40px) scale(0.9, 1.1);
-            }
-
-            60% {
-                transform: translateY(-40px) scale(0.9, 1.1);
-            }
-
-            80% {
-                transform: translateY(0) scale(1.1, 0.9);
-            }
-        }
-
-        .cat-jumping {
-            animation: jump 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.15s ease-out;
         }
 
         @keyframes leg-wiggle {
             0% {
-                transform: rotate(-15deg);
+                transform: rotate(-10deg);
             }
 
             100% {
-                transform: rotate(15deg);
+                transform: rotate(10deg);
             }
         }
 
         @keyframes tail-flick {
-            0% {
+
+            0%,
+            100% {
                 transform: rotate(0deg);
             }
 
             50% {
-                transform: rotate(20deg);
-            }
-
-            100% {
-                transform: rotate(0deg);
+                transform: rotate(15deg);
             }
         }
 
-        /* Footer */
+        @keyframes jump {
+            0% {
+                transform: translateY(0) scale(1, 1);
+            }
+
+            40% {
+                transform: translateY(-40px) scale(0.95, 1.05);
+            }
+
+            60% {
+                transform: translateY(-40px) scale(0.95, 1.05);
+            }
+
+            100% {
+                transform: translateY(0) scale(1, 1);
+            }
+        }
+
+        .cat-jumping {
+            animation: jump 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* --- Global Footer --- */
         .footer {
             position: fixed;
             bottom: 0;
@@ -480,7 +482,7 @@
             width: 100%;
             padding: 14px;
             border: none;
-            border-radius: var(--radius-main);
+            border-radius: var(--radius-sm);
             background: var(--accent);
             color: white;
             font-size: 14px;
@@ -490,10 +492,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        /* Settings */
         .settings-overlay {
             position: fixed;
             top: 0;
@@ -527,8 +528,8 @@
                             d="M22 10a11.94 11.94 0 0 1-5.69 1.48C14.7 11.48 12 11 12 11M2 10a11.94 11.94 0 0 0 5.69 1.48C9.3 11.48 12 11 12 11" />
                     </svg>
                 </div>
-                <div class="icon-btn" onclick="toggleSettings(true)" title="Settings">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                <div class="icon-btn" onclick="toggleSettings(true)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3" />
                         <path
@@ -538,24 +539,53 @@
             </div>
         </div>
         <div class="primary-tabs">
-            <div class="p-tab active" id="pTabAll" onclick="switchPrimaryTab('all')">All</div>
-            <div class="p-tab" id="pTabAssigned" onclick="switchPrimaryTab('assigned')">Assigned</div>
-            <div class="p-tab" id="pTabDiscussion" onclick="switchPrimaryTab('discussion')">Discussion</div>
+            <div class="p-tab active" id="pTabAll" onclick="switchPrimaryTab('all')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                All
+            </div>
+            <div class="p-tab" id="pTabAssigned" onclick="switchPrimaryTab('assigned')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+                Assigned
+            </div>
+            <div class="p-tab" id="pTabDiscussion" onclick="switchPrimaryTab('discussion')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Chat
+            </div>
         </div>
-        <div class="secondary-toggle">
-            <div class="s-toggle active" id="sTogglePending" onclick="switchSecondaryTab('pending')">Pending</div>
-            <div class="s-toggle" id="sToggleResolved" onclick="switchSecondaryTab('resolved')">Resolved</div>
+        <div class="control-row">
+            <div class="status-toggle">
+                <div class="s-toggle active" id="sTogglePending" onclick="switchSecondaryTab('pending')">Pending</div>
+                <div class="s-toggle" id="sToggleResolved" onclick="switchSecondaryTab('resolved')">Resolved</div>
+            </div>
+            <div class="filter-dropdown" onclick="toggleEffortDropdown()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="m6 9 6 6 6-6" />
+                </svg>
+                <span id="effortLabel">All Efforts</span>
+                <select id="effortSelect" style="position:absolute; opacity:0; width:100%; left:0; cursor:pointer;"
+                    onchange="updateEffortSelection(this.value)">
+                    <option value="All">All Efforts</option>
+                    <option value="Small">Small</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Large">Large</option>
+                </select>
+            </div>
         </div>
         <div class="progress-box">
             <div class="progress-stats"><span id="statText">0 pending</span><span id="statPercent">0%</span></div>
             <div class="progress-bar-bg">
                 <div id="progressBar" class="progress-fill" style="width: 0%;"></div>
             </div>
-        </div>
-        <div class="effort-filters">
-            <div class="effort-chip" id="fS" onclick="toggleEffortFilter('Small')">Small</div>
-            <div class="effort-chip" id="fM" onclick="toggleEffortFilter('Medium')">Medium</div>
-            <div class="effort-chip" id="fL" onclick="toggleEffortFilter('Large')">Large</div>
         </div>
     </div>
 
@@ -588,15 +618,25 @@
         </div>
     </div>
 
-    <div class="footer"><button class="btn-sync" onclick="triggerSync()">Sync Workboard</button></div>
+    <div class="footer">
+        <button class="btn-sync" onclick="triggerSync()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                <path d="M16 16h5v5" />
+            </svg>
+            Sync
+        </button>
+    </div>
 
     <div id="settingsView" class="settings-overlay">
-        <h2 style="font-weight: 800; margin-bottom: 32px;">Settings</h2>
-        <div class="input-group"><span class="input-label">Figma Access Token</span><input type="password"
-                id="patInput"></div>
-        <div class="input-group"><span class="input-label">Figma File URL</span><input type="text" id="urlInput"></div>
+        <h2 style="font-weight: 800; margin-bottom: 24px;">Settings</h2>
+        <div style="margin-bottom:20px;"><input type="password" id="patInput" placeholder="Figma Access Token"></div>
+        <div style="margin-bottom:24px;"><input type="text" id="urlInput" placeholder="Figma File URL"></div>
         <button class="btn-sync" onclick="saveSettings()">Save & Sync</button>
-        <div style="text-align:center; margin-top:24px; cursor:pointer; font-size:12px; color:var(--accent); font-weight:700;"
+        <div style="text-align:center; margin-top:24px; cursor:pointer; font-size:12px; font-weight:700;"
             onclick="toggleSettings(false)">Close</div>
     </div>
 
@@ -606,9 +646,10 @@
         let currentTheme = 'blue';
         let pTab = 'all';
         let sToggle = 'pending';
-        let effortFilters = new Set();
+        let effortFilter = 'All';
 
-        let cat = { x: 20, targetX: 20, dir: 1, jumping: false, state: 'idle' };
+        // --- PERSISTENT CAT STATE ---
+        let cat = { x: 20, targetX: 20, dir: 1, jumping: false };
         let mouseX = 0;
 
         window.addEventListener('mousemove', (e) => { mouseX = e.clientX; });
@@ -617,40 +658,31 @@
             currentTheme = theme;
             document.body.className = 'theme-' + theme;
             document.getElementById('catToggle').classList.toggle('active', theme === 'pink');
-            if (theme === 'pink') {
-                cat.x = -80; cat.targetX = 60;
-            } else {
-                cat.targetX = window.innerWidth + 80;
-            }
+            if (theme === 'pink') { cat.x = -100; cat.targetX = 60; }
+            else { cat.targetX = window.innerWidth + 100; }
         }
 
         function catJump() {
             if (cat.jumping) return;
             cat.jumping = true;
-            const el = document.getElementById('the-cat');
-            el.classList.add('cat-jumping');
-            setTimeout(() => { el.classList.remove('cat-jumping'); cat.jumping = false; }, 600);
+            document.getElementById('the-cat').classList.add('cat-jumping');
+            setTimeout(() => { document.getElementById('the-cat').classList.remove('cat-jumping'); cat.jumping = false; }, 500);
         }
 
         function animate() {
-            if (currentTheme !== 'pink' && cat.x > window.innerWidth + 20) { requestAnimationFrame(animate); return; }
             const el = document.getElementById('the-cat');
             const head = document.getElementById('cat-head');
             const legs = el.querySelector('.cat-legs');
             let dx = cat.targetX - cat.x;
-            if (Math.abs(dx) > 1) {
+            if (Math.abs(dx) > 2) {
                 cat.x += Math.sign(dx) * 2;
-                cat.state = 'walking';
                 legs.classList.add('cat-legs-walking');
                 cat.dir = Math.sign(dx);
             } else {
-                cat.state = 'idle';
                 legs.classList.remove('cat-legs-walking');
                 if (currentTheme === 'pink' && Math.random() < 0.005) { cat.targetX = Math.random() * (window.innerWidth - 80); }
             }
-            const catScreenX = cat.x + 40;
-            let lookX = (mouseX - catScreenX) / 10;
-            lookX = Math.max(-15, Math.min(15, lookX));
+            let lookX = Math.max(-12, Math.min(12, (mouseX - (cat.x + 40)) / 12));
             head.style.transform = `translateX(${lookX}px)`;
             el.style.left = cat.x + 'px';
             el.style.transform = `scaleX(${cat.dir})`;
@@ -658,57 +690,45 @@
         }
         requestAnimationFrame(animate);
 
-        function switchPrimaryTab(tab) { pTab = tab; render(); }
-        function switchSecondaryTab(toggle) { sToggle = toggle; render(); }
-        function toggleEffortFilter(eff) {
-            if (effortFilters.has(eff)) effortFilters.delete(eff);
-            else effortFilters.add(eff);
-            document.getElementById('f' + eff[0]).classList.toggle('active');
-            render();
-        }
-
-        function toggleTheme() {
-            const nt = currentTheme === 'blue' ? 'pink' : 'blue';
-            applyTheme(nt);
-            parent.postMessage({ pluginMessage: { type: 'set-theme', payload: nt } }, '*');
-        }
+        // --- Logic ---
+        function switchPrimaryTab(tab) { pTab = tab; Array.from(document.querySelectorAll('.p-tab')).forEach(t => t.classList.toggle('active', t.id === 'pTab' + tab.charAt(0).toUpperCase() + tab.slice(1))); render(); }
+        function switchSecondaryTab(toggle) { sToggle = toggle; document.getElementById('sTogglePending').classList.toggle('active', toggle === 'pending'); document.getElementById('sToggleResolved').classList.toggle('active', toggle === 'resolved'); render(); }
+        function updateEffortSelection(val) { effortFilter = val; document.getElementById('effortLabel').innerText = val === 'All' ? 'All Efforts' : val; render(); }
 
         function render() {
             if (!latestData) return;
             const container = document.getElementById('content');
             const currentUser = latestData.currentUser;
 
-            let allGrouped = latestData.tasks.filter(t => {
+            let filtered = latestData.tasks.filter(t => {
                 if (pTab === 'assigned') return t.assignee === currentUser;
                 if (pTab === 'discussion') return t.mentions.includes(currentUser) && t.mentions.length > 1;
                 return true;
             });
 
-            const total = allGrouped.length;
-            const rCount = allGrouped.filter(t => t.resolved).length;
-            const pCount = total - rCount;
-            const percent = total > 0 ? (rCount / total * 100) : 0;
-
-            document.getElementById('statText').innerText = `${pCount} pending / ${total} total`;
+            const total = filtered.length;
+            const resolved = filtered.filter(t => t.resolved).length;
+            const percent = total > 0 ? (resolved / total * 100) : 0;
+            document.getElementById('statText').innerText = `${total - resolved} pending / ${total} total`;
             document.getElementById('statPercent').innerText = `${Math.round(percent)}%`;
             document.getElementById('progressBar').style.width = `${percent}%`;
 
-            let tasks = allGrouped.filter(t => {
+            let displayTasks = filtered.filter(t => {
                 if (sToggle === 'pending' && t.resolved) return false;
                 if (sToggle === 'resolved' && !t.resolved) return false;
-                if (effortFilters.size > 0 && !effortFilters.has(t.effort)) return false;
+                if (effortFilter !== 'All' && t.effort !== effortFilter) return false;
                 return true;
             });
 
-            const workingTask = tasks.find(t => t.isCurrentlyWorking);
-            const remainingTasks = tasks.filter(t => !t.isCurrentlyWorking);
+            const working = displayTasks.find(t => t.isCurrentlyWorking);
+            const others = displayTasks.filter(t => !t.isCurrentlyWorking);
 
             let html = '';
-            if (workingTask && sToggle === 'pending') {
-                html += `<div class="pinned-section"><span class="label">Currently Working On</span>${renderCard(workingTask)}</div>`;
+            if (working && sToggle === 'pending') {
+                html += `<div class="pinned-section"><span class="label"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="10"/></svg> Currently Working</span>${renderCard(working)}</div>`;
             }
-            html += remainingTasks.map(t => renderCard(t)).join('');
-            container.innerHTML = html;
+            html += others.map(t => renderCard(t)).join('');
+            container.innerHTML = html || '<div style="padding:100px 40px; text-align:center; color:#888; font-size:12px">All clear. Enjoy the day.</div>';
         }
 
         function renderCard(t) {
@@ -717,64 +737,52 @@
                 <div class="message">${t.message}</div>
                 ${!t.resolved ? `
                     <div class="card-efforts" onclick="event.stopPropagation()">
-                        <div class="effort-btn ${t.effort === 'Small' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Small')">Small</div>
-                        <div class="effort-btn ${t.effort === 'Medium' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Medium')">Medium</div>
-                        <div class="effort-btn ${t.effort === 'Large' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Large')">Large</div>
+                        <div class="effort-btn ${t.effort === 'Small' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Small')">S</div>
+                        <div class="effort-btn ${t.effort === 'Medium' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Medium')">M</div>
+                        <div class="effort-btn ${t.effort === 'Large' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Large')">L</div>
                     </div>
                     <div class="card-actions" onclick="event.stopPropagation()">
                         <button class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">
-                            ${t.isCurrentlyWorking ? 'Focus Goal' : 'Work on this'}
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                            ${t.isCurrentlyWorking ? 'Focusing' : 'Work'}
                         </button>
-                        <button class="btn-resolve" onclick="resolve('${t.commentId}')">Resolve</button>
+                        <button class="btn-resolve" onclick="resolve('${t.commentId}')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            Done
+                        </button>
                     </div>
-                ` : '<b style="color:green;font-size:10px">RESOLVED</b>'}
+                ` : `
+                    <div style="display:flex; align-items:center; gap:6px; color:#2E7D32; font-size:11px; font-weight:800;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg>
+                        COMPLETED
+                    </div>
+                `}
             </div>`;
         }
 
         function locate(id) { parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*'); }
-        async function resolve(id) {
+        function resolve(id) {
             parent.postMessage({ pluginMessage: { type: 'resolve-comment', payload: id } }, '*');
-            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${id}`, {
-                method: 'POST',
-                headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resolved: true })
+            fetch(`https://api.figma.com/v1/files/${config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1]}/comments/${id}`, {
+                method: 'POST', headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' }, body: JSON.stringify({ resolved: true })
             });
         }
         function setWorking(id) { parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*'); }
-        function updateEffort(id, old, next) {
-            const v = old === next ? null : next;
-            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: v } } }, '*');
-        }
+        function setEffort(id, val) { parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: val } } }, '*'); }
 
         function triggerSync() {
-            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (!fileKey) return;
-            fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, { headers: { 'X-Figma-Token': config.pat } })
-                .then(r => r.json())
-                .then(data => parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*'));
+            const key = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            if (key) fetch(`https://api.figma.com/v1/files/${key}/comments`, { headers: { 'X-Figma-Token': config.pat } }).then(r => r.json()).then(d => parent.postMessage({ pluginMessage: { type: 'sync', payload: d.comments } }, '*'));
         }
 
-        function toggleSettings(s) { document.getElementById('settingsView').classList.toggle('active', s); }
-        function saveSettings() {
-            config.pat = document.getElementById('patInput').value;
-            config.fileUrl = document.getElementById('urlInput').value;
-            parent.postMessage({ pluginMessage: { type: 'save-settings', payload: config } }, '*');
-            toggleSettings(false); triggerSync();
-        }
+        function toggleTheme() { const nt = currentTheme === 'blue' ? 'pink' : 'blue'; applyTheme(nt); parent.postMessage({ pluginMessage: { type: 'set-theme', payload: nt } }, '*'); }
+        function toggleSettings(s) { document.getElementById('settingsView').style.display = s ? 'block' : 'none'; }
+        function saveSettings() { config.pat = document.getElementById('patInput').value; config.fileUrl = document.getElementById('urlInput').value; parent.postMessage({ pluginMessage: { type: 'save-settings', payload: config } }, '*'); toggleSettings(false); triggerSync(); }
 
         window.onmessage = (e) => {
             const { type, payload } = e.data.pluginMessage;
-            if (type === 'settings-loaded') {
-                config = payload;
-                document.getElementById('patInput').value = config.pat || '';
-                document.getElementById('urlInput').value = config.fileUrl || '';
-                if (config.pat && config.fileUrl) triggerSync();
-            } else if (type === 'sync-complete') {
-                latestData = payload;
-                if (payload.theme) applyTheme(payload.theme);
-                render();
-            }
+            if (type === 'settings-loaded') { config = payload; if (config.pat && config.fileUrl) triggerSync(); }
+            else if (type === 'sync-complete') { latestData = payload; if (payload.theme) applyTheme(payload.theme); render(); }
         };
     </script>
 </body>
