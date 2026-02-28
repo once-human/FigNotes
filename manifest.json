@@ -10,7 +10,7 @@
     "documentAccess": "dynamic-page",
     "networkAccess": {
         "allowedDomains": [
-            "none"
+            "https://api.figma.com"
         ]
     },
     "permissions": [

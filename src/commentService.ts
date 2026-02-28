@@ -1,38 +1,27 @@
 import { Task } from "./types";
 
 export class CommentService {
-    static async fetchAllComments(): Promise<Task[]> {
+    static async parseRestComments(rawComments: any[]): Promise<Task[]> {
         try {
-            const threadsMethod = (figma as any).getCommentThreadsAsync ||
-                ((figma as any).comments && (figma as any).comments.getThreadsAsync);
-
-            if (!threadsMethod) {
-                console.warn("[FigNotes] Comment API not found.");
-                return [];
-            }
-
-            const allThreads = await threadsMethod.call(threadsMethod === (figma as any).getCommentThreadsAsync ? figma : (figma as any).comments);
             const tasks: Task[] = [];
             const now = new Date().toISOString();
 
-            for (const thread of allThreads) {
-                const firstComment = thread.comments[0];
-                if (!firstComment) continue;
-
-                const nodeId = thread.region?.nodeId || null;
+            for (const commentObj of rawComments) {
+                // Usually REST API gives `client_meta.node_id` or similar for location
+                const nodeId = commentObj.client_meta?.node_id || commentObj.file_key /* fallback */ || null;
                 const page = await this.findPage(nodeId);
                 const frame = await this.findFrame(nodeId);
 
                 tasks.push({
-                    commentId: thread.id,
-                    message: firstComment.message,
+                    commentId: commentObj.id,
+                    message: commentObj.message,
                     page: page?.name || "Global / Unassigned",
                     frame: frame?.name || "Canvas",
-                    resolved: thread.resolved,
-                    resolvedBy: thread.resolved ? "Figma User" : null,
+                    resolved: commentObj.resolved_at !== null && commentObj.resolved_at !== undefined,
+                    resolvedBy: commentObj.resolved_at ? "Figma User" : null,
                     effort: 1,
                     discussionStatus: "pending",
-                    createdAt: firstComment.createdAt,
+                    createdAt: commentObj.created_at,
                     lastUpdatedAt: now,
                     ageInDays: 0,
                     isAvoidance: false
@@ -41,7 +30,7 @@ export class CommentService {
 
             return tasks;
         } catch (err) {
-            console.error("[FigNotes] Error fetching comments:", err);
+            console.error("[FigNotes] Error parsing REST comments:", err);
             return [];
         }
     }

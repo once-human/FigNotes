@@ -19,7 +19,7 @@ figma.showUI(__html__, { width: 480, height: 720, themeColors: true });
 let isSyncing = false;
 let syncTimeout: number | null = null;
 
-async function debouncedSync() {
+async function debouncedSync(rawComments?: any[]) {
     if (isSyncing) return;
     if (syncTimeout) clearTimeout(syncTimeout);
 
@@ -27,13 +27,13 @@ async function debouncedSync() {
         isSyncing = true;
         log("Starting sync sequence...");
         try {
-            const result = await SyncService.sync();
+            const result = await SyncService.sync(rawComments);
             figma.ui.postMessage({ type: "sync-complete", payload: result });
             log("Sync complete", result);
         } catch (err: any) {
             log("Sync failed", err);
             figma.ui.postMessage({ type: "sync-error", payload: err.message });
-            figma.notify("Hardening: Partial sync failure. Check local state.", { error: true });
+            figma.notify("Sync failure: " + err.message, { error: true });
         } finally {
             isSyncing = false;
         }
@@ -46,7 +46,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
     try {
         switch (msg.type) {
             case "sync":
-                await debouncedSync();
+                await debouncedSync(msg.payload);
                 break;
 
             case "update-task":
@@ -64,6 +64,22 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 }
                 break;
 
+            case "save-settings":
+                const { pat, fileUrl } = msg.payload;
+                await figma.clientStorage.setAsync("figma_pat", pat);
+                await figma.clientStorage.setAsync("figma_file_url", fileUrl);
+                figma.notify("Settings saved successfully.");
+                break;
+
+            case "get-settings":
+                const savedPat = await figma.clientStorage.getAsync("figma_pat");
+                const savedUrl = await figma.clientStorage.getAsync("figma_file_url");
+                figma.ui.postMessage({
+                    type: "settings-loaded",
+                    payload: { pat: savedPat || "", fileUrl: savedUrl || "" }
+                });
+                break;
+
             case "notify":
                 figma.notify(msg.payload || "Notification");
                 break;
@@ -79,4 +95,5 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
 };
 
 // Initial launch trigger
-debouncedSync();
+// We don't auto-sync here anymore because the UI needs to handle the REST fetch using settings.
+figma.ui.postMessage({ type: "init" });

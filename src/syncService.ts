@@ -3,8 +3,17 @@ import { StorageService } from "./storageService";
 import { CommentService } from "./commentService";
 
 export class SyncService {
-    static async sync(): Promise<SyncResult> {
-        const liveTasks = await CommentService.fetchAllComments();
+    static async sync(rawComments?: any[]): Promise<SyncResult> {
+        // If data comes from REST API, parse it. Otherwise attempt legacy CommentService (fallback).
+        let liveTasks: Task[] = [];
+
+        if (rawComments && Array.isArray(rawComments)) {
+            liveTasks = await CommentService.parseRestComments(rawComments);
+        } else {
+            console.warn("[FigNotes] No payload received from UI. Skipping raw parse.");
+            liveTasks = [];
+        }
+
         const storedTasks = await StorageService.getTasks();
 
         const reconciledTasks: Record<string, Task> = {};

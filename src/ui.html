@@ -28,24 +28,6 @@
             overflow-x: hidden;
         }
 
-        /* Skeleton Shimmer */
-        @keyframes shimmer {
-            0% {
-                background-position: -200% 0;
-            }
-
-            100% {
-                background-position: 200% 0;
-            }
-        }
-
-        .skeleton {
-            background: linear-gradient(90deg, var(--border) 25%, var(--accent-soft) 50%, var(--border) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 4px;
-        }
-
         .header {
             padding: 16px 20px;
             background: var(--bg);
@@ -70,15 +52,71 @@
             transition: var(--transition);
         }
 
-        .btn-sync:hover {
-            filter: brightness(0.9);
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.6;
+            transition: var(--transition);
         }
 
-        .btn-sync:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .btn-icon:hover {
+            opacity: 1;
         }
 
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .content {
+            padding: 16px 20px;
+        }
+
+        /* Settings Styles */
+        .settings-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .input-group input {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        .help-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: -4px;
+        }
+
+        /* Sync Styles */
         .filter-bar {
             padding: 12px 20px;
             display: flex;
@@ -97,7 +135,6 @@
             background: var(--surface);
             color: var(--text-secondary);
             transition: var(--transition);
-            white-space: nowrap;
         }
 
         .chip.active {
@@ -106,23 +143,12 @@
             border-color: var(--accent);
         }
 
-        .content {
-            padding: 16px 20px;
-        }
-
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             margin-bottom: 16px;
-            overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
         }
 
         .card-header {
@@ -130,7 +156,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
         }
 
         .task-item {
@@ -139,17 +164,6 @@
             display: flex;
             gap: 12px;
             align-items: flex-start;
-        }
-
-        .error-state {
-            padding: 60px 40px;
-            text-align: center;
-        }
-
-        .loading-skeleton {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
         }
 
         select {
@@ -166,64 +180,200 @@
 
 <body>
     <div class="header">
-        <div style="font-weight: 700; font-size: 18px; letter-spacing: -0.5px;">FigNotes</div>
+        <div
+            style="font-weight: 700; font-size: 18px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;">
+            FigNotes
+            <button class="btn-icon" id="settingsToggleBtn" title="Settings">⚙️</button>
+        </div>
         <button id="syncBtn" class="btn-sync">Sync</button>
     </div>
 
-    <div class="filter-bar">
-        <div class="chip active" onclick="setFilter('all')">All</div>
-        <div class="chip" onclick="setFilter('unresolved')">Unresolved</div>
-        <div class="chip" onclick="setFilter('discussion')">Discussion</div>
+    <!-- SETTINGS VIEW -->
+    <div id="settingsView" class="view-section content active">
+        <div style="margin-bottom: 24px;">
+            <h2 style="margin: 0 0 8px 0; font-size: 16px;">Configuration</h2>
+            <p style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.4;">
+                Figma requires a Personal Access Token (PAT) and the File URL to securely extract comments.
+            </p>
+        </div>
+
+        <div class="settings-form">
+            <div class="input-group">
+                <label for="patInput">Personal Access Token</label>
+                <input type="password" id="patInput" placeholder="figd_...">
+                <div class="help-text">Generate this in Figma Account Settings > Personal access tokens.</div>
+            </div>
+
+            <div class="input-group">
+                <label for="urlInput">Figma File URL</label>
+                <input type="text" id="urlInput" placeholder="https://www.figma.com/file/...">
+                <div class="help-text">Paste the full URL of this exact file.</div>
+            </div>
+
+            <button class="btn-sync" id="saveSettingsBtn" style="margin-top: 8px;">Save Configuration</button>
+        </div>
     </div>
 
-    <div id="main" class="content">
-        <div class="loading-skeleton">
-            <div class="skeleton" style="height: 80px; border-radius: 12px;"></div>
-            <div class="skeleton" style="height: 80px; border-radius: 12px;"></div>
-            <div class="skeleton" style="height: 200px; border-radius: 12px;"></div>
+    <!-- MAIN SYNC VIEW -->
+    <div id="mainView" class="view-section">
+        <div class="filter-bar">
+            <div class="chip active" onclick="setFilter('all')">All</div>
+            <div class="chip" onclick="setFilter('unresolved')">Unresolved</div>
+            <div class="chip" onclick="setFilter('discussion')">Discussion</div>
+        </div>
+
+        <div id="mainContent" class="content">
+            <!-- Rendered by JS -->
         </div>
     </div>
 
     <script>
         const syncBtn = document.getElementById('syncBtn');
-        const main = document.getElementById('main');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const settingsToggleBtn = document.getElementById('settingsToggleBtn');
+        const settingsView = document.getElementById('settingsView');
+        const mainView = document.getElementById('mainView');
+
+        const patInput = document.getElementById('patInput');
+        const urlInput = document.getElementById('urlInput');
+        const mainContent = document.getElementById('mainContent');
+
         let currentFilter = 'all';
         let latestData = null;
+        let config = { pat: '', fileUrl: '' };
 
-        syncBtn.onclick = () => {
-            syncBtn.disabled = true;
-            syncBtn.innerText = 'Syncing...';
-            parent.postMessage({ pluginMessage: { type: 'sync' } }, '*');
-        };
+        // --- Navigation ---
+        let isSettingsOpen = true; // Defaults open until settings load
 
+        function toggleSettings(forceState) {
+            isSettingsOpen = forceState !== undefined ? forceState : !isSettingsOpen;
+            if (isSettingsOpen) {
+                settingsView.classList.add('active');
+                mainView.classList.remove('active');
+            } else {
+                settingsView.classList.remove('active');
+                mainView.classList.add('active');
+            }
+        }
+
+        settingsToggleBtn.onclick = () => toggleSettings();
+
+        // --- Messages from Code.ts ---
         window.onmessage = (event) => {
             const { type, payload } = event.data.pluginMessage;
-            if (type === 'sync-complete') {
+
+            if (type === 'init') {
+                // Request settings on boot
+                parent.postMessage({ pluginMessage: { type: 'get-settings' } }, '*');
+            }
+            else if (type === 'settings-loaded') {
+                config = payload;
+                patInput.value = config.pat || '';
+                urlInput.value = config.fileUrl || '';
+
+                if (config.pat && config.fileUrl) {
+                    toggleSettings(false);
+                    triggerSync();
+                } else {
+                    toggleSettings(true);
+                }
+            }
+            else if (type === 'sync-complete') {
                 latestData = payload;
-                render();
-                syncBtn.disabled = false;
-                syncBtn.innerText = 'Sync';
-            } else if (type === 'sync-error') {
-                renderError(payload);
-                syncBtn.disabled = false;
-                syncBtn.innerText = 'Sync';
+                renderTasks();
+                setSyncingState(false);
+            }
+            else if (type === 'sync-error') {
+                renderError(payload || "Unknown error occurred.");
+                setSyncingState(false);
             }
         };
 
+        // --- Settings Management ---
+        saveSettingsBtn.onclick = () => {
+            config.pat = patInput.value.trim();
+            config.fileUrl = urlInput.value.trim();
+
+            if (!config.pat || !config.fileUrl) {
+                alert("Both Token and URL are required.");
+                return;
+            }
+
+            parent.postMessage({
+                pluginMessage: { type: 'save-settings', payload: config }
+            }, '*');
+
+            toggleSettings(false);
+            triggerSync();
+        };
+
+        // --- Core Sync Logic (REST API + Canvas Merge) ---
+        function setSyncingState(isSyncing) {
+            syncBtn.disabled = isSyncing;
+            syncBtn.innerText = isSyncing ? 'Syncing...' : 'Sync';
+        }
+
+        syncBtn.onclick = triggerSync;
+
+        async function triggerSync() {
+            if (!config.pat || !config.fileUrl) {
+                toggleSettings(true);
+                return;
+            }
+
+            setSyncingState(true);
+            mainContent.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-secondary);">Fetching comments from Figma API...</div>`;
+
+            // Extract File Key from URL (e.g. https://www.figma.com/file/abc123def/...)
+            const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/);
+            if (!match) {
+                renderError("Invalid Figma URL format. Could not extract File Key.");
+                setSyncingState(false);
+                return;
+            }
+            const fileKey = match[1];
+
+            try {
+                // 1. Fetch Comments via REST API
+                const response = await fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, {
+                    headers: {
+                        'X-Figma-Token': config.pat
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                // 2. Send Raw REST Comments to canvas to resolve nodes/frames and merge with Storage
+                parent.postMessage({
+                    pluginMessage: { type: 'sync', payload: data.comments }
+                }, '*');
+
+            } catch (err) {
+                console.error("REST API Error:", err);
+                renderError("Failed to fetch comments. Check your Token and URL. Detail: " + err.message);
+                setSyncingState(false);
+            }
+        }
+
+        // --- View Logic ---
         function setFilter(f) {
             currentFilter = f;
             document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
             if (event) event.target.classList.add('active');
-            render();
+            renderTasks();
         }
 
-        function render() {
+        function renderTasks() {
             if (!latestData || !latestData.metrics || latestData.metrics.length === 0) {
-                main.innerHTML = `
+                mainContent.innerHTML = `
                     <div style="text-align:center; padding: 80px 40px; color: var(--text-secondary);">
                         <div style="font-size: 32px; margin-bottom: 16px;">💬</div>
                         <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">No comments found</div>
-                        <div style="font-size: 13px; opacity: 0.7;">Add some comments to your design and click Sync.</div>
+                        <div style="font-size: 13px; opacity: 0.7;">Ensure the URL points to this exact file.</div>
                     </div>
                 `;
                 return;
@@ -269,7 +419,7 @@
                 `;
             });
 
-            main.innerHTML = html;
+            mainContent.innerHTML = html;
         }
 
         function matchesFilter(t) {
@@ -284,11 +434,11 @@
         }
 
         function renderError(err) {
-            main.innerHTML = `
-                <div class="error-state">
+            mainContent.innerHTML = `
+                <div class="error-state" style="padding: 40px; text-align: center;">
                     <div style="font-size: 32px; margin-bottom: 16px;">⚠️</div>
-                    <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: var(--danger);">Sync Error</div>
-                    <div style="font-size: 13px; opacity: 0.7;">${err}</div>
+                    <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: var(--danger);">Error</div>
+                    <div style="font-size: 13px; opacity: 0.7; word-break: break-all;">${err}</div>
                 </div>
             `;
         }

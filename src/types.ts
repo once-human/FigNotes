@@ -43,6 +43,6 @@ export interface SyncResult {
 }
 
 export interface PluginMessage {
-    type: "sync" | "update-task" | "notify" | "export";
+    type: "sync" | "update-task" | "notify" | "export" | "save-settings" | "get-settings" | "init";
     payload?: any;
 }
