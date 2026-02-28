@@ -38,6 +38,7 @@ export class CommentService {
                     frameId: frameNode?.id || null,
                     pageId: pageNode?.id || null,
                     author: commentObj.user?.handle || "Unknown",
+                    authorAvatarUrl: commentObj.user?.img_url || null,
                     createdAt: commentObj.created_at,
                     resolved: commentObj.resolved_at !== null && commentObj.resolved_at !== undefined,
                     effort: null, // Default

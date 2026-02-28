@@ -275,12 +275,10 @@
 
             50% {
                 box-shadow: var(--pulse-shadow);
-                transform: scale(0.99);
             }
 
             100% {
                 box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-                transform: scale(1);
             }
         }
 
@@ -290,25 +288,38 @@
 
         .card-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
-        .author {
+        .author-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #EEE;
+            object-fit: cover;
+        }
+
+        .author-info {
+            flex: 1;
+        }
+
+        .author-name {
             font-size: 11px;
-            font-weight: 800;
-            color: var(--text-main);
+            font-weight: 600;
+            color: var(--text-muted);
         }
 
         .meta {
             font-size: 10px;
             color: var(--text-muted);
-            font-weight: 600;
+            opacity: 0.8;
         }
 
         .message {
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
             line-height: 1.5;
             color: var(--text-main);
             margin-bottom: 16px;
@@ -317,13 +328,13 @@
 
         .card-efforts {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             margin-bottom: 16px;
         }
 
-        .effort-pill {
+        .effort-chip {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
             font-size: 11px;
             font-weight: 800;
@@ -335,17 +346,17 @@
             color: var(--text-muted);
         }
 
-        .effort-pill:hover {
+        .effort-chip:hover {
             border-color: var(--accent-outline);
             background: #fff;
             color: var(--accent);
         }
 
-        .effort-pill.active {
+        .effort-chip.active {
             background: var(--accent);
             color: white;
             border-color: var(--accent);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
 
         .card-actions {
@@ -380,7 +391,6 @@
             color: white;
         }
 
-        /* Work Button Bounce (Pink Mode) */
         @keyframes work-pop {
             0% {
                 transform: scale(1);
@@ -419,10 +429,10 @@
             color: #2E7D32;
         }
 
-        /* --- THE CAT (Lowered & Leggy) --- */
+        /* --- THE CAT --- */
         #cat-container {
             position: fixed;
-            bottom: 65px;
+            bottom: 45px;
             width: 100%;
             height: 60px;
             pointer-events: none;
@@ -535,7 +545,7 @@
             gap: 10px;
         }
 
-        /* --- SETUP FLOW (Refined Layout) --- */
+        /* --- SETUP FLOW --- */
         .settings-overlay {
             position: fixed;
             top: 0;
@@ -544,7 +554,7 @@
             bottom: 0;
             background: white;
             z-index: 3000;
-            padding: 24px 24px;
+            padding: 40px 32px;
             display: none;
             overflow-y: auto;
         }
@@ -555,13 +565,26 @@
         }
 
         .setup-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 800;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .setup-card {
+            background: #FAFAFA;
+            padding: 24px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .setup-item {
             margin-bottom: 24px;
         }
 
-        .setup-top-inputs {
-            margin-bottom: 24px;
+        .setup-item:last-child {
+            margin-bottom: 0;
         }
 
         .setup-label {
@@ -571,6 +594,7 @@
             margin-bottom: 8px;
             text-transform: uppercase;
             display: block;
+            letter-spacing: 0.05em;
         }
 
         .setup-input {
@@ -579,41 +603,54 @@
             border: 1.5px solid var(--border);
             border-radius: 12px;
             font-size: 14px;
+            font-family: inherit;
             box-sizing: border-box;
-            margin-bottom: 16px;
         }
 
         .setup-input:focus {
             border-color: var(--accent);
             outline: none;
+            background: white;
         }
 
         .setup-instructions {
             margin-top: auto;
-            padding-top: 24px;
+            padding-top: 32px;
             border-top: 2px dashed var(--border);
+            opacity: 0.8;
         }
 
         .setup-step {
-            margin-bottom: 16px;
+            position: relative;
+            padding-left: 36px;
+            margin-bottom: 20px;
         }
 
         .step-num {
-            font-size: 9px;
-            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
             background: var(--border);
             color: var(--text-muted);
-            padding: 3px 6px;
-            border-radius: 4px;
-            margin-bottom: 6px;
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 900;
         }
 
         .step-text {
             font-size: 13px;
             font-weight: 600;
-            color: var(--text-main);
             line-height: 1.4;
+            color: var(--text-muted);
+        }
+
+        .step-text b {
+            color: var(--text-main);
         }
     </style>
 </head>
@@ -693,8 +730,8 @@
         <div id="the-cat" class="cat" onclick="catMeow()">
             <svg class="cat-svg" viewBox="0 0 600 400">
                 <g class="cat-legs">
-                    <path d="M225,260v95" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
-                    <path d="M340,260v95" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                    <path d="M225,260v105" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                    <path d="M340,260v105" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
                 </g>
                 <g class="cat-body">
                     <path class="cat-tail" d="M208,240s-35.8-1.5-46-42c-5.5-25.3-9.2-40.5-32-48"
@@ -727,28 +764,33 @@
     <div id="settingsView" class="settings-overlay">
         <div class="setup-title">Setup FigNotes</div>
 
-        <div class="setup-top-inputs">
-            <span class="setup-label">Personal Access Token</span>
-            <input type="password" id="patInput" class="setup-input" placeholder="Paste Token here...">
+        <div class="setup-card">
+            <div class="setup-item">
+                <span class="setup-label">Personal Access Token</span>
+                <input type="password" id="patInput" class="setup-input" placeholder="Enter Token...">
+            </div>
 
-            <span class="setup-label">Figma Link</span>
-            <input type="text" id="urlInput" class="setup-input" placeholder="Paste File URL here...">
+            <div class="setup-item">
+                <span class="setup-label">Figma Link</span>
+                <input type="text" id="urlInput" class="setup-input" placeholder="Paste Figma URL...">
+            </div>
 
-            <button class="btn-sync" onclick="saveSettings()">Save & Get Started</button>
-            <div style="text-align:center; cursor:pointer; font-size:12px; font-weight:700; color:var(--text-muted); padding: 12px;"
+            <button class="btn-sync" onclick="saveSettings()" style="margin-top: 16px;">Save & Get Started</button>
+            <div style="text-align:center; cursor:pointer; font-size:12px; font-weight:700; color:var(--text-muted); padding: 12px; margin-top: 8px;"
                 onclick="toggleSettings(false)">Cancel</div>
         </div>
 
         <div class="setup-instructions">
             <div class="setup-step">
-                <span class="step-num">STEP 1</span>
+                <span class="step-num">1</span>
                 <div class="step-text">Go to <b>Figma Settings > Account</b> and generate a new <b>Personal access
                         token</b>.</div>
             </div>
 
             <div class="setup-step">
-                <span class="step-num">STEP 2</span>
-                <div class="step-text">Copy the URL of your current Figma file from the browser search bar.</div>
+                <span class="step-num">2</span>
+                <div class="step-text">Copy the URL of your current Figma file from your <b>browser search bar</b>.
+                </div>
             </div>
         </div>
     </div>
@@ -814,8 +856,8 @@
                 document.getElementById('content').innerHTML = `
                     <div style="padding:150px 40px; text-align:center;">
                         <div style="font-size:48px; margin-bottom:20px;">☕</div>
-                        <h2 style="font-weight:800; margin-bottom:12px;">Let's Get Started</h2>
-                        <p style="color:#888; font-size:14px; line-height:1.6; margin-bottom:28px;">Connect FigNotes to your file to start tracking your progress.</p>
+                        <h2 style="font-weight:800; margin-bottom:12px;">Welcome to FigNotes</h2>
+                        <p style="color:#888; font-size:14px; line-height:1.6; margin-bottom:28px;">The modern way to track your design comments and tasks.</p>
                         <button class="btn-sync" onclick="toggleSettings(true)" style="width:auto; padding:14px 32px;">Connect Account</button>
                     </div>`;
                 return;
@@ -855,14 +897,21 @@
         }
 
         function renderCard(t) {
+            const avatar = t.authorAvatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.author)}&background=random`;
             return `<div class="task-card ${t.resolved ? 'resolved' : ''}" id="card-${t.commentId}" onclick="triggerPulse('${t.commentId}')">
-                <div class="card-header"><b>${t.author}</b> <span class="meta">${t.page}/${t.frame}</span></div>
+                <div class="card-header" onclick="event.stopPropagation(); locate('${t.commentId}')">
+                    <img src="${avatar}" class="author-avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(t.author)}'"/>
+                    <div class="author-info">
+                        <div class="author-name">${t.author}</div>
+                        <div class="meta">${t.page}/${t.frame}</div>
+                    </div>
+                </div>
                 <div class="message">${t.message}</div>
                 ${!t.resolved ? `
                     <div class="card-efforts" onclick="event.stopPropagation()">
-                        <div class="effort-pill ${t.effort === 'Small' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Small')">S</div>
-                        <div class="effort-pill ${t.effort === 'Medium' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Medium')">M</div>
-                        <div class="effort-pill ${t.effort === 'Large' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Large')">L</div>
+                        <div class="effort-chip ${t.effort === 'Small' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Small')">Small</div>
+                        <div class="effort-chip ${t.effort === 'Medium' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Medium')">Medium</div>
+                        <div class="effort-chip ${t.effort === 'Large' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Large')">Large</div>
                     </div>
                     <div class="card-actions" onclick="event.stopPropagation()">
                         <button id="work-${t.commentId}" class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">

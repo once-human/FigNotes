@@ -7,6 +7,7 @@ export interface Task {
     frameId: string | null;
     pageId: string | null;
     author: string;
+    authorAvatarUrl: string | null;
     createdAt: string;
     resolved: boolean;
     effort: EffortSize | null;
