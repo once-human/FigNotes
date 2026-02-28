@@ -1,5 +1,5 @@
 {
-  "name": "fig-notes",
+  "name": "fignotes",
   "version": "1.0.0",
   "description": "Figma comment execution dashboard",
   "main": "code.js",
