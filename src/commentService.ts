@@ -1,18 +1,24 @@
 import { Task } from "./types";
 
 export class CommentService {
-    static async parseRestComments(rawComments: any[]): Promise<Task[]> {
+    static async parseRestComments(rawComments: any[], currentUserHandle: string | null): Promise<Task[]> {
         try {
             const tasks: Task[] = [];
-            const now = new Date().toISOString();
 
             for (const commentObj of rawComments) {
                 let nodeId = commentObj.client_meta?.node_id || null;
-                // Normalize nodeId: Figma URLs use hyphen, API uses colon
                 if (nodeId) nodeId = nodeId.replace('-', ':');
 
                 const pageNode = this.findPageNode(nodeId);
                 const frameNode = this.findFrameNode(nodeId);
+
+                const message = commentObj.message || "";
+                let assignee = null;
+
+                // Automatic Assignment: If comment text contains @username
+                if (currentUserHandle && message.includes(`@${currentUserHandle}`)) {
+                    assignee = currentUserHandle;
+                }
 
                 tasks.push({
                     commentId: commentObj.id,
@@ -22,15 +28,11 @@ export class CommentService {
                     author: commentObj.user?.handle || "Unknown",
                     createdAt: commentObj.created_at,
                     resolved: commentObj.resolved_at !== null && commentObj.resolved_at !== undefined,
-                    internalStatus: commentObj.resolved_at ? "Done" : "In Progress",
                     timeEstimateMinutes: 15, // Default
-                    assignee: null,
-                    priority: "Medium",
-                    message: commentObj.message,
+                    assignee: assignee,
+                    message: message,
                     page: pageNode?.name || "Global",
-                    frame: frameNode?.name || "Canvas",
-                    lastUpdatedAt: now,
-                    ageInDays: 0
+                    frame: frameNode?.name || "Canvas"
                 });
             }
 

@@ -2,18 +2,14 @@ import { SyncService } from "./syncService";
 import { StorageService } from "./storageService";
 import { PluginMessage, Task } from "./types";
 
-/**
- * FigNotes: Design Review Command Center
- */
-
-figma.showUI(__html__, { width: 480, height: 840, themeColors: true });
+figma.showUI(__html__, { width: 440, height: 700, themeColors: true });
 
 async function broadcastState(rawComments?: any[]) {
     try {
-        const aiInsights = await figma.clientStorage.getAsync("ai_insights");
+        const currentUserHandle = figma.currentUser?.name || "User";
         const result = rawComments
-            ? await SyncService.sync(rawComments, aiInsights)
-            : await SyncService.getState(aiInsights);
+            ? await SyncService.sync(rawComments, currentUserHandle)
+            : await SyncService.getState(currentUserHandle);
         figma.ui.postMessage({ type: "sync-complete", payload: result });
     } catch (err: any) {
         figma.ui.postMessage({ type: "sync-error", payload: err.message });
@@ -35,7 +31,6 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 const task = tasks[id];
                 if (task) {
                     (task as any)[key] = value;
-                    if (key === 'internalStatus' && value === 'Done') task.resolved = true;
                     await StorageService.updateTask(task);
                     await broadcastState();
                 }
@@ -56,31 +51,30 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 break;
             }
 
-            case "focus-mode":
-                const state = await SyncService.getState();
-                const focusTask = SyncService.getFocusTask(state.tasks, null);
+            case "focus-mode": {
+                const currentUserHandle = figma.currentUser?.name || "User";
+                const state = await SyncService.getState(currentUserHandle);
+                const focusTask = SyncService.getFocusTask(state.tasks, currentUserHandle);
                 if (focusTask) {
                     figma.ui.postMessage({ type: "focus-task-found", payload: focusTask });
                 } else {
-                    figma.notify("No actionable focus tasks found.");
+                    figma.notify("No pending tasks found.");
                 }
                 break;
+            }
 
             case "save-settings":
                 await figma.clientStorage.setAsync("figma_pat", msg.payload.pat);
                 await figma.clientStorage.setAsync("figma_file_url", msg.payload.fileUrl);
-                await figma.clientStorage.setAsync("groq_api_key", msg.payload.groq);
-                await figma.clientStorage.setAsync("ai_enabled", msg.payload.aiEnabled);
                 figma.notify("Settings saved.");
                 break;
 
-            case "get-settings":
+            case "get-settings": {
                 const pat = await figma.clientStorage.getAsync("figma_pat");
                 const url = await figma.clientStorage.getAsync("figma_file_url");
-                const groq = await figma.clientStorage.getAsync("groq_api_key");
-                const ai = await figma.clientStorage.getAsync("ai_enabled");
-                figma.ui.postMessage({ type: "settings-loaded", payload: { pat, fileUrl: url, groq, aiEnabled: ai } });
+                figma.ui.postMessage({ type: "settings-loaded", payload: { pat, fileUrl: url } });
                 break;
+            }
 
             case "locate-node": {
                 if (!msg.payload) return;
@@ -101,34 +95,14 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 break;
             }
 
-            case "update-ai-insights":
-                if (!msg.payload) return;
-                await figma.clientStorage.setAsync("ai_insights", msg.payload);
-                await broadcastState();
-                break;
-
-            case "export":
-                const { format, data } = msg.payload;
-                let content = "";
-                if (format === 'csv') {
-                    content = "ID,Message,Author,Status,Priority,Estimate,Page,Frame\n";
-                    data.tasks.forEach((t: any) => {
-                        content += `${t.commentId},"${t.message.replace(/"/g, '""')}",${t.author},${t.internalStatus},${t.priority},${t.timeEstimateMinutes},${t.page},${t.frame}\n`;
-                    });
-                } else {
-                    content = `# Design Review Executive Summary\n\n${data.weeklySummary}\n\n`;
-                    data.tasks.forEach((t: any) => {
-                        content += `### [${t.internalStatus}] ${t.message.substring(0, 50)}...\n`;
-                        content += `- **Priority**: ${t.priority} | **Time**: ${t.timeEstimateMinutes}m | **Assigned**: ${t.assignee || 'Unassigned'}\n`;
-                        content += `- **Location**: ${t.page} / ${t.frame}\n\n`;
-                    });
-                }
-                figma.ui.postMessage({ type: "export-data", payload: { format, content } });
+            case "init":
+                const pat = await figma.clientStorage.getAsync("figma_pat");
+                const fileUrl = await figma.clientStorage.getAsync("figma_file_url");
+                figma.ui.postMessage({ type: "settings-loaded", payload: { pat, fileUrl } });
                 break;
         }
     } catch (err: any) {
-        figma.notify("Runtime Error: " + err.message, { error: true });
+        console.error("[FigNotes] Plugin error:", err);
+        figma.notify(err.message, { error: true });
     }
 };
-
-figma.ui.postMessage({ type: "init", payload: { fileKey: figma.fileKey } });

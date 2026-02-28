@@ -3,991 +3,556 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>FigNotes Command Center</title>
+    <title>FigNotes</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #FFFFFF;
-            --surface: #FFFFFF;
-            --surface-hover: #F2F2F7;
-            --border: #E5E5EA;
-            --text-main: #000000;
-            --text-muted: #8E8E93;
-            --accent: #339933;
-            --accent-soft: #F0F9F0;
-            --critical: #FF3B30;
-            --warning: #FF9500;
-            --success: #34C759;
-            --shadow: none;
-            --radius: 8px;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --border: #E6E6E6;
+            --accent: #18A0FB;
+            /* Figma Blue */
+            --accent-bg: #E1F5FE;
+            --danger: #F24822;
+            --radius: 6px;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text-main);
             margin: 0;
             padding: 0;
-            user-select: none;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 100vh;
+            overflow: hidden;
         }
 
-        /* --- Header & Navigation --- */
+        /* --- Header & Summary --- */
         .header {
-            padding: 12px 16px;
+            padding: 16px;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .summary-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .nav-tabs {
-            display: flex;
-            gap: 16px;
-            padding: 0 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .tab {
-            padding: 12px 0;
+        .metrics-text {
             font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .tab.active {
-            color: var(--text-main);
-            border-bottom-color: var(--text-main);
-        }
-
-        /* --- Global Filters --- */
-        .filters {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-            background: var(--bg);
-        }
-
-        .filter-btn {
-            padding: 4px 10px;
-            font-size: 12px;
             font-weight: 500;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            cursor: pointer;
             color: var(--text-muted);
         }
 
-        .filter-btn.active {
-            background: var(--accent-soft);
-            color: var(--accent);
-            border-color: var(--accent);
+        .settings-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
         }
 
-        .search-input {
-            margin-left: auto;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
+        .settings-icon:hover {
+            opacity: 1;
+        }
+
+        /* --- Filter Bar --- */
+        .filters {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 16px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-chip {
             padding: 4px 10px;
-            font-size: 12px;
-            outline: none;
-            width: 140px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 100px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            background: transparent;
+            transition: all 0.15s;
         }
 
-        /* --- Content Area --- */
+        .filter-chip.active {
+            background: var(--text-main);
+            color: white;
+            border-color: var(--text-main);
+        }
+
+        .toggle-label {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        /* --- Viewport --- */
         .viewport {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 80px;
+            padding: 8px 0 100px;
         }
 
-        .view-section {
-            display: none;
+        /* --- Grouping --- */
+        .page-group {
+            margin-bottom: 24px;
         }
 
-        .view-section.active {
-            display: block;
-        }
-
-        /* --- Grouping & Hierarchy --- */
-        .group-header {
-            padding: 16px 16px 8px;
+        .page-title {
+            padding: 8px 16px;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.03em;
             color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
+            background: #FAFAFA;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
 
         .frame-group {
-            border-bottom: 1px solid var(--border);
-        }
-
-        .frame-summary {
-            padding: 12px 16px;
+            padding: 12px 16px 4px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            background: var(--surface-hover);
         }
 
         .frame-name {
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
         }
 
-        .frame-stats {
+        .frame-meta {
             font-size: 11px;
             color: var(--text-muted);
-            margin-left: auto;
         }
 
-        /* --- Task Cards --- */
+        /* --- Task Card --- */
         .task-card {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
+            margin: 4px 16px 12px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: white;
             cursor: pointer;
-            background: var(--bg);
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
 
         .task-card:hover {
-            background: var(--surface-hover);
+            border-color: #B3B3B3;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .task-card.resolved {
+            opacity: 0.5;
+            background: #FAFAFA;
         }
 
         .task-card.active {
-            border-left: 4px solid var(--accent);
-            padding-left: 12px;
-            background: var(--accent-soft);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-bg);
         }
 
-        .duplicate-group {
-            border-bottom: 2px dashed var(--accent-soft) !important;
-            margin-bottom: 2px;
-        }
-
-        .task-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .badge {
+        .task-author {
             font-size: 10px;
             font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-
-        .badge-priority-critical {
-            background: #FEE2E2;
-            color: #991B1B;
-        }
-
-        .badge-priority-high {
-            background: #FFEDD5;
-            color: #9A3412;
-        }
-
-        .badge-priority-medium {
-            background: #EFF6FF;
-            color: #1E40AF;
-        }
-
-        .badge-priority-low {
-            background: #F3F4F6;
-            color: #374151;
+            color: var(--text-muted);
+            margin-bottom: 4px;
         }
 
         .task-message {
             font-size: 13px;
             line-height: 1.5;
             color: var(--text-main);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            word-break: break-word;
         }
 
         .task-footer {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .assignee-chip {
-            background: var(--border);
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: 500;
-        }
-
-        /* --- Controls & Inputs --- */
-        .control-group {
-            display: flex;
             gap: 8px;
-            margin-top: 8px;
-            overflow-x: auto;
-            padding-bottom: 4px;
         }
 
-        select {
+        /* --- Time Estimate UI --- */
+        .time-selector {
+            display: flex;
+            gap: 4px;
+        }
+
+        .time-btn {
+            padding: 3px 6px;
+            font-size: 10px;
+            font-weight: 600;
             border: 1px solid var(--border);
-            background: transparent;
-            font-size: 11px;
-            color: var(--text-muted);
-            outline: none;
+            background: white;
             border-radius: 4px;
-            padding: 2px 4px;
+            color: var(--text-muted);
+            cursor: pointer;
         }
 
-        /* --- Footer --- */
+        .time-btn:hover {
+            border-color: #B3B3B3;
+        }
+
+        .time-btn.active {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .time-input {
+            width: 32px;
+            padding: 2px 4px;
+            font-size: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .assignee-select {
+            margin-left: auto;
+            padding: 2px 4px;
+            font-size: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: white;
+            color: var(--text-muted);
+            max-width: 80px;
+        }
+
+        /* --- Global Footer --- */
         .footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 12px 16px;
-            background: var(--bg);
+            padding: 16px;
+            background: white;
             border-top: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 12px;
+            z-index: 100;
         }
 
         .btn-primary {
+            flex: 1;
+            padding: 10px;
             background: var(--text-main);
             color: white;
             border: none;
-            padding: 6px 12px;
             border-radius: var(--radius);
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            padding: 10px 16px;
+            background: white;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
         }
 
-        .btn-focus {
-            background: #F2F2F7;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        .btn-primary:hover {
+            opacity: 0.9;
         }
 
-        .btn-focus:hover {
-            background: #E5E5EA;
+        .btn-secondary:hover {
+            background: #F5F5F5;
         }
 
-        /* --- Animations --- */
-        @keyframes pulse {
-            0% {
-                opacity: 0.6;
-            }
-
-            50% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.6;
-            }
-        }
-
-        .tab,
-        .btn-primary,
-        .filter-btn,
-        .task-card {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* --- Phase 2: Spatial Intelligence --- */
-        .ship-header {
-            padding: 16px;
-            background: var(--surface);
-            border-bottom: 4px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .ship-badge {
-            font-size: 14px;
-            font-weight: 800;
-            padding: 6px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-        }
-
-        .ship-ready {
-            background: #DCFCE7;
-            color: #166534;
-        }
-
-        .ship-cleanup {
-            background: #FEF9C3;
-            color: #854D0E;
-        }
-
-        .ship-risk {
-            background: #FEE2E2;
-            color: #991B1B;
-        }
-
-        .frame-card {
-            margin: 12px 16px;
-            padding: 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .frame-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .intensity-bar {
-            height: 4px;
-            width: 100%;
-            background: #E5E7EB;
-            border-radius: 2px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
-
-        .intensity-fill {
-            height: 100%;
-            transition: width 0.3s;
-        }
-
-        .bulk-bar {
-            position: fixed;
-            bottom: 60px;
-            left: 16px;
-            right: 16px;
-            background: var(--text-main);
-            color: white;
-            padding: 12px;
-            border-radius: 12px;
+        /* --- Settings View --- */
+        .settings-view {
+            padding: 24px;
             display: none;
-            align-items: center;
-            gap: 12px;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .bulk-bar.active {
-            display: flex;
+        .settings-view.active {
+            display: block;
         }
 
-        .checkbox-overlay {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border);
-            border-radius: 4px;
-            margin-right: 12px;
-            cursor: pointer;
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 13px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            outline: none;
         }
 
-        .checkbox-overlay.checked {
-            background: var(--accent);
+        input:focus {
             border-color: var(--accent);
+        }
+
+        .config-help {
+            margin-top: 24px;
+            padding: 16px;
+            background: #F9F9F9;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .config-help a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="header">
-        <div style="font-weight: 800; font-size: 16px;">FigNotes <span
-                style="font-weight: 400; color: var(--text-muted);">Command Center</span></div>
-        <div id="fileMetrics" style="font-size: 11px; font-weight: 600; color: var(--text-muted);">0min • File Workload
-        </div>
-        <div class="btn-icon" onclick="toggleSettings()" style="cursor: pointer;">⚙️</div>
-    </div>
-
-    <div class="nav-tabs">
-        <div class="tab active" onclick="switchTab('workboard')">Workboard</div>
-        <div class="tab" onclick="switchTab('map')">Map View</div>
-        <div class="tab" onclick="switchTab('insights')">Insights</div>
-    </div>
-
-    <div id="settingsView" class="view-section content" style="padding: 24px;">
-        <!-- REST API Settings -->
-        <h3 style="margin-top:0;">Configuration</h3>
-        <p style="font-size:12px; color:var(--text-muted);">Figma PAT & File URL required for REST syncing.</p>
-        <div style="display:flex; flex-direction:column; gap:16px;">
-            <input type="password" id="patInput" placeholder="Personal Access Token"
-                style="padding:8px; border:1px solid var(--border); border-radius:4px;">
-            <div style="font-size:11px; color:var(--text-muted); margin-top: 8px;">
-                Groq AI Configuration
-            </div>
-            <input type="password" id="groqInput" placeholder="Groq API Key"
-                style="padding:8px; border:1px solid var(--border); border-radius:4px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <input type="checkbox" id="aiEnabledToggle">
-                <label for="aiEnabledToggle" style="font-size:12px;">Enable AI Intelligence Layer</label>
-            </div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top: 8px;">
-                Figma File Configuration
-            </div>
-            <input type="text" id="urlInput" placeholder="Figma File URL"
-                style="padding:8px; border:1px solid var(--border); border-radius:4px;">
-            <button class="btn-primary" onclick="saveSettings()" style="background:var(--accent);">Save & Sync</button>
-
-            <div
-                style="margin-top:24px; padding:16px; background:var(--surface-hover); border-radius:8px; border:1px solid var(--border);">
-                <div style="font-size:12px; font-weight:700; margin-bottom:8px;">How to configure FigNotes:</div>
-                <ul
-                    style="font-size:11px; color:var(--text-muted); padding-left:16px; margin:0; display:flex; flex-direction:column; gap:8px;">
-                    <li><strong>Figma PAT:</strong> Go to <a href="https://www.figma.com/settings/developers"
-                            target="_blank" style="color:var(--accent);">Figma Settings</a> -> Personal Access Tokens ->
-                        Generate new token.</li>
-                    <li><strong>Groq API Key:</strong> Get your free key at <a href="https://console.groq.com/keys"
-                            target="_blank" style="color:var(--accent);">Groq Console</a>.</li>
-                    <li><strong>Figma File URL:</strong> Copy the full URL from your browser address bar or use Share ->
-                        Copy Link.</li>
-                </ul>
+    <!-- Main View -->
+    <div id="mainView">
+        <div class="header">
+            <div class="summary-bar">
+                <div id="metricsHeader" class="metrics-text">Loading insights...</div>
+                <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
             </div>
         </div>
-    </div>
 
-    <div id="mainView" class="view-section active">
-        <!-- Combinatorial Filters -->
         <div class="filters">
-            <input type="checkbox" id="selectAll" onclick="toggleSelectAll()" style="margin-right: 8px;">
-            <button class="filter-btn" id="filterAssigned" onclick="toggleFilter('assignedToMe')">Assigned to
-                me</button>
-            <select class="filter-btn" id="filterStatus" onchange="updateFilters()" style="padding: 2px 6px;">
-                <option value="">All Statuses</option>
-                <option value="Critical">Critical</option>
-                <option value="Needs Review">Review</option>
-                <option value="In Progress">Active</option>
-                <option value="Blocked">Blocked</option>
-                <option value="Approved">Approved</option>
-                <option value="Done">Done</option>
-            </select>
-            <select class="filter-btn" id="filterPriority" onchange="updateFilters()" style="padding: 2px 6px;">
-                <option value="">All Priorities</option>
-                <option value="Critical">Critical</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-            </select>
-            <select class="filter-btn" id="filterCategory" onchange="updateFilters()" style="padding: 2px 6px;">
-                <option value="">All Categories</option>
-                <option value="Copy">Copy</option>
-                <option value="Layout">Layout</option>
-                <option value="Alignment">Alignment</option>
-                <option value="Branding">Branding</option>
-                <option value="Dev Clarification">Dev</option>
-                <option value="Content Missing">Missing</option>
-                <option value="Other">Other</option>
-            </select>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..."
-                oninput="updateFilters()">
+            <div class="filter-chip active" id="filterAll" onclick="setTabFilter('all')">All</div>
+            <div class="filter-chip" id="filterMe" onclick="setTabFilter('me')">Assigned to Me</div>
+            <div class="filter-chip" id="filterUnassigned" onclick="setTabFilter('unassigned')">Unassigned</div>
+            <label class="toggle-label">
+                <input type="checkbox" id="showResolvedToggle" onchange="render()">
+                Show Resolved
+            </label>
         </div>
 
         <div class="viewport" id="workboardContent">
             <!-- Rendered dynamically -->
         </div>
 
-        <!-- Bulk Action Bar -->
-        <div id="bulkBar" class="bulk-bar">
-            <span id="bulkCount" style="font-weight: 700;">0 selected</span>
-            <select onchange="bulkUpdate('internalStatus', this.value)"
-                style="background: white; color: black; padding: 2px;">
-                <option value="">Move status...</option>
-                <option value="In Progress">Active</option>
-                <option value="Approved">Approved</option>
-                <option value="Done">Done</option>
-            </select>
-            <button class="btn-primary" style="padding: 4px 8px;" onclick="clearSelection()">Cancel</button>
+        <div class="footer">
+            <button class="btn-secondary" onclick="triggerSync()">Sync</button>
+            <button class="btn-primary" onclick="startWorking()">Start Working</button>
         </div>
     </div>
 
-    <!-- Map View Overlay -->
-    <div id="mapView" class="view-section">
-        <div id="shipReadiness" class="ship-header">
-            <!-- Rendered dynamically -->
-        </div>
-        <div class="viewport" id="mapContent" style="background: var(--surface-hover);">
-            <!-- Rendered dynamically -->
-        </div>
-    </div>
+    <!-- Settings View -->
+    <div id="settingsView" class="settings-view">
+        <h2 style="font-size:18px; margin-bottom:8px;">Configuration</h2>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">Setup Figma access tokens for
+            synchronization.</p>
 
-    <div class="footer">
-        <div style="display:flex; gap:8px;">
-            <button class="btn-primary" onclick="triggerSync()" style="background:var(--accent);">Sync</button>
-            <button class="btn-primary btn-focus" onclick="triggerFocus()">Focus Mode</button>
+        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Personal
+            Access Token</label>
+        <input type="password" id="patInput" placeholder="figp_...">
+
+        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Figma File
+            URL</label>
+        <input type="text" id="urlInput" placeholder="https://www.figma.com/design/...">
+
+        <button class="btn-primary" onclick="saveSettings()">Save Configuration</button>
+        <button class="btn-secondary" onclick="toggleSettings()" style="width:100%; margin-top:8px;">Back to
+            Workboard</button>
+
+        <div class="config-help">
+            <strong>How to configure:</strong><br>
+            • Figma PAT: Generate in <a href="https://www.figma.com/settings/developers" target="_blank">Figma
+                Settings</a>.<br>
+            • File URL: Copy from browser address bar or Share -> Copy Link.
         </div>
-        <div id="userMetrics" style="font-size: 11px; font-weight: 600; color: var(--text-muted); padding-right: 4px;">
-            0min assigned</div>
     </div>
 
     <script>
-        let config = { pat: '', fileUrl: '', groq: '', aiEnabled: false };
         let latestData = null;
-        let filters = {
-            assignedToMe: false,
-            status: null,
-            priority: null,
-            category: null,
-            search: ''
-        };
-        let selectedTasks = new Set();
-        let activeTab = 'workboard';
+        let config = { pat: '', fileUrl: '' };
+        let currentFilter = 'all'; // all, me, unassigned
+        let activeTaskId = null;
 
-        // --- Core Logic ---
+        // --- Communication ---
         window.onmessage = (event) => {
             const { type, payload } = event.data.pluginMessage;
-            if (type === 'init') {
-                parent.postMessage({ pluginMessage: { type: 'get-settings' } }, '*');
-            } else if (type === 'settings-loaded') {
+            if (type === 'settings-loaded') {
                 config = payload;
                 document.getElementById('patInput').value = config.pat || '';
-                document.getElementById('groqInput').value = config.groq || '';
-                document.getElementById('aiEnabledToggle').checked = config.aiEnabled || false;
                 document.getElementById('urlInput').value = config.fileUrl || '';
-
                 if (config.pat && config.fileUrl) triggerSync();
-                else switchTab('settings');
+                else toggleSettings(true);
             } else if (type === 'sync-complete') {
                 latestData = payload;
                 render();
             } else if (type === 'focus-task-found') {
-                locateNode(payload.nodeId);
+                activeTaskId = payload.commentId;
+                render();
             }
         };
 
-        function switchTab(tab) {
-            activeTab = tab;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        // Initialize
+        parent.postMessage({ pluginMessage: { type: 'init' } }, '*');
 
-            if (tab === 'settings') {
-                document.getElementById('settingsView').classList.add('active');
-                document.getElementById('mainView').classList.remove('active');
-                document.getElementById('mapView').classList.remove('active');
-            } else if (tab === 'map') {
-                document.getElementById('mapView').classList.add('active');
-                document.getElementById('mainView').classList.remove('active');
-                document.getElementById('settingsView').classList.remove('active');
-            } else if (tab === 'insights') {
-                document.getElementById('mainView').classList.add('active');
-                document.getElementById('mapView').classList.remove('active');
-                document.getElementById('settingsView').classList.remove('active');
-                document.querySelector('.filters').style.display = 'none';
-                renderInsights();
+        // --- Core Functions ---
+        function toggleSettings(forceActive = false) {
+            const sv = document.getElementById('settingsView');
+            const mv = document.getElementById('mainView');
+            if (forceActive || sv.style.display === 'none') {
+                sv.style.display = 'block';
+                mv.style.display = 'none';
             } else {
-                document.getElementById('mainView').classList.add('active');
-                document.getElementById('mapView').classList.remove('active');
-                document.getElementById('settingsView').classList.remove('active');
-                document.querySelector('.filters').style.display = 'flex';
+                sv.style.display = 'none';
+                mv.style.display = 'block';
             }
-            const tabEl = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase().includes(tab));
-            if (tabEl) tabEl.classList.add('active');
-            render();
-        }
-
-        function toggleSettings() {
-            switchTab(activeTab === 'settings' ? 'workboard' : 'settings');
         }
 
         function saveSettings() {
             config.pat = document.getElementById('patInput').value;
             config.fileUrl = document.getElementById('urlInput').value;
-            config.groq = document.getElementById('groqInput').value;
-            config.aiEnabled = document.getElementById('aiEnabledToggle').checked;
             parent.postMessage({ pluginMessage: { type: 'save-settings', payload: config } }, '*');
+            toggleSettings(false);
             triggerSync();
-            switchTab('workboard');
         }
 
         async function triggerSync() {
             if (!config.pat || !config.fileUrl) return;
-
             const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (!match) return alert("Invalid or missing Figma URL in settings.");
-            const fileKey = match;
+            if (!match) return alert("Invalid Figma URL.");
 
-            document.getElementById('workboardContent').innerHTML = '<div style="padding:20px; text-align:center; font-size:12px; color:var(--text-muted); animation: pulse 2s infinite;">Syncing with Figma...</div>';
+            document.getElementById('workboardContent').innerHTML = '<div style="padding:40px; text-align:center; font-size:13px; color:var(--text-muted);">Syncing comments...</div>';
 
             try {
-                const resp = await fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, {
+                const resp = await fetch(`https://api.figma.com/v1/files/${match}/comments`, {
                     headers: { 'X-Figma-Token': config.pat }
                 });
                 const data = await resp.json();
-                if (data.status === 403) throw new Error("PAT invalid or no access.");
                 parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*');
-
-                // Trigger AI Intelligence
-                if (config.aiEnabled && config.groq) {
-                    processAIIntelligence(data.comments);
-                }
             } catch (e) {
-                alert("Sync failed: " + e.message);
-                switchTab('settings');
+                alert("Sync failed. Check PAT/URL.");
             }
         }
 
-        function updateFilters() {
-            filters.search = document.getElementById('searchInput').value.toLowerCase();
-            filters.status = document.getElementById('filterStatus').value;
-            filters.priority = document.getElementById('filterPriority').value;
-            filters.category = document.getElementById('filterCategory').value;
+        function setTabFilter(f) {
+            currentFilter = f;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1)).classList.add('active');
             render();
-        }
-
-        function toggleFilter(key) {
-            filters[key] = !filters[key];
-            document.getElementById('filterAssigned').classList.toggle('active', filters.assignedToMe);
-            render();
-        }
-
-        // --- Render Logic ---
-        function render() {
-            if (!latestData) return;
-
-            // Update Global Metrics
-            document.getElementById('fileMetrics').innerText = `${latestData.fileMetrics.totalTime}min • File Workload`;
-            document.getElementById('userMetrics').innerText = `${latestData.fileMetrics.userTime}min assigned`;
-
-            if (activeTab === 'workboard') renderWorkboard();
-            else if (activeTab === 'map') renderMapView();
-            else if (activeTab === 'insights') renderInsights();
-
-            updateBulkBar();
-        }
-
-        function renderWorkboard() {
-            const content = document.getElementById('workboardContent');
-            const tasks = latestData.tasks.filter(t => applyFilters(t));
-
-            if (tasks.length === 0) {
-                content.innerHTML = '<div style="padding:40px; text-align:center; font-size:12px; color:var(--text-muted);">No tasks match your filters.</div>';
-                return;
-            }
-
-            // Grouping: Page -> Frame
-            const groups = {};
-            tasks.forEach(t => {
-                const key = `${t.page} / ${t.frame}`;
-                if (!groups[key]) groups[key] = [];
-                groups[key].push(t);
-            });
-
-            content.innerHTML = Object.entries(groups).map(([groupName, groupTasks]) => {
-                const frameMetrics = latestData.metrics.find(m => m.flowName === groupName);
-                return `
-                <div class="frame-group">
-                    <div class="group-header">
-                        <span>${groupName}</span>
-                        <span>${frameMetrics ? frameMetrics.totalTimeEstimate : 0}m</span>
-                    </div>
-                    ${groupTasks.map(t => renderTaskCard(t)).join('')}
-                </div>
-            `;
-            }).join('');
-        }
-
-        function renderTaskCard(t) {
-            const presets = [5, 15, 30, 60, 120, 240];
-            const isSelected = selectedTasks.has(t.commentId);
-            const priority = t.priority || "Medium";
-            const status = t.internalStatus || "In Progress";
-            const author = t.author || "Unknown";
-            const message = t.message || "...";
-            const category = t.aiCategory || "";
-            const isDuplicate = !!t.duplicateClusterId;
-
-            return `
-            <div class="task-card ${isSelected ? 'active' : ''} ${isDuplicate ? 'duplicate-group' : ''}" onclick="toggleSelection('${t.commentId}', event)">
-                <div class="task-meta">
-                    <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation()">
-                    <span class="badge badge-priority-${priority.toLowerCase()}">${priority}</span>
-                    <span style="font-size:11px; font-weight:500; color:var(--text-muted);">${status}</span>
-                    ${category ? `<span class="badge" style="background:#E5E7EB; color:#374151;">${category}</span>` : ''}
-                    <span style="font-size:11px; color:var(--text-muted); margin-left:auto;">${author}</span>
-                </div>
-                <div class="task-message" onclick="locateNode('${t.nodeId}'); event.stopPropagation();">
-                    ${isDuplicate ? `<span style="color:var(--accent); font-weight:700; font-size:10px; vertical-align:middle; margin-right:4px;">DUP</span>` : ''}
-                    ${message}
-                </div>
-                <div class="task-footer">
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <span style="font-size:10px;">Estimate:</span>
-                        <select onclick="event.stopPropagation()" onchange="updateTask('${t.commentId}', 'timeEstimateMinutes', parseInt(this.value))" style="width:50px;">
-                            ${presets.map(p => `<option value="${p}" ${t.timeEstimateMinutes === p ? 'selected' : ''}>${p}m</option>`).join('')}
-                            <option value="${t.timeEstimateMinutes}" ${!presets.includes(t.timeEstimateMinutes) ? 'selected' : ''} hidden>${t.timeEstimateMinutes}m</option>
-                        </select>
-                        <input type="number" value="${t.timeEstimateMinutes}" 
-                            onclick="event.stopPropagation()" 
-                            onchange="updateTask('${t.commentId}', 'timeEstimateMinutes', parseInt(this.value))" 
-                            style="width:30px; font-size:10px; border:1px solid var(--border); border-radius: 4px;"
-                            title="Custom minutes">
-                    </div>
-                    <span class="assignee-chip">${t.assignee || 'Unassigned'}</span>
-                    <div style="margin-left:auto; display:flex; gap:4px;">
-                        <select onclick="event.stopPropagation()" onchange="updateTask('${t.commentId}', 'internalStatus', this.value)">
-                            <option value="Critical" ${status === 'Critical' ? 'selected' : ''}>Critical</option>
-                            <option value="Needs Review" ${status === 'Needs Review' ? 'selected' : ''}>Review</option>
-                            <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>Active</option>
-                            <option value="Blocked" ${status === 'Blocked' ? 'selected' : ''}>Blocked</option>
-                            <option value="Approved" ${status === 'Approved' ? 'selected' : ''}>Approved</option>
-                            <option value="Done" ${status === 'Done' ? 'selected' : ''}>Done</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        `;
-        }
-
-        // --- Phase 2: Map View Rendering ---
-        function renderMapView() {
-            const shipEl = document.getElementById('shipReadiness');
-            const mapContent = document.getElementById('mapContent');
-            const metrics = latestData.fileMetrics;
-
-            const shipClass = metrics.shipReadiness === "Ready" ? "ship-ready" :
-                metrics.shipReadiness === "Needs Cleanup" ? "ship-cleanup" : "ship-risk";
-
-            shipEl.innerHTML = `
-                <div>
-                    <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Ship Readiness</div>
-                    <div class="ship-badge ${shipClass}">${metrics.shipReadiness}</div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:18px; font-weight:800;">${metrics.totalUnresolved}</div>
-                    <div style="font-size:10px; color:var(--text-muted);">UNRESOLVED CRITICALS: ${metrics.totalCritical}</div>
-                </div>
-            `;
-
-            mapContent.innerHTML = latestData.metrics.map(m => {
-                const healthColor = m.healthScore > 80 ? "var(--success)" : m.healthScore > 50 ? "var(--warning)" : "var(--critical)";
-                const intensityColor = `linear-gradient(90deg, #E5E7EB 0%, ${healthColor} ${m.intensity * 100}%)`;
-
-                return `
-                    <div class="frame-card" onclick="locateNode('${m.flowId}')">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
-                            <div>
-                                <div class="frame-name">${m.flowName}</div>
-                                <div style="font-size:11px; color:var(--text-muted);">${m.totalTasks} comments • ${m.totalTimeEstimate}m remaining</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div style="font-size:14px; font-weight:800; color:${healthColor}">${m.healthScore}%</div>
-                                <div style="font-size:9px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Health</div>
-                            </div>
-                        </div>
-                        <div style="font-size:10px; color:var(--text-muted); margin-bottom:4px;">Heatmap Density</div>
-                        <div class="intensity-bar">
-                            <div class="intensity-fill" style="width:${m.intensity * 100}%; background:${healthColor};"></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // --- Bulk Actions ---
-        function toggleSelection(id, event) {
-            if (selectedTasks.has(id)) selectedTasks.delete(id);
-            else selectedTasks.add(id);
-            render();
-        }
-
-        function toggleSelectAll() {
-            const allChecked = document.getElementById('selectAll').checked;
-            if (allChecked) {
-                latestData.tasks.filter(t => applyFilters(t)).forEach(t => selectedTasks.add(t.commentId));
-            } else {
-                selectedTasks.clear();
-            }
-            render();
-        }
-
-        function updateBulkBar() {
-            const bar = document.getElementById('bulkBar');
-            const count = document.getElementById('bulkCount');
-            if (selectedTasks.size > 0) {
-                bar.classList.add('active');
-                count.innerText = `${selectedTasks.size} selected`;
-            } else {
-                bar.classList.remove('active');
-            }
-        }
-
-        function clearSelection() {
-            selectedTasks.clear();
-            document.getElementById('selectAll').checked = false;
-            render();
-        }
-
-        function bulkUpdate(key, value) {
-            if (!value) return;
-            parent.postMessage({
-                pluginMessage: {
-                    type: 'bulk-update',
-                    payload: { ids: Array.from(selectedTasks), updates: { [key]: value } }
-                }
-            }, '*');
-            clearSelection();
-        }
-
-        function applyFilters(t) {
-            if (filters.search && !t.message.toLowerCase().includes(filters.search)) return false;
-            if (filters.status && t.internalStatus !== filters.status) return false;
-            if (filters.priority && t.priority !== filters.priority) return false;
-            if (filters.category && t.aiCategory !== filters.category) return false;
-            if (filters.assignedToMe && t.assignee !== 'Me') return false;
-            return true;
         }
 
         function updateTask(id, key, value) {
             parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key, value } } }, '*');
         }
 
-        function locateNode(nodeId) {
-            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: nodeId } }, '*');
-        }
-
-        function triggerFocus() {
+        function startWorking() {
             parent.postMessage({ pluginMessage: { type: 'focus-mode' } }, '*');
         }
 
-        function renderInsights() {
-            const content = document.getElementById('workboardContent');
-            const ai = latestData.aiInsights;
+        function locateNode(id) {
+            activeTaskId = id;
+            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*');
+        }
 
-            content.innerHTML = `
-            <div style="padding:24px; display:flex; flex-direction:column; gap:24px;">
-                ${ai ? `
-                    <div class="frame-card" style="margin:0; background: var(--accent-soft); border-color: var(--accent);">
-                        <div style="font-size:10px; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:8px;">AI Smart Suggestion</div>
-                        <div style="font-size:13px; font-weight:600; line-height:1.4;">${ai.suggestion}</div>
-                    </div>
+        // --- Rendering ---
+        function render() {
+            if (!latestData) return;
 
-                    <div class="frame-card" style="margin:0;">
-                        <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">AI Health Summary</div>
-                        <div style="font-size:13px; line-height:1.6; color:var(--text-main);">${ai.summary}</div>
-                    </div>
-                ` : ''}
+            const m = latestData.fileMetrics;
+            const timeStr = m.unresolvedTimeEstimate >= 60
+                ? `${Math.floor(m.unresolvedTimeEstimate / 60)}h ${m.unresolvedTimeEstimate % 60}m`
+                : `${m.unresolvedTimeEstimate}m`;
 
-                <div>
-                    <h3>Health Score</h3>
-                    <p style="font-size:12px; color:var(--text-muted);">Overall file completion and velocity.</p>
-                    <div style="height:150px; display:flex; align-items:flex-end; gap:8px; border-bottom:1px solid var(--border); margin-top:16px;">
-                        ${latestData.metrics.map(m => `
-                            <div style="flex:1; background:var(--accent); height:${m.healthScore}%; min-width:20px; border-radius:4px 4px 0 0;" title="${m.flowName}: ${m.healthScore}%"></div>
-                        `).join('')}
+            document.getElementById('metricsHeader').innerText =
+                `${m.totalUnresolved} unresolved • ${timeStr} remaining • ${m.completionPercentage}% complete`;
+
+            const showResolved = document.getElementById('showResolvedToggle').checked;
+            const container = document.getElementById('workboardContent');
+
+            // Filtering
+            let filteredTasks = latestData.tasks.filter(t => {
+                if (!showResolved && t.resolved) return false;
+                if (currentFilter === 'me') return t.assignee === m.currentUser;
+                if (currentFilter === 'unassigned') return !t.assignee;
+                return true;
+            });
+
+            if (filteredTasks.length === 0) {
+                container.innerHTML = '<div style="padding:60px; text-align:center; font-size:13px; color:var(--text-muted);">All tasks complete!</div>';
+                return;
+            }
+
+            // Grouping by Page -> Frame
+            const pages = {};
+            filteredTasks.forEach(t => {
+                if (!pages[t.page]) pages[t.page] = {};
+                if (!pages[t.page][t.frame]) pages[t.page][t.frame] = [];
+                pages[t.page][t.frame].push(t);
+            });
+
+            container.innerHTML = Object.entries(pages).map(([pageName, frames]) => `
+                <div class="page-group">
+                    <div class="page-title">${pageName}</div>
+                    ${Object.entries(frames).map(([frameName, tasks]) => {
+                const unresolved = tasks.filter(tx => !tx.resolved);
+                const time = unresolved.reduce((acc, tx) => acc + tx.timeEstimateMinutes, 0);
+                return `
+                            <div class="frame-group">
+                                <div class="frame-name">${frameName}</div>
+                                <div class="frame-meta">${unresolved.length} left • ${time}m</div>
+                            </div>
+                            ${tasks.map(t => renderTaskCard(t)).join('')}
+                        `;
+            }).join('')}
+                </div>
+            `).join('');
+        }
+
+        function renderTaskCard(t) {
+            const presets = [5, 15, 30, 60, 120];
+            const isActive = activeTaskId === t.commentId || activeTaskId === t.nodeId;
+
+            return `
+                <div class="task-card ${t.resolved ? 'resolved' : ''} ${isActive ? 'active' : ''}" onclick="locateNode('${t.nodeId}'); activeTaskId='${t.commentId}'; render();">
+                    <div class="task-author">${t.author.toUpperCase()}</div>
+                    <div class="task-message">${t.message}</div>
+                    <div class="task-footer">
+                        <div class="time-selector">
+                            ${presets.map(p => `
+                                <div class="time-btn ${t.timeEstimateMinutes === p ? 'active' : ''}" 
+                                     onclick="event.stopPropagation(); updateTask('${t.commentId}', 'timeEstimateMinutes', ${p})">${p}m</div>
+                            `).join('')}
+                            <input type="number" class="time-input" value="${t.timeEstimateMinutes}" 
+                                   onclick="event.stopPropagation()" 
+                                   onchange="updateTask('${t.commentId}', 'timeEstimateMinutes', parseInt(this.value))">
+                        </div>
+                        <select class="assignee-select" onclick="event.stopPropagation()" onchange="updateTask('${t.commentId}', 'assignee', this.value)">
+                            <option value="">Assign...</option>
+                            <option value="${latestData.fileMetrics.currentUser}" ${t.assignee === latestData.fileMetrics.currentUser ? 'selected' : ''}>Me</option>
+                            ${t.assignee && t.assignee !== latestData.fileMetrics.currentUser ? `<option value="${t.assignee}" selected>${t.assignee}</option>` : ''}
+                        </select>
                     </div>
                 </div>
-            </div>
-        `;
-        }
-
-        // --- AI Intelligence Service ---
-        async function processAIIntelligence(comments) {
-            console.log("[AI] Starting intelligence layer processing...");
-            const filtered = comments.filter(c => !c.resolved).slice(0, 30);
-            if (filtered.length === 0) return;
-
-            const messages = filtered.map(c => c.message);
-
-            try {
-                // 1. Categorization & Duplicate Detection
-                const prompt = `
-                Act as a Design Ops Assistant. Categorize these Figma comments and find duplicates.
-                Categories: Copy, Layout, Alignment, Branding, Dev Clarification, Content Missing, Other.
-                Identify duplicates by assigning the same integer 'clusterId' (start from 1). Use null if no duplicate.
-                
-                Comments to process:
-                ${messages.map((m, i) => `ID ${i}: ${m}`).join('\n')}
-
-                Respond ONLY with a JSON object: {"results": [{"id": 0, "category": "Copy", "clusterId": 1}, ...]}
-                `;
-
-                const enriched = await callGroq(prompt);
-                if (enriched && (enriched.results || enriched.comments)) {
-                    const results = enriched.results || enriched.comments;
-                    results.forEach(item => {
-                        const comment = filtered[item.id];
-                        if (comment) {
-                            updateTask(comment.id, 'aiCategory', item.category || item.c);
-                            if (item.clusterId !== undefined || item.d !== undefined) {
-                                const cId = item.clusterId !== undefined ? item.clusterId : item.d;
-                                if (cId !== null) updateTask(comment.id, 'duplicateClusterId', `cluster_${cId}`);
-                            }
-                        }
-                    });
-                }
-
-                // 2. Summary & Suggestions
-                const summaryPrompt = `
-                Summarize these design issues and suggest the next best action.
-                Issues:
-                ${messages.join('\n')}
-
-                Respond ONLY with JSON: {"summary": "2 sentence high level view", "suggestion": "1 crisp next step"}
-                `;
-
-                const insights = await callGroq(summaryPrompt);
-                if (insights && (insights.summary || insights.results)) {
-                    const data = insights.summary ? insights : (insights.results?.[0] || insights.results);
-                    parent.postMessage({ pluginMessage: { type: 'update-ai-insights', payload: data } }, '*');
-                }
-            } catch (err) {
-                console.error("[AI] Intelligence failure:", err);
-            }
-        }
-
-        async function callGroq(prompt) {
-            try {
-                const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${config.groq}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
-                        messages: [
-                            { role: "system", content: "You are a specialized JSON-only assistant for design team productivity. Always return valid JSON." },
-                            { role: "user", content: prompt }
-                        ],
-                        response_format: { type: "json_object" },
-                        temperature: 0.1
-                    })
-                });
-                const result = await resp.json();
-                if (result.error) throw new Error(result.error.message);
-                const content = result.choices[0].message.content;
-                const parsed = JSON.parse(content);
-                return parsed;
-            } catch (e) {
-                console.error("[AI] Groq call failed", e);
-                return null;
-            }
+            `;
         }
     </script>
 </body>
