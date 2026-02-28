@@ -3,7 +3,7 @@ import { CommentService } from "./commentService";
 import { Task, SyncResult, FlowMetrics, InternalStatus, Priority, ShipStatus } from "./types";
 
 export class SyncService {
-    static async sync(rawComments?: any[]): Promise<SyncResult> {
+    static async sync(rawComments?: any[], aiInsights?: any): Promise<SyncResult> {
         let liveTasks: Task[] = [];
 
         if (rawComments && Array.isArray(rawComments)) {
@@ -33,16 +33,16 @@ export class SyncService {
         reconciledTasks.forEach(t => fullTasksMap[t.commentId] = t);
         await StorageService.saveTasks(fullTasksMap);
 
-        return this.calculateResult(reconciledTasks);
+        return this.calculateResult(reconciledTasks, aiInsights);
     }
 
-    static async getState(): Promise<SyncResult> {
+    static async getState(aiInsights?: any): Promise<SyncResult> {
         const storedTasksMap = await StorageService.getTasks();
         const storedTasks = Object.values(storedTasksMap);
-        return this.calculateResult(storedTasks);
+        return this.calculateResult(storedTasks, aiInsights);
     }
 
-    private static calculateResult(tasks: Task[]): SyncResult {
+    private static calculateResult(tasks: Task[], aiInsights?: any): SyncResult {
         const sortedTasks = [...tasks].sort((a, b) => {
             const priorityWeight = { "Critical": 0, "High": 1, "Medium": 2, "Low": 3 };
             const statusWeight = { "Critical": 0, "Blocked": 1, "In Progress": 2, "Needs Review": 3, "Approved": 4, "Done": 5 };
@@ -139,7 +139,8 @@ export class SyncService {
                 oldestUnresolvedAge: oldestAge,
                 shipReadiness
             },
-            weeklySummary: `Ship Status: ${shipReadiness}. ${totalUnresolved} tasks remaining.`
+            weeklySummary: `Ship Status: ${shipReadiness}. ${totalUnresolved} tasks remaining.`,
+            aiInsights
         };
     }
 

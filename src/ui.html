@@ -13,8 +13,8 @@
             --border: #E5E5EA;
             --text-main: #000000;
             --text-muted: #8E8E93;
-            --accent: #303115;
-            --accent-soft: #F1F2ED;
+            --accent: #339933;
+            --accent-soft: #F0F9F0;
             --critical: #FF3B30;
             --warning: #FF9500;
             --success: #34C759;
@@ -170,6 +170,11 @@
             border-left: 4px solid var(--accent);
             padding-left: 12px;
             background: var(--accent-soft);
+        }
+
+        .duplicate-group {
+            border-bottom: 2px dashed var(--accent-soft) !important;
+            margin-bottom: 2px;
         }
 
         .task-meta {
@@ -435,7 +440,16 @@
         <div style="display:flex; flex-direction:column; gap:16px;">
             <input type="password" id="patInput" placeholder="Personal Access Token"
                 style="padding:8px; border:1px solid var(--border); border-radius:4px;">
-            <div style="font-size:11px; color:var(--text-muted);">
+            <div style="font-size:11px; color:var(--text-muted); margin-top: 8px;">
+                Groq AI Configuration
+            </div>
+            <input type="password" id="groqInput" placeholder="Groq API Key"
+                style="padding:8px; border:1px solid var(--border); border-radius:4px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="aiEnabledToggle">
+                <label for="aiEnabledToggle" style="font-size:12px;">Enable AI Intelligence Layer</label>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top: 8px;">
                 Advanced: Manual File URL (leave empty for current file)
             </div>
             <input type="text" id="urlInput" placeholder="Figma File URL (Optional)"
@@ -465,6 +479,16 @@
                 <option value="High">High</option>
                 <option value="Medium">Medium</option>
                 <option value="Low">Low</option>
+            </select>
+            <select class="filter-btn" id="filterCategory" onchange="updateFilters()" style="padding: 2px 6px;">
+                <option value="">All Categories</option>
+                <option value="Copy">Copy</option>
+                <option value="Layout">Layout</option>
+                <option value="Alignment">Alignment</option>
+                <option value="Branding">Branding</option>
+                <option value="Dev Clarification">Dev</option>
+                <option value="Content Missing">Missing</option>
+                <option value="Other">Other</option>
             </select>
             <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..."
                 oninput="updateFilters()">
@@ -508,13 +532,14 @@
     </div>
 
     <script>
-        let config = { pat: '', fileUrl: '' };
+        let config = { pat: '', fileUrl: '', groq: '', aiEnabled: false };
         let autoFileKey = '';
         let latestData = null;
         let filters = {
             assignedToMe: false,
             status: null,
             priority: null,
+            category: null,
             search: ''
         };
         let selectedTasks = new Set();
@@ -528,6 +553,11 @@
                 parent.postMessage({ pluginMessage: { type: 'get-settings' } }, '*');
             } else if (type === 'settings-loaded') {
                 config = payload;
+                document.getElementById('patInput').value = config.pat || '';
+                document.getElementById('groqInput').value = config.groq || '';
+                document.getElementById('aiEnabledToggle').checked = config.aiEnabled || false;
+                document.getElementById('urlInput').value = config.fileUrl || '';
+
                 if (config.pat) triggerSync();
                 else switchTab('settings');
             } else if (type === 'sync-complete') {
@@ -568,6 +598,8 @@
         function saveSettings() {
             config.pat = document.getElementById('patInput').value;
             config.fileUrl = document.getElementById('urlInput').value;
+            config.groq = document.getElementById('groqInput').value;
+            config.aiEnabled = document.getElementById('aiEnabledToggle').checked;
             parent.postMessage({ pluginMessage: { type: 'save-settings', payload: config } }, '*');
             triggerSync();
             switchTab('workboard');
@@ -593,6 +625,11 @@
                 const data = await resp.json();
                 if (data.status === 403) throw new Error("PAT invalid or no access.");
                 parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*');
+
+                // Trigger AI Intelligence
+                if (config.aiEnabled && config.groq) {
+                    processAIIntelligence(data.comments);
+                }
             } catch (e) {
                 alert("Sync failed: " + e.message);
                 switchTab('settings');
@@ -603,6 +640,7 @@
             filters.search = document.getElementById('searchInput').value.toLowerCase();
             filters.status = document.getElementById('filterStatus').value;
             filters.priority = document.getElementById('filterPriority').value;
+            filters.category = document.getElementById('filterCategory').value;
             render();
         }
 
@@ -665,16 +703,22 @@
             const status = t.internalStatus || "In Progress";
             const author = t.author || "Unknown";
             const message = t.message || "...";
+            const category = t.aiCategory || "";
+            const isDuplicate = !!t.duplicateClusterId;
 
             return `
-            <div class="task-card ${isSelected ? 'active' : ''}" onclick="toggleSelection('${t.commentId}', event)">
+            <div class="task-card ${isSelected ? 'active' : ''} ${isDuplicate ? 'duplicate-group' : ''}" onclick="toggleSelection('${t.commentId}', event)">
                 <div class="task-meta">
                     <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation()">
                     <span class="badge badge-priority-${priority.toLowerCase()}">${priority}</span>
                     <span style="font-size:11px; font-weight:500; color:var(--text-muted);">${status}</span>
+                    ${category ? `<span class="badge" style="background:#E5E7EB; color:#374151;">${category}</span>` : ''}
                     <span style="font-size:11px; color:var(--text-muted); margin-left:auto;">${author}</span>
                 </div>
-                <div class="task-message" onclick="locateNode('${t.nodeId}'); event.stopPropagation();">${message}</div>
+                <div class="task-message" onclick="locateNode('${t.nodeId}'); event.stopPropagation();">
+                    ${isDuplicate ? `<span style="color:var(--accent); font-weight:700; font-size:10px; vertical-align:middle; margin-right:4px;">DUP</span>` : ''}
+                    ${message}
+                </div>
                 <div class="task-footer">
                     <div style="display:flex; align-items:center; gap:4px;">
                         <span style="font-size:10px;">Estimate:</span>
@@ -798,6 +842,7 @@
             if (filters.search && !t.message.toLowerCase().includes(filters.search)) return false;
             if (filters.status && t.internalStatus !== filters.status) return false;
             if (filters.priority && t.priority !== filters.priority) return false;
+            if (filters.category && t.aiCategory !== filters.category) return false;
             if (filters.assignedToMe && t.assignee !== 'Me') return false;
             return true;
         }
@@ -816,17 +861,104 @@
 
         function renderInsights() {
             const content = document.getElementById('workboardContent');
+            const ai = latestData.aiInsights;
+
             content.innerHTML = `
-            <div style="padding:24px;">
-                <h3>Health Score</h3>
-                <p style="font-size:12px; color:var(--text-muted);">Overall file completion and velocity.</p>
-                <div style="height:200px; display:flex; align-items:flex-end; gap:8px; border-bottom:1px solid var(--border);">
-                    ${latestData.metrics.map(m => `
-                        <div style="flex:1; background:var(--accent); height:${m.healthScore}%; min-width:20px; border-radius:4px 4px 0 0;" title="${m.flowName}: ${m.healthScore}%"></div>
-                    `).join('')}
+            <div style="padding:24px; display:flex; flex-direction:column; gap:24px;">
+                ${ai ? `
+                    <div class="frame-card" style="margin:0; background: var(--accent-soft); border-color: var(--accent);">
+                        <div style="font-size:10px; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:8px;">AI Smart Suggestion</div>
+                        <div style="font-size:13px; font-weight:600; line-height:1.4;">${ai.suggestion}</div>
+                    </div>
+
+                    <div class="frame-card" style="margin:0;">
+                        <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">AI Health Summary</div>
+                        <div style="font-size:13px; line-height:1.6; color:var(--text-main);">${ai.summary}</div>
+                    </div>
+                ` : ''}
+
+                <div>
+                    <h3>Health Score</h3>
+                    <p style="font-size:12px; color:var(--text-muted);">Overall file completion and velocity.</p>
+                    <div style="height:150px; display:flex; align-items:flex-end; gap:8px; border-bottom:1px solid var(--border); margin-top:16px;">
+                        ${latestData.metrics.map(m => `
+                            <div style="flex:1; background:var(--accent); height:${m.healthScore}%; min-width:20px; border-radius:4px 4px 0 0;" title="${m.flowName}: ${m.healthScore}%"></div>
+                        `).join('')}
+                    </div>
                 </div>
             </div>
         `;
+        }
+
+        // --- AI Intelligence Service ---
+        async function processAIIntelligence(comments) {
+            console.log("[AI] Starting intelligence layer processing...");
+            const messages = comments.map(c => c.message).slice(0, 50); // limit for performance
+
+            try {
+                // 1. Categorization & Duplicate Detection
+                const prompt = `
+                Categorize these design comments into: Copy, Layout, Alignment, Branding, Dev Clarification, Content Missing, Other.
+                Also identifying any duplicate/near-identical comments by assigning the same integer clusterId.
+                
+                Return ONLY a JSON array of objects: [{c: "category", d: clusterId_or_null}]
+                Comments:
+                ${messages.map((m, i) => `${i}: "${m}"`).join('\n')}
+                `;
+
+                const enriched = await callGroq(prompt);
+                if (enriched) {
+                    enriched.forEach((item, i) => {
+                        if (comments[i]) {
+                            updateTask(comments[i].id, 'aiCategory', item.c);
+                            if (item.d !== null) updateTask(comments[i].id, 'duplicateClusterId', `cluster_${item.d}`);
+                        }
+                    });
+                }
+
+                // 2. Summary & Suggestions
+                const summaryPrompt = `
+                Analyze these design comments and provide:
+                1. A brief summary (2 sentences) of the overall state of the file.
+                2. A "Suggested Next Action" (1 sentence) focus based on priority.
+                
+                Return ONLY JSON: { "summary": "...", "suggestion": "..." }
+                Comments:
+                ${messages.join('\n')}
+                `;
+
+                const insights = await callGroq(summaryPrompt);
+                if (insights) {
+                    parent.postMessage({ pluginMessage: { type: 'update-ai-insights', payload: insights } }, '*');
+                }
+            } catch (err) {
+                console.error("[AI] Intelligence failure:", err);
+            }
+        }
+
+        async function callGroq(prompt) {
+            try {
+                const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${config.groq}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "llama3-8b-8192",
+                        messages: [{ role: "user", content: prompt }],
+                        response_format: { type: "json_object" }
+                    })
+                });
+                const result = await resp.json();
+                const content = result.choices[0].message.content;
+                const parsed = JSON.parse(content);
+                // Groq returns JSON based on object but we need to handle if it's nested
+                return parsed.comments || parsed.results || parsed;
+            } catch (e) {
+                console.error("[AI] Groq call failed", e);
+                return null;
+            }
         }
     </script>
 </body>

@@ -10,9 +10,10 @@ figma.showUI(__html__, { width: 480, height: 840, themeColors: true });
 
 async function broadcastState(rawComments?: any[]) {
     try {
+        const aiInsights = await figma.clientStorage.getAsync("ai_insights");
         const result = rawComments
-            ? await SyncService.sync(rawComments)
-            : await SyncService.getState();
+            ? await SyncService.sync(rawComments, aiInsights)
+            : await SyncService.getState(aiInsights);
         figma.ui.postMessage({ type: "sync-complete", payload: result });
     } catch (err: any) {
         figma.ui.postMessage({ type: "sync-error", payload: err.message });
@@ -65,13 +66,17 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
             case "save-settings":
                 await figma.clientStorage.setAsync("figma_pat", msg.payload.pat);
                 await figma.clientStorage.setAsync("figma_file_url", msg.payload.fileUrl);
+                await figma.clientStorage.setAsync("groq_api_key", msg.payload.groq);
+                await figma.clientStorage.setAsync("ai_enabled", msg.payload.aiEnabled);
                 figma.notify("Settings saved.");
                 break;
 
             case "get-settings":
                 const pat = await figma.clientStorage.getAsync("figma_pat");
                 const url = await figma.clientStorage.getAsync("figma_file_url");
-                figma.ui.postMessage({ type: "settings-loaded", payload: { pat, fileUrl: url } });
+                const groq = await figma.clientStorage.getAsync("groq_api_key");
+                const ai = await figma.clientStorage.getAsync("ai_enabled");
+                figma.ui.postMessage({ type: "settings-loaded", payload: { pat, fileUrl: url, groq, aiEnabled: ai } });
                 break;
 
             case "locate-node":
@@ -89,6 +94,12 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 } else {
                     figma.notify("Node not found on canvas.");
                 }
+                break;
+
+            case "update-ai-insights":
+                if (!msg.payload) return;
+                await figma.clientStorage.setAsync("ai_insights", msg.payload);
+                await broadcastState();
                 break;
 
             case "export":

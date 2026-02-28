@@ -2,23 +2,27 @@ export type Priority = "Low" | "Medium" | "High" | "Critical";
 export type InternalStatus = "Critical" | "Needs Review" | "In Progress" | "Blocked" | "Approved" | "Done";
 export type ShipStatus = "Ready" | "Needs Cleanup" | "High Risk";
 
+export type AICategory = "Copy" | "Layout" | "Alignment" | "Branding" | "Dev Clarification" | "Content Missing" | "Other";
+
 export interface Task {
     commentId: string;
     nodeId: string | null;
     frameId: string | null;
     pageId: string | null;
-    author: string;         // Name of the author
+    author: string;
     createdAt: string;
-    resolved: boolean;      // Figma native status
+    resolved: boolean;
     internalStatus: InternalStatus;
     timeEstimateMinutes: number;
     assignee: string | null;
     priority: Priority;
     message: string;
-    page: string;           // Display name
-    frame: string;          // Display name
+    page: string;
+    frame: string;
     lastUpdatedAt: string;
     ageInDays: number;
+    aiCategory?: AICategory;
+    duplicateClusterId?: string;
 }
 
 export interface UserBreakdown {
@@ -34,8 +38,8 @@ export interface FlowMetrics {
     unresolvedTasks: number;
     criticalTasks: number;
     totalTimeEstimate: number;
-    healthScore: number;    // 0-100 (weighted formula)
-    intensity: number;      // 0-1 (heatmap density)
+    healthScore: number;
+    intensity: number;
 }
 
 export interface SyncResult {
@@ -50,9 +54,13 @@ export interface SyncResult {
         shipReadiness: ShipStatus;
     };
     weeklySummary: string;
+    aiInsights?: {
+        summary: string;
+        suggestion: string;
+    };
 }
 
 export interface PluginMessage {
-    type: "sync" | "update-task" | "bulk-update" | "notify" | "export" | "save-settings" | "get-settings" | "init" | "locate-node" | "focus-mode";
+    type: "sync" | "update-task" | "bulk-update" | "notify" | "export" | "save-settings" | "get-settings" | "init" | "locate-node" | "focus-mode" | "update-ai-insights";
     payload?: any;
 }
