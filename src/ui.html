@@ -207,6 +207,7 @@
             color: var(--text-muted);
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .effort-chip.active {
@@ -219,9 +220,10 @@
         .viewport {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 120px;
+            padding-bottom: 140px;
             background: inherit;
             scroll-behavior: smooth;
+            scrollbar-width: thin;
         }
 
         .pinned-section {
@@ -250,6 +252,7 @@
             transition: all 0.3s var(--transition-type);
             cursor: pointer;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            position: relative;
         }
 
         .task-card:hover {
@@ -307,6 +310,8 @@
             border: 1px solid var(--border);
             cursor: pointer;
             transition: all 0.2s;
+            background: white;
+            color: var(--text-muted);
         }
 
         .effort-btn.active {
@@ -330,6 +335,17 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-work:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-work.active {
+            background: var(--accent);
+            color: white;
         }
 
         .btn-resolve {
@@ -343,33 +359,9 @@
             cursor: pointer;
         }
 
-        /* --- Footer --- */
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 16px;
-            background: white;
-            border-top: 1px solid var(--border);
-            z-index: 2000;
-        }
-
-        .btn-sync {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: var(--radius);
-            background: var(--accent);
-            color: white;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s var(--transition-type);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        .btn-resolve:hover {
+            border-color: #A5D6A7;
+            color: #2E7D32;
         }
 
         /* --- THE CAT --- */
@@ -397,7 +389,6 @@
             user-select: none;
             will-change: transform, left;
             transition: left 0.1s linear;
-            /* Smooth movement update */
         }
 
         .cat-svg {
@@ -407,7 +398,6 @@
             overflow: visible;
         }
 
-        /* Group Animations */
         .cat-legs {
             transform-origin: top;
         }
@@ -426,7 +416,6 @@
             transition: transform 0.1s ease;
         }
 
-        /* Jump Animation */
         @keyframes jump {
 
             0%,
@@ -475,6 +464,35 @@
             }
         }
 
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: white;
+            border-top: 1px solid var(--border);
+            z-index: 2000;
+        }
+
+        .btn-sync {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-main);
+            background: var(--accent);
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-type);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
         /* Settings */
         .settings-overlay {
             position: fixed;
@@ -490,16 +508,6 @@
 
         .settings-overlay.active {
             display: block;
-        }
-
-        input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-size: 14px;
-            box-sizing: border-box;
-            outline: none;
         }
     </style>
 </head>
@@ -600,7 +608,6 @@
         let sToggle = 'pending';
         let effortFilters = new Set();
 
-        // --- Cat Engine ---
         let cat = { x: 20, targetX: 20, dir: 1, jumping: false, state: 'idle' };
         let mouseX = 0;
 
@@ -611,9 +618,9 @@
             document.body.className = 'theme-' + theme;
             document.getElementById('catToggle').classList.toggle('active', theme === 'pink');
             if (theme === 'pink') {
-                cat.x = -80; cat.targetX = 60; // Walk in
+                cat.x = -80; cat.targetX = 60;
             } else {
-                cat.targetX = window.innerWidth + 80; // Walk out
+                cat.targetX = window.innerWidth + 80;
             }
         }
 
@@ -622,23 +629,14 @@
             cat.jumping = true;
             const el = document.getElementById('the-cat');
             el.classList.add('cat-jumping');
-            setTimeout(() => {
-                el.classList.remove('cat-jumping');
-                cat.jumping = false;
-            }, 600);
+            setTimeout(() => { el.classList.remove('cat-jumping'); cat.jumping = false; }, 600);
         }
 
         function animate() {
-            if (currentTheme !== 'pink' && cat.x > window.innerWidth + 20) {
-                requestAnimationFrame(animate);
-                return;
-            }
-
+            if (currentTheme !== 'pink' && cat.x > window.innerWidth + 20) { requestAnimationFrame(animate); return; }
             const el = document.getElementById('the-cat');
             const head = document.getElementById('cat-head');
             const legs = el.querySelector('.cat-legs');
-
-            // 1. Move Cat towards target
             let dx = cat.targetX - cat.x;
             if (Math.abs(dx) > 1) {
                 cat.x += Math.sign(dx) * 2;
@@ -648,26 +646,18 @@
             } else {
                 cat.state = 'idle';
                 legs.classList.remove('cat-legs-walking');
-                if (currentTheme === 'pink' && Math.random() < 0.005) {
-                    cat.targetX = Math.random() * (window.innerWidth - 80);
-                }
+                if (currentTheme === 'pink' && Math.random() < 0.005) { cat.targetX = Math.random() * (window.innerWidth - 80); }
             }
-
-            // 2. Mouse Tracking (Head)
             const catScreenX = cat.x + 40;
             let lookX = (mouseX - catScreenX) / 10;
             lookX = Math.max(-15, Math.min(15, lookX));
             head.style.transform = `translateX(${lookX}px)`;
-
-            // 3. Update DOM
             el.style.left = cat.x + 'px';
             el.style.transform = `scaleX(${cat.dir})`;
-
             requestAnimationFrame(animate);
         }
         requestAnimationFrame(animate);
 
-        // --- View Logic ---
         function switchPrimaryTab(tab) { pTab = tab; render(); }
         function switchSecondaryTab(toggle) { sToggle = toggle; render(); }
         function toggleEffortFilter(eff) {
@@ -710,14 +700,34 @@
                 return true;
             });
 
-            container.innerHTML = tasks.map(t => renderCard(t)).join('');
+            const workingTask = tasks.find(t => t.isCurrentlyWorking);
+            const remainingTasks = tasks.filter(t => !t.isCurrentlyWorking);
+
+            let html = '';
+            if (workingTask && sToggle === 'pending') {
+                html += `<div class="pinned-section"><span class="label">Currently Working On</span>${renderCard(workingTask)}</div>`;
+            }
+            html += remainingTasks.map(t => renderCard(t)).join('');
+            container.innerHTML = html;
         }
 
         function renderCard(t) {
             return `<div class="task-card ${t.resolved ? 'resolved' : ''}" onclick="locate('${t.commentId}')">
                 <div class="card-header"><b>${t.author}</b> <span class="meta">${t.page}/${t.frame}</span></div>
                 <div class="message">${t.message}</div>
-                ${!t.resolved ? `<div class="card-actions"><button class="btn-resolve" onclick="event.stopPropagation(); resolve('${t.commentId}')">Resolve</button></div>` : '<b style="color:green;font-size:10px">RESOLVED</b>'}
+                ${!t.resolved ? `
+                    <div class="card-efforts" onclick="event.stopPropagation()">
+                        <div class="effort-btn ${t.effort === 'Small' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Small')">Small</div>
+                        <div class="effort-btn ${t.effort === 'Medium' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Medium')">Medium</div>
+                        <div class="effort-btn ${t.effort === 'Large' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Large')">Large</div>
+                    </div>
+                    <div class="card-actions" onclick="event.stopPropagation()">
+                        <button class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">
+                            ${t.isCurrentlyWorking ? 'Focus Goal' : 'Work on this'}
+                        </button>
+                        <button class="btn-resolve" onclick="resolve('${t.commentId}')">Resolve</button>
+                    </div>
+                ` : '<b style="color:green;font-size:10px">RESOLVED</b>'}
             </div>`;
         }
 
@@ -730,6 +740,11 @@
                 headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ resolved: true })
             });
+        }
+        function setWorking(id) { parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*'); }
+        function updateEffort(id, old, next) {
+            const v = old === next ? null : next;
+            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: v } } }, '*');
         }
 
         function triggerSync() {
