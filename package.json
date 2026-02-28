@@ -4,8 +4,8 @@
   "description": "Figma comment execution dashboard",
   "main": "code.js",
   "scripts": {
-    "build": "tsc --noEmit && esbuild src/code.ts --bundle --outfile=dist/code.js",
-    "watch": "esbuild src/code.ts --bundle --outfile=dist/code.js --watch"
+    "build": "tsc --noEmit && esbuild src/code.ts --bundle --target=es6 --outfile=dist/code.js",
+    "watch": "esbuild src/code.ts --bundle --target=es6 --outfile=dist/code.js --watch"
   },
   "author": "Antigravity",
   "license": "MIT",
