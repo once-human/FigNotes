@@ -35,6 +35,7 @@
             --radius: var(--radius-main);
             --bounce: none;
             --pulse-shadow: 0 0 15px rgba(0, 112, 246, 0.3);
+            --tab-anim: none;
         }
 
         body.theme-pink {
@@ -48,6 +49,7 @@
             --bounce: scale(1.02) rotate(var(--tilt, -1deg));
             --pulse-shadow: 0 0 25px rgba(252, 151, 207, 0.5);
             --work-bounce: work-pop 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            --tab-anim: tab-bounce 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
         }
 
         body {
@@ -127,13 +129,17 @@
         .icon-btn:hover {
             opacity: 1;
             background: #F5F5F5;
-            transform: scale(1.1);
+            transform: scale(1.15) rotate(5deg);
         }
 
         .icon-btn.active {
             opacity: 1;
             color: var(--accent);
             background: var(--accent-soft);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.9) rotate(-5deg);
         }
 
         /* --- Control Row --- */
@@ -268,6 +274,22 @@
             border-style: dashed;
         }
 
+        @keyframes tab-bounce {
+            0% {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .viewport.animating .task-card {
+            animation: var(--tab-anim);
+        }
+
         /* SHADOW PULSE */
         @keyframes shadow-pulse {
             0% {
@@ -379,12 +401,12 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 8px;
+            padding: 9.5px;
             border: none;
             border-radius: 10px;
             background: var(--accent-soft);
             color: var(--accent);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -422,12 +444,12 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 14px;
+            padding: 9.5px 16px;
             border: 1.5px solid var(--border);
             border-radius: 100px;
             background: white;
             color: var(--text-muted);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -438,7 +460,7 @@
             color: #2E7D32;
         }
 
-        /* --- THE CAT (Raised for clear visibility) --- */
+        /* --- THE CAT --- */
         #cat-container {
             position: fixed;
             bottom: 88px;
@@ -493,22 +515,23 @@
             animation: meow-float 1.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
             opacity: 0;
+            transform-origin: center;
         }
 
         @keyframes meow-float {
             0% {
-                transform: translateY(0) scale(0.5);
+                transform: translate(0, 0) scale(0.5);
                 opacity: 0;
             }
 
             20% {
                 opacity: 1;
-                transform: translateY(-12px) scale(1.1);
+                transform: translate(0, -12px) scale(1.1);
             }
 
             100% {
                 opacity: 0;
-                transform: translateY(-40px) scale(0.9);
+                transform: translate(0, -40px) scale(0.9);
             }
         }
 
@@ -552,6 +575,10 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+        }
+
+        .btn-sync:active {
+            transform: scale(0.98);
         }
 
         /* --- SETUP FLOW --- */
@@ -832,6 +859,18 @@
             const bubble = document.createElement('div');
             bubble.className = 'meow-bubble';
             bubble.innerText = 'Meoww!';
+
+            // Fix Bubble orientation: Un-scale the bubble so text is readable
+            // And position it on the "correct" side of the head
+            if (cat.dir === -1) {
+                bubble.style.left = 'auto';
+                bubble.style.right = '25px';
+                bubble.style.transform = 'scaleX(-1)';
+            } else {
+                bubble.style.left = '25px';
+                bubble.style.right = 'auto';
+            }
+
             const el = document.getElementById('the-cat');
             el.appendChild(bubble);
             setTimeout(() => bubble.remove(), 1500);
@@ -857,9 +896,16 @@
         }
         requestAnimationFrame(animate);
 
-        function switchPrimaryTab(tab) { pTab = tab; Array.from(document.querySelectorAll('.p-tab')).forEach(t => t.classList.toggle('active', t.id === 'pTab' + tab.charAt(0).toUpperCase() + tab.slice(1))); render(); }
-        function switchSecondaryTab(toggle) { sToggle = toggle; Array.from(document.querySelectorAll('.s-toggle')).forEach(t => t.classList.toggle('active', t.id === 'sToggle' + toggle.charAt(0).toUpperCase() + toggle.slice(1))); render(); }
-        function updateEffortSelection(val) { effortFilter = val; document.getElementById('effortLabel').innerText = val === 'All' ? 'All Efforts' : val; render(); }
+        function triggerTabAnimation() {
+            const v = document.getElementById('content');
+            v.classList.remove('animating');
+            void v.offsetWidth;
+            v.classList.add('animating');
+        }
+
+        function switchPrimaryTab(tab) { pTab = tab; Array.from(document.querySelectorAll('.p-tab')).forEach(t => t.classList.toggle('active', t.id === 'pTab' + tab.charAt(0).toUpperCase() + tab.slice(1))); triggerTabAnimation(); render(); }
+        function switchSecondaryTab(toggle) { sToggle = toggle; Array.from(document.querySelectorAll('.s-toggle')).forEach(t => t.classList.toggle('active', t.id === 'sToggle' + toggle.charAt(0).toUpperCase() + toggle.slice(1))); triggerTabAnimation(); render(); }
+        function updateEffortSelection(val) { effortFilter = val; document.getElementById('effortLabel').innerText = val === 'All' ? 'All Efforts' : val; triggerTabAnimation(); render(); }
 
         const AVATAR_COLORS_BLUE = ['#0070F6', '#2E7D32', '#6200EE', '#0097A7', '#455A64', '#1565C0'];
         const AVATAR_COLORS_PINK = ['#FC97CF', '#FF80AB', '#CE93D8', '#BA68C8', '#F48FB1', '#EF9A9A'];
@@ -875,7 +921,10 @@
 
         function setRandomTilt(el) {
             if (currentTheme !== 'pink') return;
-            const tilt = (Math.random() * 1.6 - 0.8).toFixed(2);
+            // Randomly pick left or right-ish tilt
+            const dir = Math.random() < 0.5 ? 1 : -1;
+            const amount = Math.random() * 1.5 + 0.5;
+            const tilt = (dir * amount).toFixed(2);
             el.style.setProperty('--tilt', tilt + 'deg');
         }
 
