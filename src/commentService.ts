@@ -3,16 +3,14 @@ import { Task } from "./types";
 export class CommentService {
     static async fetchAllComments(): Promise<Task[]> {
         try {
-            // Modern Figma API check
             const threadsMethod = (figma as any).getCommentThreadsAsync ||
                 ((figma as any).comments && (figma as any).comments.getThreadsAsync);
 
             if (!threadsMethod) {
-                console.warn("[FigNotes] Comment API not found. Ensure you are on a modern Figma version.");
+                console.warn("[FigNotes] Comment API not found.");
                 return [];
             }
 
-            // Call the matched method
             const allThreads = await threadsMethod.call(threadsMethod === (figma as any).getCommentThreadsAsync ? figma : (figma as any).comments);
             const tasks: Task[] = [];
             const now = new Date().toISOString();
@@ -22,8 +20,8 @@ export class CommentService {
                 if (!firstComment) continue;
 
                 const nodeId = thread.region?.nodeId || null;
-                const page = this.findPage(nodeId);
-                const frame = this.findFrame(nodeId);
+                const page = await this.findPage(nodeId);
+                const frame = await this.findFrame(nodeId);
 
                 tasks.push({
                     commentId: thread.id,
@@ -48,10 +46,11 @@ export class CommentService {
         }
     }
 
-    private static findPage(nodeId: string | null): PageNode | null {
+    private static async findPage(nodeId: string | null): Promise<PageNode | null> {
         if (!nodeId) return null;
         try {
-            let node = figma.getNodeById(nodeId);
+            // Using Async version for dynamic-page support
+            let node = await figma.getNodeByIdAsync(nodeId);
             while (node && node.type !== "PAGE") {
                 node = node.parent as BaseNode;
             }
@@ -61,10 +60,11 @@ export class CommentService {
         }
     }
 
-    private static findFrame(nodeId: string | null): FrameNode | null {
+    private static async findFrame(nodeId: string | null): Promise<FrameNode | null> {
         if (!nodeId) return null;
         try {
-            let node = figma.getNodeById(nodeId);
+            // Using Async version for dynamic-page support
+            let node = await figma.getNodeByIdAsync(nodeId);
             while (node && node.type !== "FRAME" && node.type !== "PAGE") {
                 node = node.parent as BaseNode;
             }
