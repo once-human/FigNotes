@@ -7,7 +7,10 @@ export class CommentService {
             const now = new Date().toISOString();
 
             for (const commentObj of rawComments) {
-                const nodeId = commentObj.client_meta?.node_id || null;
+                let nodeId = commentObj.client_meta?.node_id || null;
+                // Normalize nodeId: Figma URLs use hyphen, API uses colon
+                if (nodeId) nodeId = nodeId.replace('-', ':');
+
                 const pageNode = this.findPageNode(nodeId);
                 const frameNode = this.findFrameNode(nodeId);
 

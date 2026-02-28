@@ -28,19 +28,21 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 await broadcastState(msg.payload);
                 break;
 
-            case "update-task":
+            case "update-task": {
                 if (!msg.payload || !msg.payload.id) throw new Error("Invalid task update payload");
                 const { id, key, value } = msg.payload;
                 const tasks = await StorageService.getTasks();
                 const task = tasks[id];
                 if (task) {
                     (task as any)[key] = value;
+                    if (key === 'internalStatus' && value === 'Done') task.resolved = true;
                     await StorageService.updateTask(task);
                     await broadcastState();
                 }
                 break;
+            }
 
-            case "bulk-update":
+            case "bulk-update": {
                 if (!msg.payload || !msg.payload.ids) throw new Error("Invalid bulk update payload");
                 const { ids, updates } = msg.payload;
                 const allTasks = await StorageService.getTasks();
@@ -52,6 +54,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 await StorageService.saveTasks(allTasks);
                 await broadcastState();
                 break;
+            }
 
             case "focus-mode":
                 const state = await SyncService.getState();
@@ -79,9 +82,10 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 figma.ui.postMessage({ type: "settings-loaded", payload: { pat, fileUrl: url, groq, aiEnabled: ai } });
                 break;
 
-            case "locate-node":
+            case "locate-node": {
                 if (!msg.payload) return;
-                const node = await figma.getNodeByIdAsync(msg.payload);
+                const targetId = msg.payload.toString().replace('-', ':');
+                const node = await figma.getNodeByIdAsync(targetId);
                 if (node) {
                     let page = node.parent;
                     while (page && page.type !== "PAGE") page = page.parent;
@@ -95,6 +99,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                     figma.notify("Node not found on canvas.");
                 }
                 break;
+            }
 
             case "update-ai-insights":
                 if (!msg.payload) return;

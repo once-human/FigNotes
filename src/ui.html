@@ -455,6 +455,21 @@
             <input type="text" id="urlInput" placeholder="Figma File URL"
                 style="padding:8px; border:1px solid var(--border); border-radius:4px;">
             <button class="btn-primary" onclick="saveSettings()" style="background:var(--accent);">Save & Sync</button>
+
+            <div
+                style="margin-top:24px; padding:16px; background:var(--surface-hover); border-radius:8px; border:1px solid var(--border);">
+                <div style="font-size:12px; font-weight:700; margin-bottom:8px;">How to configure FigNotes:</div>
+                <ul
+                    style="font-size:11px; color:var(--text-muted); padding-left:16px; margin:0; display:flex; flex-direction:column; gap:8px;">
+                    <li><strong>Figma PAT:</strong> Go to <a href="https://www.figma.com/settings/developers"
+                            target="_blank" style="color:var(--accent);">Figma Settings</a> -> Personal Access Tokens ->
+                        Generate new token.</li>
+                    <li><strong>Groq API Key:</strong> Get your free key at <a href="https://console.groq.com/keys"
+                            target="_blank" style="color:var(--accent);">Groq Console</a>.</li>
+                    <li><strong>Figma File URL:</strong> Copy the full URL from your browser address bar or use Share ->
+                        Copy Link.</li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -579,10 +594,17 @@
                 document.getElementById('mapView').classList.add('active');
                 document.getElementById('mainView').classList.remove('active');
                 document.getElementById('settingsView').classList.remove('active');
+            } else if (tab === 'insights') {
+                document.getElementById('mainView').classList.add('active');
+                document.getElementById('mapView').classList.remove('active');
+                document.getElementById('settingsView').classList.remove('active');
+                document.querySelector('.filters').style.display = 'none';
+                renderInsights();
             } else {
                 document.getElementById('mainView').classList.add('active');
                 document.getElementById('mapView').classList.remove('active');
                 document.getElementById('settingsView').classList.remove('active');
+                document.querySelector('.filters').style.display = 'flex';
             }
             const tabEl = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase().includes(tab));
             if (tabEl) tabEl.classList.add('active');
@@ -887,43 +909,52 @@
         // --- AI Intelligence Service ---
         async function processAIIntelligence(comments) {
             console.log("[AI] Starting intelligence layer processing...");
-            const messages = comments.map(c => c.message).slice(0, 50); // limit for performance
+            const filtered = comments.filter(c => !c.resolved).slice(0, 30);
+            if (filtered.length === 0) return;
+
+            const messages = filtered.map(c => c.message);
 
             try {
                 // 1. Categorization & Duplicate Detection
                 const prompt = `
-                Categorize these design comments into: Copy, Layout, Alignment, Branding, Dev Clarification, Content Missing, Other.
-                Also identifying any duplicate/near-identical comments by assigning the same integer clusterId.
+                Act as a Design Ops Assistant. Categorize these Figma comments and find duplicates.
+                Categories: Copy, Layout, Alignment, Branding, Dev Clarification, Content Missing, Other.
+                Identify duplicates by assigning the same integer 'clusterId' (start from 1). Use null if no duplicate.
                 
-                Return ONLY a JSON array of objects: [{c: "category", d: clusterId_or_null}]
-                Comments:
-                ${messages.map((m, i) => `${i}: "${m}"`).join('\n')}
+                Comments to process:
+                ${messages.map((m, i) => `ID ${i}: ${m}`).join('\n')}
+
+                Respond ONLY with a JSON object: {"results": [{"id": 0, "category": "Copy", "clusterId": 1}, ...]}
                 `;
 
                 const enriched = await callGroq(prompt);
-                if (enriched) {
-                    enriched.forEach((item, i) => {
-                        if (comments[i]) {
-                            updateTask(comments[i].id, 'aiCategory', item.c);
-                            if (item.d !== null) updateTask(comments[i].id, 'duplicateClusterId', `cluster_${item.d}`);
+                if (enriched && (enriched.results || enriched.comments)) {
+                    const results = enriched.results || enriched.comments;
+                    results.forEach(item => {
+                        const comment = filtered[item.id];
+                        if (comment) {
+                            updateTask(comment.id, 'aiCategory', item.category || item.c);
+                            if (item.clusterId !== undefined || item.d !== undefined) {
+                                const cId = item.clusterId !== undefined ? item.clusterId : item.d;
+                                if (cId !== null) updateTask(comment.id, 'duplicateClusterId', `cluster_${cId}`);
+                            }
                         }
                     });
                 }
 
                 // 2. Summary & Suggestions
                 const summaryPrompt = `
-                Analyze these design comments and provide:
-                1. A brief summary (2 sentences) of the overall state of the file.
-                2. A "Suggested Next Action" (1 sentence) focus based on priority.
-                
-                Return ONLY JSON: { "summary": "...", "suggestion": "..." }
-                Comments:
+                Summarize these design issues and suggest the next best action.
+                Issues:
                 ${messages.join('\n')}
+
+                Respond ONLY with JSON: {"summary": "2 sentence high level view", "suggestion": "1 crisp next step"}
                 `;
 
                 const insights = await callGroq(summaryPrompt);
-                if (insights) {
-                    parent.postMessage({ pluginMessage: { type: 'update-ai-insights', payload: insights } }, '*');
+                if (insights && (insights.summary || insights.results)) {
+                    const data = insights.summary ? insights : (insights.results?.[0] || insights.results);
+                    parent.postMessage({ pluginMessage: { type: 'update-ai-insights', payload: data } }, '*');
                 }
             } catch (err) {
                 console.error("[AI] Intelligence failure:", err);
@@ -939,16 +970,20 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama3-8b-8192",
-                        messages: [{ role: "user", content: prompt }],
-                        response_format: { type: "json_object" }
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: "You are a specialized JSON-only assistant for design team productivity. Always return valid JSON." },
+                            { role: "user", content: prompt }
+                        ],
+                        response_format: { type: "json_object" },
+                        temperature: 0.1
                     })
                 });
                 const result = await resp.json();
+                if (result.error) throw new Error(result.error.message);
                 const content = result.choices[0].message.content;
                 const parsed = JSON.parse(content);
-                // Groq returns JSON based on object but we need to handle if it's nested
-                return parsed.comments || parsed.results || parsed;
+                return parsed;
             } catch (e) {
                 console.error("[AI] Groq call failed", e);
                 return null;
