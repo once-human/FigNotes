@@ -14,12 +14,12 @@
             --radius-main: 12px;
             --radius-sm: 8px;
 
-            /* Blue Theme */
+            /* Blue Theme (Corporate Apple-like) */
             --accent-blue: #0070F6;
             --accent-blue-soft: #EEF6FF;
             --accent-blue-outline: #CCE4FF;
 
-            /* Pink Theme */
+            /* Pink Theme (Meow Mode) */
             --accent-pink: #FC97CF;
             --accent-pink-soft: #FFF5F9;
             --accent-pink-outline: #FFD6EA;
@@ -30,9 +30,12 @@
             --accent: var(--accent-blue);
             --accent-soft: var(--accent-blue-soft);
             --accent-outline: var(--accent-blue-outline);
-            --transition-type: ease-in-out;
-            --card-shadow: 0 2px 8px rgba(0, 112, 246, 0.08);
+            --transition-type: cubic-bezier(0.4, 0, 0.2, 1);
+            /* Precise Apple-like */
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             --radius: var(--radius-main);
+            --bounce: none;
+            --hover-transform: translateY(-1px);
         }
 
         body.theme-pink {
@@ -40,9 +43,12 @@
             --accent-soft: var(--accent-pink-soft);
             --accent-outline: var(--accent-pink-outline);
             --bg: var(--bg-pink);
-            --transition-type: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --card-shadow: 0 4px 12px rgba(252, 151, 207, 0.15);
-            --radius: 16px;
+            --transition-type: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            /* Super playful bounce */
+            --card-shadow: 0 4px 12px rgba(252, 151, 207, 0.2);
+            --radius: 18px;
+            --bounce: scale(1.05);
+            --hover-transform: translateY(-4px) rotate(1deg);
         }
 
         body {
@@ -59,68 +65,32 @@
             transition: background 0.4s ease;
         }
 
-        /* --- Header & Navigation --- */
+        /* --- New Integrated Header --- */
         .page-header {
             background: white;
-            padding-top: 12px;
             z-index: 1000;
             border-bottom: 2px solid var(--border);
         }
 
-        .top-nav {
+        .tab-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px 8px;
-        }
-
-        .app-title {
-            font-size: 16px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
-
-        .header-actions {
-            display: flex;
+            padding: 4px 16px 0;
             gap: 8px;
-            align-items: center;
-        }
-
-        .icon-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            opacity: 0.6;
-            color: var(--text-main);
-        }
-
-        .icon-btn:hover {
-            opacity: 1;
-            background: #F5F5F5;
-        }
-
-        .icon-btn.active {
-            opacity: 1;
-            color: var(--accent);
-            background: var(--accent-soft);
         }
 
         .primary-tabs {
             display: flex;
-            padding: 0 16px;
             gap: 16px;
+            flex: 1;
         }
 
         .p-tab {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 12px 0;
+            padding: 14px 0;
             font-size: 13px;
             font-weight: 700;
             color: var(--text-muted);
@@ -136,6 +106,42 @@
             opacity: 1;
         }
 
+        .theme-pink .p-tab.active {
+            transform: scale(1.1);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-type);
+            opacity: 0.6;
+            color: var(--text-main);
+        }
+
+        .icon-btn:hover {
+            opacity: 1;
+            background: #F5F5F5;
+            transform: var(--bounce);
+        }
+
+        .icon-btn.active {
+            opacity: 1;
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        /* --- Control Row --- */
         .control-row {
             display: flex;
             padding: 12px 16px;
@@ -170,6 +176,7 @@
             background: white;
             color: var(--accent);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transform: var(--bounce);
         }
 
         .filter-dropdown {
@@ -185,6 +192,11 @@
             color: var(--text-main);
             cursor: pointer;
             position: relative;
+            transition: all 0.2s;
+        }
+
+        .filter-dropdown:hover {
+            border-color: var(--accent-outline);
         }
 
         .progress-box {
@@ -215,7 +227,7 @@
             transition: width 0.6s var(--transition-type);
         }
 
-        /* --- Content & Cards --- */
+        /* --- Cards --- */
         .viewport {
             flex: 1;
             overflow-y: auto;
@@ -235,7 +247,7 @@
             font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             color: var(--accent);
             margin-bottom: 8px;
             display: flex;
@@ -249,16 +261,15 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             background: white;
-            transition: all 0.3s var(--transition-type);
+            transition: all 0.4s var(--transition-type);
             cursor: pointer;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-            position: relative;
         }
 
         .task-card:hover {
             border-color: var(--accent-outline);
             box-shadow: var(--card-shadow);
-            transform: translateY(-2px);
+            transform: var(--hover-transform);
         }
 
         .task-card.resolved {
@@ -309,7 +320,7 @@
             border-radius: 6px;
             border: 1px solid var(--border);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s var(--transition-type);
             background: white;
             color: var(--text-muted);
         }
@@ -318,6 +329,7 @@
             background: var(--accent);
             color: white;
             border-color: var(--accent);
+            transform: var(--bounce);
         }
 
         .card-actions {
@@ -339,12 +351,13 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s var(--transition-type);
         }
 
         .btn-work:hover {
             background: var(--accent);
             color: white;
+            transform: var(--bounce);
         }
 
         .btn-work.active {
@@ -364,17 +377,19 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .btn-resolve:hover {
             border-color: #A5D6A7;
             color: #2E7D32;
+            transform: var(--bounce);
         }
 
-        /* --- THE CAT (Small & Smooth) --- */
+        /* --- THE CAT (Bigger & Lower) --- */
         #cat-container {
             position: fixed;
-            bottom: 80px;
+            bottom: 50px;
             width: 100%;
             height: 60px;
             pointer-events: none;
@@ -389,8 +404,8 @@
 
         .cat {
             position: absolute;
-            width: 56px;
-            height: 42px;
+            width: 62px;
+            height: 46px;
             cursor: pointer;
             pointer-events: auto;
             will-change: transform, left;
@@ -421,13 +436,53 @@
             transition: transform 0.15s ease-out;
         }
 
-        @keyframes leg-wiggle {
+        /* Meow Bubble */
+        .meow-bubble {
+            position: absolute;
+            top: -30px;
+            left: 20px;
+            background: white;
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--accent-outline);
+            animation: meow-float 1s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        @keyframes meow-float {
             0% {
-                transform: rotate(-10deg);
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+                transform: translateY(-10px) scale(1.1);
+            }
+
+            80% {
+                opacity: 1;
+                transform: translateY(-20px) scale(1);
             }
 
             100% {
-                transform: rotate(10deg);
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+        }
+
+        @keyframes leg-wiggle {
+            0% {
+                transform: rotate(-8deg);
+            }
+
+            100% {
+                transform: rotate(8deg);
             }
         }
 
@@ -449,10 +504,6 @@
             }
 
             40% {
-                transform: translateY(-40px) scale(0.95, 1.05);
-            }
-
-            60% {
                 transform: translateY(-40px) scale(0.95, 1.05);
             }
 
@@ -486,11 +537,16 @@
             font-size: 14px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.3s var(--transition-type);
+            transition: all 0.4s var(--transition-type);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+        }
+
+        .btn-sync:hover {
+            transform: var(--bounce);
+            filter: brightness(1.05);
         }
 
         .settings-overlay {
@@ -514,10 +570,27 @@
 <body class="theme-blue">
 
     <div class="page-header">
-        <div class="top-nav">
-            <div class="app-title">FigNotes</div>
+        <div class="tab-row">
+            <div class="primary-tabs">
+                <div class="p-tab active" id="pTabAll" onclick="switchPrimaryTab('all')"><svg width="14" height="14"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                    </svg> All</div>
+                <div class="p-tab" id="pTabAssigned" onclick="switchPrimaryTab('assigned')"><svg width="14" height="14"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg> Assigned</div>
+                <div class="p-tab" id="pTabDiscussion" onclick="switchPrimaryTab('discussion')"><svg width="14"
+                        height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg> Discussion</div>
+            </div>
             <div class="header-actions">
-                <div class="icon-btn" id="catToggle" onclick="toggleTheme()" title="Latte Mode :)">
+                <div class="icon-btn" id="catToggle" onclick="toggleTheme()" title="Meow Mode 🐾">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path
@@ -535,24 +608,6 @@
                     </svg>
                 </div>
             </div>
-        </div>
-        <div class="primary-tabs">
-            <div class="p-tab active" id="pTabAll" onclick="switchPrimaryTab('all')"><svg width="14" height="14"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <rect x="3" y="3" width="7" height="7" />
-                    <rect x="14" y="3" width="7" height="7" />
-                    <rect x="14" y="14" width="7" height="7" />
-                    <rect x="3" y="14" width="7" height="7" />
-                </svg> All</div>
-            <div class="p-tab" id="pTabAssigned" onclick="switchPrimaryTab('assigned')"><svg width="14" height="14"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                </svg> Assigned</div>
-            <div class="p-tab" id="pTabDiscussion" onclick="switchPrimaryTab('discussion')"><svg width="14" height="14"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg> Chat</div>
         </div>
         <div class="control-row">
             <div class="status-toggle">
@@ -584,7 +639,7 @@
     <div class="viewport" id="content"></div>
 
     <div id="cat-container">
-        <div id="the-cat" class="cat" onclick="catJump()">
+        <div id="the-cat" class="cat" onclick="catMeow()">
             <svg class="cat-svg" viewBox="0 0 600 400">
                 <g class="cat-legs">
                     <path d="M225,260v78" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
@@ -639,7 +694,6 @@
         let sToggle = 'pending';
         let effortFilter = 'All';
 
-        // --- PERSISTENT CAT STATE ---
         let cat = { x: 20, targetX: 20, dir: 1, jumping: false };
         let mouseX = 0;
 
@@ -653,11 +707,20 @@
             else { cat.targetX = window.innerWidth + 80; }
         }
 
-        function catJump() {
+        function catMeow() {
             if (cat.jumping) return;
             cat.jumping = true;
-            document.getElementById('the-cat').classList.add('cat-jumping');
-            setTimeout(() => { document.getElementById('the-cat').classList.remove('cat-jumping'); cat.jumping = false; }, 500);
+
+            // Spawn Meow Bubble
+            const bubble = document.createElement('div');
+            bubble.className = 'meow-bubble';
+            bubble.innerText = 'Meoww!';
+            const el = document.getElementById('the-cat');
+            el.appendChild(bubble);
+            setTimeout(() => bubble.remove(), 1000);
+
+            el.classList.add('cat-jumping');
+            setTimeout(() => { el.classList.remove('cat-jumping'); cat.jumping = false; }, 500);
         }
 
         function animate() {
@@ -681,9 +744,8 @@
         }
         requestAnimationFrame(animate);
 
-        // --- Logic ---
         function switchPrimaryTab(tab) { pTab = tab; Array.from(document.querySelectorAll('.p-tab')).forEach(t => t.classList.toggle('active', t.id === 'pTab' + tab.charAt(0).toUpperCase() + tab.slice(1))); render(); }
-        function switchSecondaryTab(toggle) { sToggle = toggle; document.getElementById('sTogglePending').classList.toggle('active', toggle === 'pending'); document.getElementById('sToggleResolved').classList.toggle('active', toggle === 'resolved'); render(); }
+        function switchSecondaryTab(toggle) { sToggle = toggle; Array.from(document.querySelectorAll('.s-toggle')).forEach(t => t.classList.toggle('active', t.id === 'sToggle' + toggle.charAt(0).toUpperCase() + toggle.slice(1))); render(); }
         function updateEffortSelection(val) { effortFilter = val; document.getElementById('effortLabel').innerText = val === 'All' ? 'All Efforts' : val; render(); }
 
         function render() {
@@ -698,9 +760,9 @@
             });
 
             const total = filtered.length;
-            const resolved = filtered.filter(t => t.resolved).length;
-            const percent = total > 0 ? (resolved / total * 100) : 0;
-            document.getElementById('statText').innerText = `${total - resolved} pending / ${total} total`;
+            const resCount = filtered.filter(t => t.resolved).length;
+            const percent = total > 0 ? (resCount / total * 100) : 0;
+            document.getElementById('statText').innerText = `${total - resCount} pending / ${total} total`;
             document.getElementById('statPercent').innerText = `${Math.round(percent)}%`;
             document.getElementById('progressBar').style.width = `${percent}%`;
 
@@ -752,21 +814,14 @@
         }
 
         function locate(id) { parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*'); }
-
         function resolve(id) {
-            // Optimistic UI Update
             const task = latestData.tasks.find(t => t.commentId === id);
-            if (task) {
-                task.resolved = true;
-                task.isCurrentlyWorking = false;
-                render();
-            }
-
+            if (task) { task.resolved = true; task.isCurrentlyWorking = false; render(); }
             parent.postMessage({ pluginMessage: { type: 'resolve-comment', payload: id } }, '*');
             const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
             if (fileKey) fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${id}`, {
                 method: 'POST', headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' }, body: JSON.stringify({ resolved: true })
-            }).catch(e => console.error("REST Resolve Failed", e));
+            }).catch(e => console.error(e));
         }
 
         function setWorking(id) { parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*'); }
