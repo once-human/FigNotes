@@ -138,17 +138,16 @@ async function navigateToTask(task: Task) {
             }
 
             if (targetNode.type !== "PAGE" && targetNode.type !== "DOCUMENT") {
-                // Smooth zoom using scrollAndZoomIntoView
-                // We pass an array of nodes to zoom to. If the node is small, it provides a nice context.
+                // Professional smooth zoom
                 figma.viewport.scrollAndZoomIntoView([targetNode as SceneNode]);
                 figma.currentPage.selection = [targetNode as SceneNode];
             } else {
                 figma.viewport.center = { x: 0, y: 0 };
             }
         } else {
-            // Safe center fallback
+            // Absolute fallback
             figma.viewport.center = { x: figma.viewport.center.x, y: figma.viewport.center.y };
-            figma.notify("Node not found. Focusing canvas.", { timeout: 1000 });
+            figma.notify("Focusing canvas...", { timeout: 1000 });
         }
     } catch (err) {
         console.warn("[FigNotes] Navigation fallback failed", err);

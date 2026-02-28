@@ -9,51 +9,54 @@
         :root {
             --bg: #FFFFFF;
             --text-main: #111111;
-            --text-muted: #666666;
+            --text-muted: #888888;
             --border: #F0F0F0;
-            --radius-main: 8px;
-            --radius-btn: 6px;
-            --font-main: 'Inter', -apple-system, sans-serif;
+            --radius-main: 12px;
+            --radius-btn: 10px;
 
             /* Blue Theme (Professional) */
-            --blue-accent: #0070F6;
-            --blue-accent-soft: #EBF5FF;
-            --blue-accent-muted: #CCE3FD;
-            --blue-shadow: 0 1px 4px rgba(0, 112, 246, 0.05);
+            --accent-blue: #0070F6;
+            --accent-blue-soft: #EEF6FF;
+            --accent-blue-outline: #CCE4FF;
 
             /* Pink Theme (Cute Thoughtful) */
-            --pink-accent: #FC97CF;
-            --pink-accent-soft: #FFF0F7;
-            --pink-accent-muted: #FFD6EA;
-            --pink-bg: #FFFAFC;
-            --pink-shadow: 0 2px 8px rgba(252, 151, 207, 0.08);
+            --accent-pink: #FC97CF;
+            --accent-pink-soft: #FFF5F9;
+            --accent-pink-outline: #FFD6EA;
+            --bg-pink: #FFFBFC;
+            /* Warmer white */
         }
 
+        /* --- Theme Modes --- */
         body.theme-blue {
-            --accent: var(--blue-accent);
-            --accent-soft: var(--blue-accent-soft);
-            --accent-muted: var(--blue-accent-muted);
-            --shadow: var(--blue-shadow);
+            --accent: var(--accent-blue);
+            --accent-soft: var(--accent-blue-soft);
+            --accent-outline: var(--accent-blue-outline);
+            --transition-type: ease-in-out;
+            --spring: none;
+            --card-hover-translate: translateY(-1px);
+            --card-shadow: 0 2px 8px rgba(0, 112, 246, 0.08);
             --radius: var(--radius-main);
-            --body-bg: var(--bg);
-            --anim-tab: all 0.15s ease-in-out;
-            --anim-bounce: none;
         }
 
         body.theme-pink {
-            --accent: var(--pink-accent);
-            --accent-soft: var(--pink-accent-soft);
-            --accent-muted: var(--pink-accent-muted);
-            --shadow: var(--pink-shadow);
-            --radius: 12px;
-            --body-bg: var(--pink-bg);
-            --anim-tab: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            --anim-bounce: scale(1.02);
+            --accent: var(--accent-pink);
+            --accent-soft: var(--accent-pink-soft);
+            --accent-outline: var(--accent-pink-outline);
+            --bg: var(--bg-pink);
+            --transition-type: cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Spring-like */
+            --spring: scale(1.05);
+            /* Soft overshoot */
+            --card-hover-translate: translateY(-2px);
+            --card-shadow: 0 4px 12px rgba(252, 151, 207, 0.15);
+            --radius: 16px;
+            /* Rounder */
         }
 
         body {
-            font-family: var(--font-main);
-            background: var(--body-bg);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
             color: var(--text-main);
             margin: 0;
             padding: 0;
@@ -62,268 +65,268 @@
             height: 100vh;
             overflow: hidden;
             letter-spacing: -0.01em;
-            transition: background 0.3s ease;
+            transition: background 0.4s ease;
         }
 
-        /* --- Compact Header --- */
-        .header {
+        /* --- Header & Tab Restructure --- */
+        .page-header {
             background: white;
+            padding-top: 12px;
             z-index: 1000;
-            border-bottom: 1px solid var(--border);
-            padding: 0;
+            border-bottom: 2px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
         }
 
-        .top-row {
+        .top-nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 14px;
+            padding: 0 16px 8px;
         }
 
-        /* --- Inline Navigation --- */
-        .nav-row {
+        .app-title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
-            padding: 0 14px;
-            border-bottom: 1px solid var(--border);
-            gap: 16px;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.6;
         }
 
-        .tab {
-            padding: 10px 0;
-            font-size: 12px;
+        .icon-btn:hover {
+            opacity: 1;
+            background: #F5F5F5;
+        }
+
+        .icon-btn.active {
+            opacity: 1;
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        /* Primary Tabs: All, Assigned, Discussion */
+        .primary-tabs {
+            display: flex;
+            padding: 0 16px;
+            gap: 20px;
+        }
+
+        .p-tab {
+            padding: 12px 0;
+            font-size: 13px;
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: var(--anim-tab);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition-type) 0.3s;
+            opacity: 0.7;
             white-space: nowrap;
-            opacity: 0.6;
-            margin-bottom: -1px;
         }
 
-        .tab.active {
+        .p-tab.active {
             color: var(--accent);
             border-bottom-color: var(--accent);
             opacity: 1;
         }
 
-        .nav-divider {
-            width: 1px;
-            height: 14px;
-            background: var(--border);
-            margin: 0 4px;
-        }
-
-        /* --- Controls Bar --- */
-        .controls-row {
+        /* Secondary Toggles: Pending, Resolved */
+        .secondary-toggle {
             display: flex;
-            align-items: center;
-            padding: 6px 14px;
-            gap: 8px;
+            padding: 12px 16px;
             background: #FAFAFA;
             border-bottom: 1px solid var(--border);
-        }
-
-        .sub-tab-group {
-            display: flex;
-            background: #E0E0E0;
-            padding: 2px;
-            border-radius: 6px;
-            gap: 1px;
-        }
-
-        .sub-tab {
-            padding: 4px 10px;
-            font-size: 10px;
-            font-weight: 800;
-            border-radius: 4px;
-            cursor: pointer;
-            background: transparent;
-            color: var(--text-muted);
-            transition: all 0.2s;
-            text-transform: uppercase;
-        }
-
-        .sub-tab.active {
-            background: white;
-            color: var(--text-main);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-filter {
-            margin-left: auto;
-            display: flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
+            gap: 8px;
+        }
+
+        .s-toggle {
+            padding: 6px 12px;
+            border-radius: 100px;
             font-size: 11px;
             font-weight: 700;
-            border-radius: 6px;
             cursor: pointer;
-            background: white;
             border: 1px solid var(--border);
+            background: white;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .s-toggle.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* --- Progress Bar --- */
+        .progress-box {
+            padding: 12px 16px;
+            background: white;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 6px;
             color: var(--text-muted);
         }
 
-        .btn-filter.active {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: var(--accent-soft);
-        }
-
-        /* --- Progress Hairline --- */
-        .progress-container {
-            position: relative;
-            height: 2px;
+        .progress-bar-bg {
+            height: 4px;
             background: #F0F0F0;
-            width: 100%;
+            border-radius: 100px;
+            overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
             background: var(--accent);
-            transition: width 0.6s cubic-bezier(0.1, 0.9, 0.2, 1);
+            border-radius: 100px;
+            transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .metrics-row {
+        /* --- Effort Filters --- */
+        .effort-filters {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 14px;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--text-muted);
+            padding: 12px 16px;
+            gap: 8px;
             background: white;
+            border-bottom: 1px solid var(--border);
         }
 
-        /* --- Filter Dropdown --- */
-        .filter-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 14px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 8px;
-            display: none;
-            z-index: 2000;
-            min-width: 120px;
-        }
-
-        .filter-dropdown.active {
-            display: block;
-        }
-
-        .filter-option {
-            padding: 8px 10px;
+        .effort-chip {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
             font-size: 11px;
-            font-weight: 700;
-            border-radius: 4px;
+            font-weight: 800;
+            text-align: center;
+            border: 1px solid var(--border);
+            background: #F9F9F9;
+            color: var(--text-muted);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            transition: all 0.2s;
         }
 
-        .filter-option:hover {
-            background: #F5F5F5;
-        }
-
-        .filter-option.selected {
-            color: var(--accent);
+        .effort-chip.active {
             background: var(--accent-soft);
+            color: var(--accent);
+            border-color: var(--accent-outline);
         }
 
-        /* --- Scrollable Content --- */
+        /* --- Content & Lists --- */
         .viewport {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 100px;
-            background: transparent;
+            padding-bottom: 120px;
+            scrollbar-width: thin;
+            background: inherit;
+        }
+
+        .pinned-section {
+            padding: 16px;
+            background: var(--accent-soft);
+            border-bottom: 1px solid var(--accent-outline);
+            margin-bottom: 8px;
+        }
+
+        .label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: block;
         }
 
         /* --- Task Cards --- */
         .task-card {
-            margin: 8px 12px;
-            padding: 12px;
-            background: white;
+            margin: 8px 16px 16px;
+            padding: 16px;
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            background: white;
+            transition: all 0.3s var(--transition-type);
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-            position: relative;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
         }
 
         .task-card:hover {
-            border-color: var(--accent-muted);
-            box-shadow: var(--shadow);
-            transform: var(--anim-bounce);
+            border-color: var(--accent-outline);
+            box-shadow: var(--card-shadow);
+            transform: var(--card-hover-translate);
         }
 
         .task-card.resolved {
             opacity: 0.5;
-            filter: grayscale(0.5);
+            background: #FAFAFA;
+            border-style: dashed;
         }
 
-        .task-header {
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .author {
-            font-size: 9px;
+            font-size: 11px;
             font-weight: 800;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 0.02em;
+            color: var(--text-main);
         }
 
-        .card-meta {
+        .meta {
             font-size: 10px;
-            color: #999;
+            color: var(--text-muted);
             font-weight: 600;
         }
 
         .message {
-            font-size: 13px;
-            line-height: 1.4;
-            margin-bottom: 12px;
-            word-break: break-word;
+            font-size: 14px;
+            line-height: 1.5;
             color: var(--text-main);
+            margin-bottom: 16px;
+            word-break: break-word;
         }
 
-        /* --- Effort Selector (Compact Horizontal) --- */
-        .effort-bar {
+        /* --- Actions --- */
+        .card-efforts {
             display: flex;
-            gap: 4px;
-            margin-bottom: 12px;
+            gap: 6px;
+            margin-bottom: 16px;
         }
 
-        .effort-pill {
+        .effort-btn {
             flex: 1;
-            padding: 6px 0;
-            font-size: 10px;
-            font-weight: 800;
+            padding: 8px;
             text-align: center;
-            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 8px;
             border: 1px solid var(--border);
-            background: #FAFAFA;
-            color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.1s;
-            text-transform: uppercase;
+            transition: all 0.2s;
         }
 
-        .effort-pill:hover {
-            border-color: var(--accent);
-        }
-
-        .effort-pill.active {
+        .effort-btn.active {
             background: var(--accent);
             color: white;
             border-color: var(--accent);
@@ -336,54 +339,68 @@
 
         .btn-work {
             flex: 1;
-            padding: 8px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
             background: var(--accent-soft);
             color: var(--accent);
-            border: none;
-            border-radius: var(--radius-btn);
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .btn-resolve {
-            padding: 8px 12px;
-            background: white;
+            padding: 12px 18px;
             border: 1px solid var(--border);
-            border-radius: var(--radius-btn);
+            border-radius: 8px;
+            background: white;
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
         }
 
         .btn-resolve:hover {
-            color: #2E7D32;
             border-color: #A5D6A7;
+            color: #2E7D32;
         }
 
-        /* --- Cat Overlay --- */
-        .cat-box {
-            position: fixed;
-            bottom: 72px;
-            left: 0;
-            right: 0;
-            height: 48px;
-            pointer-events: none;
-            z-index: 900;
+        /* --- Click Animations --- */
+        @keyframes pulse-blue {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
-        .cat {
-            position: absolute;
-            bottom: 0;
-            width: 40px;
-            height: 40px;
-            opacity: 0;
-            transition: left 3s linear, opacity 0.5s;
+        @keyframes pulse-pink {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
-        body.theme-pink .cat {
-            opacity: 1;
+        .click-blue {
+            animation: pulse-blue 0.2s ease-in-out;
+        }
+
+        .click-pink {
+            animation: pulse-pink 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* --- Footer --- */
@@ -392,145 +409,291 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 12px 14px;
+            padding: 16px;
             background: white;
             border-top: 1px solid var(--border);
-            z-index: 1000;
+            z-index: 2000;
         }
 
         .btn-sync {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius);
             background: var(--accent);
             color: white;
-            border: none;
-            border-radius: var(--radius-main);
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-type);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            cursor: pointer;
         }
 
-        /* --- Overlay --- */
-        .overlay {
+        .btn-sync:hover {
+            filter: brightness(1.05);
+        }
+
+        .theme-pink .btn-sync:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(252, 151, 207, 0.3);
+        }
+
+        /* --- Cats (Animated SVG) --- */
+        #cat-container {
+            position: fixed;
+            bottom: 80px;
+            width: 100%;
+            height: 60px;
+            pointer-events: none;
+            z-index: 500;
+            overflow: hidden;
+            display: none;
+        }
+
+        body.theme-pink #cat-container {
+            display: block;
+        }
+
+        .cat {
+            position: absolute;
+            bottom: 0;
+            width: 60px;
+            height: 40px;
+            transition: left 8s linear;
+        }
+
+        .cat-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Animation Keyframes for Specific SVG Groups */
+        @keyframes cat-walk {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        @keyframes leg-move {
+
+            0%,
+            100% {
+                transform: rotate(-10deg);
+            }
+
+            50% {
+                transform: rotate(10deg);
+            }
+        }
+
+        @keyframes tail-flick {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(15deg);
+            }
+        }
+
+        .cat-body {
+            animation: cat-walk 0.6s infinite ease-in-out;
+            transform-origin: center;
+        }
+
+        .cat-legs {
+            animation: leg-move 0.6s infinite ease-in-out;
+            transform-origin: top;
+        }
+
+        .cat-tail {
+            animation: tail-flick 2s infinite ease-in-out;
+            transform-origin: left center;
+        }
+
+        /* --- Settings Overlay --- */
+        .settings-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: white;
-            z-index: 2000;
-            padding: 24px;
+            z-index: 3000;
+            padding: 32px 24px;
             display: none;
+            transition: all 0.3s ease;
         }
 
-        .overlay.active {
+        .settings-overlay.active {
             display: block;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            background: var(--accent-soft);
         }
     </style>
 </head>
 
 <body class="theme-blue">
 
-    <div class="header">
-        <!-- Top Title Root -->
-        <div class="top-row">
-            <div style="font-size: 16px; font-weight: 900; letter-spacing: -0.04em;">FigNotes</div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <div class="icon-btn" id="catToggle" onclick="toggleTheme()" title="Toggle Theme">🐱</div>
-                <div class="icon-btn" onclick="toggleSettings(true)" title="Settings">⚙️</div>
+    <!-- Header -->
+    <div class="page-header">
+        <div class="top-nav">
+            <div class="app-title">FigNotes</div>
+            <div class="header-actions">
+                <div class="icon-btn" id="catToggle" onclick="toggleTheme()" title="Toggle Thoughtful Mode">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M12 5c.67 0 1.35.09 2 .26 1.78-2 2.61-2.07 3-.16.14.63.14 1.25.07 1.87a6 6 0 0 1 3.51 5.95c0 4.29-3.5 11.08-8.58 11.08-5.08 0-8.58-6.79-8.58-11.08A6 6 0 0 1 7 7.02c-.07-.62-.07-1.24.07-1.87.39-1.91 1.22-1.84 3-.16.65-.17 1.33-.26 2-.26z" />
+                        <path
+                            d="M22 10a11.94 11.94 0 0 1-5.69 1.48C14.7 11.48 12 11 12 11M2 10a11.94 11.94 0 0 0 5.69 1.48C9.3 11.48 12 11 12 11" />
+                    </svg>
+                </div>
+                <div class="icon-btn" onclick="toggleSettings(true)" title="Settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                </div>
             </div>
         </div>
 
-        <!-- Primary Navigation -->
-        <div class="nav-row">
-            <div class="tab active" data-id="all" onclick="setPrimaryTab('all')">All</div>
-            <div class="tab" data-id="me" onclick="setPrimaryTab('me')">Assigned</div>
-            <div class="tab" data-id="discussion" onclick="setPrimaryTab('discussion')">Discussion</div>
+        <div class="primary-tabs">
+            <div class="p-tab active" id="pTabAll" onclick="switchPrimaryTab('all')">All</div>
+            <div class="p-tab" id="pTabAssigned" onclick="switchPrimaryTab('assigned')">Assigned</div>
+            <div class="p-tab" id="pTabDiscussion" onclick="switchPrimaryTab('discussion')">Discussion</div>
         </div>
 
-        <!-- Secondary Sub-Navigation & Filters -->
-        <div class="controls-row">
-            <div class="sub-tab-group">
-                <div class="sub-tab active" data-id="pending" onclick="setSecondaryTab('pending')">Pending</div>
-                <div class="sub-tab" data-id="resolved" onclick="setSecondaryTab('resolved')">Resolved</div>
-            </div>
+        <div class="secondary-toggle">
+            <div class="s-toggle active" id="sTogglePending" onclick="switchSecondaryTab('pending')">Pending</div>
+            <div class="s-toggle" id="sToggleResolved" onclick="switchSecondaryTab('resolved')">Resolved</div>
+        </div>
 
-            <div class="btn-filter" id="filterBtn" onclick="toggleFilterDropdown()">
-                <view-icon>🔍</view-icon>
-                <span id="filterLabel">Effort</span>
+        <div class="progress-box">
+            <div class="progress-stats">
+                <span id="statText">0 comments</span>
+                <span id="statPercent">0%</span>
             </div>
-
-            <!-- Filter Dropdown -->
-            <div class="filter-dropdown" id="filterMenu">
-                <div class="filter-option" id="optS" onclick="toggleEffortFilter('Small')">Small <span
-                        class="check"></span></div>
-                <div class="filter-option" id="optM" onclick="toggleEffortFilter('Medium')">Medium <span
-                        class="check"></span></div>
-                <div class="filter-option" id="optL" onclick="toggleEffortFilter('Large')">Large <span
-                        class="check"></span></div>
+            <div class="progress-bar-bg">
+                <div id="progressBar" class="progress-fill" style="width: 0%;"></div>
             </div>
         </div>
 
-        <!-- Metrics & Progress -->
-        <div class="metrics-row">
-            <span id="progressPercent">0% complete</span>
-            <div style="display:flex; gap:8px;">
-                <span id="totalCount">0 Total</span>
-                <span style="opacity:0.5;">/</span>
-                <span id="pendingCount">0 Pending</span>
-            </div>
-        </div>
-        <div class="progress-container">
-            <div class="progress-fill" id="progressBar"></div>
+        <div class="effort-filters">
+            <div class="effort-chip" id="fS" onclick="toggleEffortFilter('Small')">Small</div>
+            <div class="effort-chip" id="fM" onclick="toggleEffortFilter('Medium')">Medium</div>
+            <div class="effort-chip" id="fL" onclick="toggleEffortFilter('Large')">Large</div>
         </div>
     </div>
 
-    <!-- Content -->
+    <!-- Main List -->
     <div class="viewport" id="content">
         <!-- Rendered dynamically -->
     </div>
 
-    <!-- Cat Box -->
-    <div class="cat-box" id="catBox"></div>
+    <!-- Cats Layer -->
+    <div id="cat-container">
+        <!-- Cats injected here -->
+    </div>
 
     <!-- Footer -->
     <div class="footer">
-        <button class="btn-sync" onclick="triggerSync()">Sync Workboard</button>
+        <button class="btn-sync" onclick="triggerSync()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 4v6h-6" />
+                <path d="M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+            </svg>
+            Sync
+        </button>
     </div>
 
-    <!-- Overlay Settings -->
-    <div id="settingsView" class="overlay">
-        <h2 style="font-weight: 900; margin-top:0;">Figma Setup</h2>
-        <div style="margin-bottom:20px;">
-            <label style="font-size:10px; font-weight:800; color:#666; text-transform:uppercase;">Access Token</label>
-            <input type="password" id="patInput"
-                style="width:100%; padding:12px; margin-top:4px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+    <!-- Settings -->
+    <div id="settingsView" class="settings-overlay">
+        <h2 style="font-weight: 800; margin-bottom: 32px;">Configuration</h2>
+        <div class="input-group">
+            <span class="input-label">Figma Access Token</span>
+            <input type="password" id="patInput" placeholder="figp_...">
         </div>
-        <div style="margin-bottom:24px;">
-            <label style="font-size:10px; font-weight:800; color:#666; text-transform:uppercase;">File URL</label>
-            <input type="text" id="urlInput"
-                style="width:100%; padding:12px; margin-top:4px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;">
+        <div class="input-group">
+            <span class="input-label">Figma File URL</span>
+            <input type="text" id="urlInput" placeholder="https://www.figma.com/design/...">
         </div>
-        <button class="btn-sync" onclick="saveSettings()">Save & Close</button>
-        <p style="text-align:center; font-size:12px; color:#666; margin-top:20px; cursor:pointer;"
-            onclick="toggleSettings(false)">Cancel</p>
+        <button class="btn-sync" onclick="saveSettings()">Apply Changes</button>
+        <div style="text-align:center; margin-top:24px; cursor:pointer; font-size:12px; color:var(--accent); font-weight:700;"
+            onclick="toggleSettings(false)">Back</div>
     </div>
 
     <script>
         let latestData = null;
         let config = { pat: '', fileUrl: '' };
-        let primTab = 'all';
-        let secTab = 'pending';
-        let effortFilters = new Set();
         let currentTheme = 'blue';
+        let pTab = 'all'; // all, assigned, discussion
+        let sToggle = 'pending'; // pending, resolved
+        let effortFilters = new Set();
+        let cats = [];
+
+        // SVG Template for Cat
+        const catSvgTemplate = `
+        <svg class="cat-svg" viewBox="0 0 600 400">
+            <g class="cat-legs"><path d="M225,260v78" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px"/><path d="M340,260v78" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px"/></g>
+            <g class="cat-body">
+                <path class="cat-tail" d="M208,240s-35.8-1.5-46-42c-5.5-25.3-9.2-40.5-32-48" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px"/>
+                <rect x="190" y="201" width="200" height="118" rx="58.9" style="fill:#eba13d"/>
+                <g class="cat-head">
+                    <path d="M330,121c5,16-1,34-14,38s-29-5-34-22c-8-25,1-49,10-52,8-2,30,11,38,36z" style="fill:#eba13d"/>
+                    <path d="M372,121c-5,16,1,34,14,38s29-5,34-22c8-25-1-49-10-52-8-2-30,11-38,36z" style="fill:#eba13d"/>
+                    <path d="M430,164c0,43-35,67-78,67s-78-23-78-66,41-75,78-75,78,32,78,74z" style="fill:#eba13d"/>
+                    <circle cx="320" cy="156" r="10" style="fill:#33281b"/><circle cx="382" cy="156" r="10" style="fill:#33281b"/>
+                    <path d="M373,176c0,2-4,6-9,6s-9-4-9-6,4-4,9-4,9,2,9,4z" style="fill:#33281b"/>
+                </g>
+            </g>
+        </svg>`;
 
         // --- Communication ---
-        window.onmessage = (event) => {
-            const { type, payload } = event.data.pluginMessage;
+        window.onmessage = (e) => {
+            const { type, payload } = e.data.pluginMessage;
             if (type === 'settings-loaded') {
                 config = payload;
                 document.getElementById('patInput').value = config.pat || '';
@@ -546,93 +709,91 @@
 
         parent.postMessage({ pluginMessage: { type: 'init' } }, '*');
 
-        // --- Navigation ---
-        function setPrimaryTab(id) {
-            primTab = id;
-            document.querySelectorAll('.nav-row .tab').forEach(t => t.classList.toggle('active', t.dataset.id === id));
-            render();
-        }
-
-        function setSecondaryTab(id) {
-            secTab = id;
-            document.querySelectorAll('.sub-tab-group .sub-tab').forEach(t => t.classList.toggle('active', t.dataset.id === id));
-            render();
-        }
-
-        function toggleFilterDropdown() {
-            document.getElementById('filterMenu').classList.toggle('active');
-        }
-
-        function toggleEffortFilter(id) {
-            if (effortFilters.has(id)) effortFilters.delete(id);
-            else effortFilters.add(id);
-
-            document.getElementById('opt' + id[0]).classList.toggle('selected');
-            document.getElementById('filterBtn').classList.toggle('active', effortFilters.size > 0);
-            render();
-        }
-
-        // --- Theme ---
+        // --- Theme & Cats ---
         function toggleTheme() {
-            const next = currentTheme === 'blue' ? 'pink' : 'blue';
-            applyTheme(next);
-            parent.postMessage({ pluginMessage: { type: 'set-theme', payload: next } }, '*');
+            const nt = currentTheme === 'blue' ? 'pink' : 'blue';
+            applyTheme(nt);
+            parent.postMessage({ pluginMessage: { type: 'set-theme', payload: nt } }, '*');
         }
 
         function applyTheme(theme) {
             currentTheme = theme;
             document.body.className = 'theme-' + theme;
-            document.getElementById('catToggle').innerText = theme === 'pink' ? '🐱' : '🐈';
+            document.getElementById('catToggle').classList.toggle('active', theme === 'pink');
 
-            if (theme === 'pink') initCats();
-            else clearCats();
+            if (theme === 'pink') spawnCats();
+            else despawnCats();
         }
 
-        // --- Actions ---
-        function triggerSync() {
-            if (!config.pat || !config.fileUrl) return;
-            const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (!match) return;
-
-            document.getElementById('content').innerHTML = '<div style="padding:40px; text-align:center; font-size:11px; font-weight:800; opacity:0.5;">SYNCING DATA...</div>';
-
-            fetch(`https://api.figma.com/v1/files/${match}/comments`, {
-                headers: { 'X-Figma-Token': config.pat }
-            })
-                .then(r => r.json())
-                .then(data => {
-                    parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*');
-                })
-                .catch(() => alert("Sync Failed"));
-        }
-
-        function handleResolve(id, isResolved) {
-            const type = isResolved ? 'resolve-comment' : 'unresolve-comment';
-            parent.postMessage({ pluginMessage: { type, payload: id } }, '*');
-            const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            fetch(`https://api.figma.com/v1/files/${match}/comments/${id}`, {
-                method: 'POST',
-                headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resolved: isResolved })
+        function spawnCats() {
+            const container = document.getElementById('cat-container');
+            container.innerHTML = '';
+            cats = [
+                { id: 'cat1', x: 20, targetX: 20, dir: 1 },
+                { id: 'cat2', x: 200, targetX: 200, dir: -1 }
+            ];
+            cats.forEach(c => {
+                const el = document.createElement('div');
+                el.id = c.id; el.className = 'cat';
+                el.innerHTML = catSvgTemplate;
+                container.appendChild(el);
             });
+            requestAnimationFrame(animateCats);
         }
 
-        function updateEffort(id, curr, target) {
-            const val = curr === target ? null : target;
-            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: val } } }, '*');
+        function despawnCats() {
+            cats.forEach(c => {
+                const el = document.getElementById(c.id);
+                if (el) el.style.left = '-100px'; // Walk off screen
+            });
+            setTimeout(() => { document.getElementById('cat-container').innerHTML = ''; }, 2000);
         }
 
-        function setWorking(id) {
-            parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*');
+        function animateCats() {
+            if (currentTheme !== 'pink') return;
+            cats.forEach(c => {
+                const el = document.getElementById(c.id);
+                if (!el) return;
+
+                // Simple AI: Move towards target
+                if (Math.abs(c.x - c.targetX) < 1) {
+                    if (Math.random() < 0.01) { // New target
+                        c.targetX = Math.random() * (window.innerWidth - 60);
+                        c.dir = c.targetX > c.x ? 1 : -1;
+                    }
+                } else {
+                    c.x += c.dir * 0.5;
+                    el.style.left = c.x + 'px';
+                    el.style.transform = `scaleX(${c.dir})`; // Flip based on direction
+                }
+            });
+            requestAnimationFrame(animateCats);
         }
 
-        function locate(id, el) {
-            el.classList.add('pulse');
-            setTimeout(() => el.classList.remove('pulse'), 400);
-            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*');
+        // --- View Logic ---
+        function switchPrimaryTab(tab) {
+            pTab = tab;
+            document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('pTab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            render();
+        }
+
+        function switchSecondaryTab(toggle) {
+            sToggle = toggle;
+            document.querySelectorAll('.s-toggle').forEach(t => t.classList.remove('active'));
+            document.getElementById('sToggle' + toggle.charAt(0).toUpperCase() + toggle.slice(1)).classList.add('active');
+            render();
+        }
+
+        function toggleEffortFilter(eff) {
+            if (effortFilters.has(eff)) effortFilters.delete(eff);
+            else effortFilters.add(eff);
+            document.getElementById('f' + eff[0]).classList.toggle('active');
+            render();
         }
 
         function toggleSettings(show) { document.getElementById('settingsView').classList.toggle('active', show); }
+
         function saveSettings() {
             config.pat = document.getElementById('patInput').value;
             config.fileUrl = document.getElementById('urlInput').value;
@@ -641,104 +802,109 @@
             triggerSync();
         }
 
+        function triggerSync() {
+            if (!config.pat || !config.fileUrl) return;
+            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            if (!fileKey) return;
+            fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, { headers: { 'X-Figma-Token': config.pat } })
+                .then(r => r.json())
+                .then(data => parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*'))
+                .catch(() => alert("Sync Failed. Check credentials."));
+        }
+
+        async function toggleResolve(commentId, isResolved) {
+            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            const type = isResolved ? 'unresolve-comment' : 'resolve-comment';
+            parent.postMessage({ pluginMessage: { type, payload: commentId } }, '*');
+
+            fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${commentId}`, {
+                method: 'POST',
+                headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resolved: !isResolved })
+            }).catch(e => console.error(e));
+        }
+
+        function setWorking(id) { parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*'); }
+        function updateEffort(id, old, next) {
+            const v = old === next ? null : next;
+            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: v } } }, '*');
+        }
+        function locate(id, el) {
+            el.classList.add(currentTheme === 'blue' ? 'click-blue' : 'click-pink');
+            setTimeout(() => el.classList.remove('click-blue', 'click-pink'), 400);
+            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*');
+        }
+
         // --- Rendering ---
         function render() {
             if (!latestData) return;
-            const { tasks, currentUser } = latestData;
+            const container = document.getElementById('content');
+            const currentUser = latestData.currentUser;
 
-            // Filtering
-            let scoped = tasks.filter(t => {
-                if (primTab === 'me') return t.assignee === currentUser;
-                if (primTab === 'discussion') return t.mentions.includes(currentUser) && t.mentions.length > 1;
+            // 1. Filter by Primary Tab
+            let allGrouped = latestData.tasks.filter(t => {
+                if (pTab === 'assigned') return t.assignee === currentUser;
+                if (pTab === 'discussion') return t.mentions.includes(currentUser) && t.mentions.length > 1;
                 return true;
             });
 
-            // Metrics
-            const total = scoped.length;
-            const resolved = scoped.filter(t => t.resolved).length;
-            const pending = total - resolved;
-            const pct = total > 0 ? Math.round((resolved / total) * 100) : 0;
+            // Calculate Progress Bar for this group
+            const total = allGrouped.length;
+            const resolvedCount = allGrouped.filter(t => t.resolved).length;
+            const pendingCount = total - resolvedCount;
+            const percent = total > 0 ? Math.round((resolvedCount / total) * 100) : 0;
 
-            document.getElementById('totalCount').innerText = `${total} Total`;
-            document.getElementById('pendingCount').innerText = `${pending} Pending`;
-            document.getElementById('progressPercent').innerText = `${pct}% Resolved`;
-            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('statText').innerText = `${pendingCount} pending / ${total} total`;
+            document.getElementById('statPercent').innerText = `${percent}%`;
+            document.getElementById('progressBar').style.width = `${percent}%`;
 
-            let view = scoped.filter(t => (secTab === 'resolved' ? t.resolved : !t.resolved));
-            if (effortFilters.size > 0) view = view.filter(t => effortFilters.has(t.effort));
+            // 2. Filter by Secondary Toggle & Effort
+            let tasks = allGrouped.filter(t => {
+                if (sToggle === 'pending' && t.resolved) return false;
+                if (sToggle === 'resolved' && !t.resolved) return false;
+                if (effortFilters.size > 0 && !effortFilters.has(t.effort)) return false;
+                return true;
+            });
 
-            const working = tasks.find(t => t.isCurrentlyWorking);
+            const workingTask = tasks.find(t => t.isCurrentlyWorking);
+            const listTasks = tasks.filter(t => !t.isCurrentlyWorking);
 
             let html = '';
-            // Pinned
-            if (working && !working.resolved && secTab === 'pending') {
-                html += `<div class="pinned-section" style="background:var(--accent-soft); border-bottom:1px solid var(--border); padding:10px 12px;">
-                    <span style="font-size:9px; font-weight:800; color:var(--accent); text-transform:uppercase; margin-bottom:8px; display:block;">Current Goal</span>
-                    ${renderCard(working)}
-                </div>`;
+            if (workingTask && sToggle === 'pending') {
+                html += `<div class="pinned-section"><span class="label">Currently Working On</span>${renderCard(workingTask)}</div>`;
             }
 
-            const list = view.filter(t => !t.isCurrentlyWorking);
-            if (list.length === 0) {
-                html += `<div style="padding:60px 20px; text-align:center; font-size:12px; color:#999;">Board is clear.</div>`;
+            if (listTasks.length === 0) {
+                html += `<div style="padding:100px 40px; text-align:center; font-size:13px; color:var(--text-muted);">Inbox zero.</div>`;
             } else {
-                html += list.map(t => renderCard(t)).join('');
+                html += listTasks.map(t => renderCard(t)).join('');
             }
-
-            document.getElementById('content').innerHTML = html;
+            container.innerHTML = html;
         }
 
         function renderCard(t) {
             return `
                 <div class="task-card ${t.resolved ? 'resolved' : ''}" onclick="locate('${t.commentId}', this)">
-                    <div class="task-header">
-                        <span class="author">${t.author}</span>
-                        <span class="card-meta">${t.page} / ${t.frame}</span>
-                    </div>
+                    <div class="card-header"><span class="author">${t.author}</span><span class="meta">${t.page} / ${t.frame}</span></div>
                     <div class="message">${t.message}</div>
-                    
                     ${!t.resolved ? `
-                        <div class="effort-bar" onclick="event.stopPropagation()">
-                            <div class="effort-pill ${t.effort === 'Small' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Small')">S</div>
-                            <div class="effort-pill ${t.effort === 'Medium' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Medium')">M</div>
-                            <div class="effort-pill ${t.effort === 'Large' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Large')">L</div>
+                        <div class="card-efforts" onclick="event.stopPropagation()">
+                            <div class="effort-btn ${t.effort === 'Small' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Small')">Small</div>
+                            <div class="effort-btn ${t.effort === 'Medium' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Medium')">Medium</div>
+                            <div class="effort-btn ${t.effort === 'Large' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Large')">Large</div>
                         </div>
                         <div class="card-actions" onclick="event.stopPropagation()">
-                            <button class="btn-work" style="${t.isCurrentlyWorking ? 'background:var(--accent); color:white;' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">
-                                ${t.isCurrentlyWorking ? 'Focusing' : 'Focus'}
-                            </button>
-                            <button class="btn-resolve" onclick="handleResolve('${t.commentId}', true)">Resolve</button>
+                            <button class="btn-work" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">${t.isCurrentlyWorking ? 'Stop Focus' : 'Work on this'}</button>
+                            <button class="btn-resolve" onclick="toggleResolve('${t.commentId}', false)">Resolve</button>
                         </div>
                     ` : `
-                        <button class="btn-resolve" onclick="event.stopPropagation(); handleResolve('${t.commentId}', false)" style="width:100%;">Re-open</button>
+                        <div class="card-actions" onclick="event.stopPropagation()">
+                            <span style="font-size:11px; font-weight:800; color:#2E7D32; margin-right:auto;">RESOLVED</span>
+                            <button class="btn-resolve" onclick="toggleResolve('${t.commentId}', true)">Unignore</button>
+                        </div>
                     `}
                 </div>
             `;
-        }
-
-        // --- Cats ---
-        let catIntervals = [];
-        function initCats() {
-            clearCats();
-            const box = document.getElementById('catBox');
-            box.innerHTML = `<div class="cat" id="c1">${getCatSVG('#FC97CF')}</div><div class="cat" id="c2">${getCatSVG('#FFD6EA')}</div>`;
-            const cats = box.querySelectorAll('.cat');
-            cats.forEach((c, i) => {
-                c.style.left = (20 + i * 80) + 'px';
-                catIntervals.push(setInterval(() => {
-                    if (currentTheme !== 'pink') return;
-                    c.style.left = Math.random() * (window.innerWidth - 40) + 'px';
-                }, 10000 + i * 2000));
-            });
-        }
-        function clearCats() {
-            catIntervals.forEach(clearInterval);
-            catIntervals = [];
-            const cats = document.querySelectorAll('.cat');
-            cats.forEach(c => { c.style.left = '-60px'; setTimeout(() => c.remove(), 2000); });
-        }
-        function getCatSVG(c) {
-            return `<svg viewBox="0 0 48 48" fill="none"><path d="M12 36C12 36 12 28 24 28C36 28 36 36 36 36" stroke="${c}" stroke-width="2.5"/><circle cx="24" cy="22" r="7" fill="white" stroke="${c}" stroke-width="1.5"/><path d="M17 18L14 10L21 15" fill="${c}"/><path d="M31 18L34 10L27 15" fill="${c}"/></svg>`;
         }
     </script>
 </body>

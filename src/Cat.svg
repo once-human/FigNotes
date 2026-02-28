@@ -1,0 +1,54 @@
+<svg id="Cat" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+  <line id="ground" x1="160" y1="360" x2="410" y2="360" style="fill: none;stroke: #e2e2f2;stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 16px"/>
+  <g id="Front_Legs" data-name="Front Legs">
+    <path id="leg" d="M225,260v78" style="fill: none;stroke: #eba13d;stroke-linecap: round;stroke-width: 28px"/>
+    <path id="leg-2" data-name="leg" d="M340,260v78" style="fill: none;stroke: #eba13d;stroke-linecap: round;stroke-width: 28px"/>
+  </g>
+  <g id="Body">
+    <path id="tail" d="M208,240s-35.8682-1.5507-46-42c-5.4932-25.33-9.237-40.5144-32-48" style="fill: none;stroke: #eba13d;stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 28px"/>
+    <g id="Body-2" data-name="Body">
+      <rect x="190" y="201" width="200" height="118" rx="58.9999" style="fill: #eba13d"/>
+      <path d="M277,234c-8.09.8989-14.5641-27.2905-15.7905-33h20.0554C282.17,208.3027,284.674,233.1473,277,234Z" style="fill: #d48533"/>
+      <path d="M255.2144,201c1.3944,6.6367,8.81,43.0887-1.2144,44-10.2225.9293-17.854-36.8682-18.8819-42.3576C242,201,245,201,255.2144,201Z" style="fill: #d48533"/>
+      <path d="M209.4213,216.2441a58.948,58.948,0,0,1,20.9133-12.2306C231,208,237,241,228,243s-18.5787-26.756-18.5787-26.756Z" style="fill: #d48533"/>
+    </g>
+    <circle cx="362" cy="253" r="11" style="fill: #ffdf45"/>
+    <path id="collar" d="M282,199s11.57,23.2994,44.647,31.9507c13.5562,2.9386,26.3219,6.4642,54.353-2.1871" style="fill: none;stroke: #ac1515;stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 12px"/>
+    <g id="Head">
+      <g id="Ears">
+        <g id="Left_Ear" data-name="Left Ear">
+          <path d="M330.99,121.98c5.478,16.8814-1.0848,34.1494-14.66,38.5741s-29.0272-5.6826-34.4857-22.5639c-8.1218-25.0308,1.1923-49.3569,10.2133-52.2936,8.2976-2.7115,30.7571,11.0911,38.9326,36.2835Z" style="fill: #eba13d"/>
+          <path d="M325.1129,122.783c4.2608,13.33-.84,26.9652-11.3975,30.4548s-22.5683-4.486-26.8291-17.8164c-6.3164-19.76.9265-38.9655,7.9378-41.2871,6.4756-2.14,23.9337,8.7561,30.2888,28.6487Z" style="fill: #d48533"/>
+        </g>
+        <g id="Right_Ear" data-name="Right Ear">
+          <path d="M372.01,121.98c-5.478,16.8814,1.0849,34.1494,14.66,38.5741s29.0273-5.6826,34.4857-22.5639c8.1218-25.0308-1.1923-49.3569-10.2133-52.2936C402.6447,82.9854,380.1852,96.788,372.01,121.98Z" style="fill: #eba13d"/>
+          <path d="M377.8871,122.783c-4.2608,13.33.84,26.9652,11.3976,30.4548s22.5682-4.486,26.829-17.8164c6.3164-19.76-.9265-38.9655-7.9378-41.2871-6.4756-2.14-23.9337,8.7561-30.2888,28.6487Z" style="fill: #d48533"/>
+        </g>
+      </g>
+      <path id="head-2" data-name="head" d="M430,164.265C430,207.417,395.0771,231,352,231s-78-23.583-78-66.735S315.7189,89,352,89C387.439,89.02,430,121.1331,430,164.265Z" style="fill: #eba13d"/>
+      <g id="Face">
+        <g id="Left_Eye" data-name="Left Eye">
+          <path d="M320,156a13,13,0,1,1,13,13A13,13,0,0,1,320,156Z" style="fill: #33281b"/>
+          <rect x="318" y="169" width="30" height="16" style="fill: #eba13d"/>
+          <rect x="318" y="127" width="30" height="16" style="fill: #eba13d"/>
+        </g>
+        <g id="Right_Eye" data-name="Right Eye">
+          <path d="M382,156a13,13,0,1,1,13,13A13,13,0,0,1,382,156Z" style="fill: #33281b"/>
+          <rect x="380" y="169" width="30" height="16" style="fill: #eba13d"/>
+          <rect x="380" y="127" width="30" height="16" style="fill: #eba13d"/>
+        </g>
+        <g id="Whiskers">
+          <line x1="331" y1="179" x2="273" y2="170" style="fill: none;stroke: #33281b;stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 3.40000009536743px"/>
+          <line x1="273" y1="193" x2="331" y2="185" style="fill: none;stroke: #33281b;stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 3.40000009536743px"/>
+          <line x1="397" y1="179" x2="455" y2="171" style="fill: none;stroke: #33281b;stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 3.40000009536743px"/>
+          <line x1="455" y1="193" x2="397" y2="185" style="fill: none;stroke: #33281b;stroke-linecap: round;stroke-miterlimit: 10;stroke-width: 3.40000009536743px"/>
+        </g>
+        <g id="Nose">
+          <path d="M389,184.4848C389,196.0818,377.8071,208,364,208s-25-11.9182-25-23.5152C339,176.4523,350.1929,166,364,166S389,176.3117,389,184.4848Z" style="fill: #fff"/>
+          <path id="nose-2" data-name="nose" d="M373,176.816c0,2.3844-4.0269,6.684-9,6.684s-9-4.3-9-6.684,4.0269-4.316,9-4.316S373,174.4316,373,176.816Z" style="fill: #33281b"/>
+          <path id="mouth" d="M348.0026,183A8.0013,8.0013,0,0,0,364,183a8.0013,8.0013,0,0,0,16.0026,0" style="fill: none;stroke: #33281b;stroke-linecap: round;stroke-linejoin: round;stroke-width: 3.40000009536743px"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
