@@ -136,7 +136,6 @@
             opacity: 1;
         }
 
-        /* --- Compact Control Row --- */
         .control-row {
             display: flex;
             padding: 12px 16px;
@@ -188,7 +187,6 @@
             position: relative;
         }
 
-        /* --- Progress Bar --- */
         .progress-box {
             padding: 10px 16px;
             background: white;
@@ -254,6 +252,7 @@
             transition: all 0.3s var(--transition-type);
             cursor: pointer;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            position: relative;
         }
 
         .task-card:hover {
@@ -372,7 +371,7 @@
             color: #2E7D32;
         }
 
-        /* --- THE CAT --- */
+        /* --- THE CAT (Small & Smooth) --- */
         #cat-container {
             position: fixed;
             bottom: 80px;
@@ -390,8 +389,8 @@
 
         .cat {
             position: absolute;
-            width: 80px;
-            height: 60px;
+            width: 56px;
+            height: 42px;
             cursor: pointer;
             pointer-events: auto;
             will-change: transform, left;
@@ -466,7 +465,6 @@
             animation: jump 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* --- Global Footer --- */
         .footer {
             position: fixed;
             bottom: 0;
@@ -519,7 +517,7 @@
         <div class="top-nav">
             <div class="app-title">FigNotes</div>
             <div class="header-actions">
-                <div class="icon-btn" id="catToggle" onclick="toggleTheme()" title="Thoughtful Mode">
+                <div class="icon-btn" id="catToggle" onclick="toggleTheme()" title="Latte Mode :)">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path
@@ -539,35 +537,29 @@
             </div>
         </div>
         <div class="primary-tabs">
-            <div class="p-tab active" id="pTabAll" onclick="switchPrimaryTab('all')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <div class="p-tab active" id="pTabAll" onclick="switchPrimaryTab('all')"><svg width="14" height="14"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <rect x="3" y="3" width="7" height="7" />
                     <rect x="14" y="3" width="7" height="7" />
                     <rect x="14" y="14" width="7" height="7" />
                     <rect x="3" y="14" width="7" height="7" />
-                </svg>
-                All
-            </div>
-            <div class="p-tab" id="pTabAssigned" onclick="switchPrimaryTab('assigned')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                </svg> All</div>
+            <div class="p-tab" id="pTabAssigned" onclick="switchPrimaryTab('assigned')"><svg width="14" height="14"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
-                </svg>
-                Assigned
-            </div>
-            <div class="p-tab" id="pTabDiscussion" onclick="switchPrimaryTab('discussion')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                </svg> Assigned</div>
+            <div class="p-tab" id="pTabDiscussion" onclick="switchPrimaryTab('discussion')"><svg width="14" height="14"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-                Chat
-            </div>
+                </svg> Chat</div>
         </div>
         <div class="control-row">
             <div class="status-toggle">
                 <div class="s-toggle active" id="sTogglePending" onclick="switchSecondaryTab('pending')">Pending</div>
                 <div class="s-toggle" id="sToggleResolved" onclick="switchSecondaryTab('resolved')">Resolved</div>
             </div>
-            <div class="filter-dropdown" onclick="toggleEffortDropdown()">
+            <div class="filter-dropdown">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                     <path d="m6 9 6 6 6-6" />
                 </svg>
@@ -618,23 +610,22 @@
         </div>
     </div>
 
-    <div class="footer">
-        <button class="btn-sync" onclick="triggerSync()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                stroke-linecap="round" stroke-linejoin="round">
+    <div class="footer"><button class="btn-sync" onclick="triggerSync()"><svg width="16" height="16" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                 <path d="M3 3v5h5" />
                 <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
                 <path d="M16 16h5v5" />
-            </svg>
-            Sync
-        </button>
-    </div>
+            </svg> Sync</button></div>
 
     <div id="settingsView" class="settings-overlay">
         <h2 style="font-weight: 800; margin-bottom: 24px;">Settings</h2>
-        <div style="margin-bottom:20px;"><input type="password" id="patInput" placeholder="Figma Access Token"></div>
-        <div style="margin-bottom:24px;"><input type="text" id="urlInput" placeholder="Figma File URL"></div>
+        <div style="margin-bottom:20px;"><input type="password" id="patInput" placeholder="Figma Access Token"
+                style="width:100%; padding:14px; border:1px solid #F0F0F0; border-radius:12px; font-size:14px; box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:24px;"><input type="text" id="urlInput" placeholder="Figma File URL"
+                style="width:100%; padding:14px; border:1px solid #F0F0F0; border-radius:12px; font-size:14px; box-sizing:border-box;">
+        </div>
         <button class="btn-sync" onclick="saveSettings()">Save & Sync</button>
         <div style="text-align:center; margin-top:24px; cursor:pointer; font-size:12px; font-weight:700;"
             onclick="toggleSettings(false)">Close</div>
@@ -658,8 +649,8 @@
             currentTheme = theme;
             document.body.className = 'theme-' + theme;
             document.getElementById('catToggle').classList.toggle('active', theme === 'pink');
-            if (theme === 'pink') { cat.x = -100; cat.targetX = 60; }
-            else { cat.targetX = window.innerWidth + 100; }
+            if (theme === 'pink') { cat.x = -80; cat.targetX = 60; }
+            else { cat.targetX = window.innerWidth + 80; }
         }
 
         function catJump() {
@@ -761,20 +752,31 @@
         }
 
         function locate(id) { parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*'); }
+
         function resolve(id) {
+            // Optimistic UI Update
+            const task = latestData.tasks.find(t => t.commentId === id);
+            if (task) {
+                task.resolved = true;
+                task.isCurrentlyWorking = false;
+                render();
+            }
+
             parent.postMessage({ pluginMessage: { type: 'resolve-comment', payload: id } }, '*');
-            fetch(`https://api.figma.com/v1/files/${config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1]}/comments/${id}`, {
+            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            if (fileKey) fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${id}`, {
                 method: 'POST', headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' }, body: JSON.stringify({ resolved: true })
-            });
+            }).catch(e => console.error("REST Resolve Failed", e));
         }
+
         function setWorking(id) { parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*'); }
         function setEffort(id, val) { parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: val } } }, '*'); }
-
         function triggerSync() {
             const key = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (key) fetch(`https://api.figma.com/v1/files/${key}/comments`, { headers: { 'X-Figma-Token': config.pat } }).then(r => r.json()).then(d => parent.postMessage({ pluginMessage: { type: 'sync', payload: d.comments } }, '*'));
+            if (key) fetch(`https://api.figma.com/v1/files/${key}/comments`, { headers: { 'X-Figma-Token': config.pat } }).then(r => r.json()).then(d => {
+                parent.postMessage({ pluginMessage: { type: 'sync', payload: d.comments } }, '*');
+            });
         }
-
         function toggleTheme() { const nt = currentTheme === 'blue' ? 'pink' : 'blue'; applyTheme(nt); parent.postMessage({ pluginMessage: { type: 'set-theme', payload: nt } }, '*'); }
         function toggleSettings(s) { document.getElementById('settingsView').style.display = s ? 'block' : 'none'; }
         function saveSettings() { config.pat = document.getElementById('patInput').value; config.fileUrl = document.getElementById('urlInput').value; parent.postMessage({ pluginMessage: { type: 'save-settings', payload: config } }, '*'); toggleSettings(false); triggerSync(); }
