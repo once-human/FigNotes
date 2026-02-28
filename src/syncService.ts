@@ -18,10 +18,10 @@ export class SyncService {
             if (stored) {
                 reconciledTasks.push({
                     ...live,
-                    internalStatus: stored.internalStatus,
-                    timeEstimateMinutes: stored.timeEstimateMinutes,
-                    assignee: stored.assignee,
-                    priority: stored.priority,
+                    internalStatus: stored.internalStatus || live.internalStatus,
+                    timeEstimateMinutes: typeof stored.timeEstimateMinutes === 'number' ? stored.timeEstimateMinutes : live.timeEstimateMinutes,
+                    assignee: stored.assignee || null,
+                    priority: stored.priority || live.priority,
                     lastUpdatedAt: new Date().toISOString()
                 });
             } else {

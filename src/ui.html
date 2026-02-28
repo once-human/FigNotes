@@ -9,17 +9,17 @@
         :root {
             --bg: #FFFFFF;
             --surface: #FFFFFF;
-            --surface-hover: #F9FAFB;
-            --border: #F3F4F6;
-            --text-main: #111827;
-            --text-muted: #6B7280;
-            --accent: #3B82F6;
-            --accent-soft: #EFF6FF;
-            --critical: #EF4444;
-            --warning: #F59E0B;
-            --success: #10B981;
-            --shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --radius: 6px;
+            --surface-hover: #F2F2F7;
+            --border: #E5E5EA;
+            --text-main: #000000;
+            --text-muted: #8E8E93;
+            --accent: #007AFF;
+            --accent-soft: #F2F2F7;
+            --critical: #FF3B30;
+            --warning: #FF9500;
+            --success: #34C759;
+            --shadow: none;
+            --radius: 8px;
         }
 
         body {
@@ -278,7 +278,8 @@
         }
 
         .btn-focus {
-            background: var(--accent);
+            background: #F2F2F7;
+            color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 6px;
@@ -467,10 +468,10 @@
 
     <div class="footer">
         <div style="display:flex; gap:8px;">
-            <button class="btn-primary" onclick="triggerSync()">Sync</button>
-            <button class="btn-primary btn-focus" onclick="triggerFocus()">⚡ Focus Mode</button>
+            <button class="btn-primary" onclick="triggerSync()" style="background:var(--text-main);">Sync</button>
+            <button class="btn-primary btn-focus" onclick="triggerFocus()">Focus Mode</button>
         </div>
-        <div id="userMetrics" style="font-size: 11px; font-weight: 600; color: var(--accent);">0min assigned</div>
+        <div id="userMetrics" style="font-size: 11px; font-weight: 600; color: var(--text-muted);">0min assigned</div>
     </div>
 
     <script>
@@ -619,15 +620,20 @@
         function renderTaskCard(t) {
             const presets = [5, 15, 30, 60, 120, 240];
             const isSelected = selectedTasks.has(t.commentId);
+            const priority = t.priority || "Medium";
+            const status = t.internalStatus || "In Progress";
+            const author = t.author || "Unknown";
+            const message = t.message || "...";
+
             return `
             <div class="task-card ${isSelected ? 'active' : ''}" onclick="toggleSelection('${t.commentId}', event)">
                 <div class="task-meta">
                     <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation()">
-                    <span class="badge badge-priority-${t.priority.toLowerCase()}">${t.priority}</span>
-                    <span style="font-size:11px; font-weight:600; color:var(--text-muted);">${t.internalStatus}</span>
-                    <span style="font-size:11px; color:var(--text-muted); margin-left:auto;">${t.author}</span>
+                    <span class="badge badge-priority-${priority.toLowerCase()}">${priority}</span>
+                    <span style="font-size:11px; font-weight:500; color:var(--text-muted);">${status}</span>
+                    <span style="font-size:11px; color:var(--text-muted); margin-left:auto;">${author}</span>
                 </div>
-                <div class="task-message" onclick="locateNode('${t.nodeId}'); event.stopPropagation();">${t.message}</div>
+                <div class="task-message" onclick="locateNode('${t.nodeId}'); event.stopPropagation();">${message}</div>
                 <div class="task-footer">
                     <div style="display:flex; align-items:center; gap:4px;">
                         <span style="font-size:10px;">Estimate:</span>
@@ -638,18 +644,18 @@
                         <input type="number" value="${t.timeEstimateMinutes}" 
                             onclick="event.stopPropagation()" 
                             onchange="updateTask('${t.commentId}', 'timeEstimateMinutes', parseInt(this.value))" 
-                            style="width:30px; font-size:10px; border:1px solid var(--border);"
+                            style="width:30px; font-size:10px; border:1px solid var(--border); border-radius: 4px;"
                             title="Custom minutes">
                     </div>
                     <span class="assignee-chip">${t.assignee || 'Unassigned'}</span>
                     <div style="margin-left:auto; display:flex; gap:4px;">
                         <select onclick="event.stopPropagation()" onchange="updateTask('${t.commentId}', 'internalStatus', this.value)">
-                            <option value="Critical" ${t.internalStatus === 'Critical' ? 'selected' : ''}>Critical</option>
-                            <option value="Needs Review" ${t.internalStatus === 'Needs Review' ? 'selected' : ''}>Review</option>
-                            <option value="In Progress" ${t.internalStatus === 'In Progress' ? 'selected' : ''}>Active</option>
-                            <option value="Blocked" ${t.internalStatus === 'Blocked' ? 'selected' : ''}>Blocked</option>
-                            <option value="Approved" ${t.internalStatus === 'Approved' ? 'selected' : ''}>Approved</option>
-                            <option value="Done" ${t.internalStatus === 'Done' ? 'selected' : ''}>Done</option>
+                            <option value="Critical" ${status === 'Critical' ? 'selected' : ''}>Critical</option>
+                            <option value="Needs Review" ${status === 'Needs Review' ? 'selected' : ''}>Review</option>
+                            <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>Active</option>
+                            <option value="Blocked" ${status === 'Blocked' ? 'selected' : ''}>Blocked</option>
+                            <option value="Approved" ${status === 'Approved' ? 'selected' : ''}>Approved</option>
+                            <option value="Done" ${status === 'Done' ? 'selected' : ''}>Done</option>
                         </select>
                     </div>
                 </div>
