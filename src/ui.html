@@ -13,8 +13,8 @@
             --border: #E5E5EA;
             --text-main: #000000;
             --text-muted: #8E8E93;
-            --accent: #007AFF;
-            --accent-soft: #F2F2F7;
+            --accent: #303115;
+            --accent-soft: #F1F2ED;
             --critical: #FF3B30;
             --warning: #FF9500;
             --success: #34C759;
@@ -74,6 +74,7 @@
             gap: 8px;
             flex-wrap: wrap;
             align-items: center;
+            background: var(--bg);
         }
 
         .filter-btn {
@@ -158,7 +159,7 @@
             padding: 12px 16px;
             border-bottom: 1px solid var(--border);
             cursor: pointer;
-            transition: background 0.2s;
+            background: var(--bg);
         }
 
         .task-card:hover {
@@ -166,8 +167,9 @@
         }
 
         .task-card.active {
-            border-left: 3px solid var(--accent);
-            padding-left: 13px;
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+            background: var(--accent-soft);
         }
 
         .task-meta {
@@ -283,6 +285,33 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-focus:hover {
+            background: #E5E5EA;
+        }
+
+        /* --- Animations --- */
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
+        .tab,
+        .btn-primary,
+        .filter-btn,
+        .task-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* --- Phase 2: Spatial Intelligence --- */
@@ -406,9 +435,12 @@
         <div style="display:flex; flex-direction:column; gap:16px;">
             <input type="password" id="patInput" placeholder="Personal Access Token"
                 style="padding:8px; border:1px solid var(--border); border-radius:4px;">
-            <input type="text" id="urlInput" placeholder="Figma File URL"
+            <div style="font-size:11px; color:var(--text-muted);">
+                Advanced: Manual File URL (leave empty for current file)
+            </div>
+            <input type="text" id="urlInput" placeholder="Figma File URL (Optional)"
                 style="padding:8px; border:1px solid var(--border); border-radius:4px;">
-            <button class="btn-primary" onclick="saveSettings()">Save & Sync</button>
+            <button class="btn-primary" onclick="saveSettings()" style="background:var(--accent);">Save & Sync</button>
         </div>
     </div>
 
@@ -468,14 +500,16 @@
 
     <div class="footer">
         <div style="display:flex; gap:8px;">
-            <button class="btn-primary" onclick="triggerSync()" style="background:var(--text-main);">Sync</button>
+            <button class="btn-primary" onclick="triggerSync()" style="background:var(--accent);">Sync</button>
             <button class="btn-primary btn-focus" onclick="triggerFocus()">Focus Mode</button>
         </div>
-        <div id="userMetrics" style="font-size: 11px; font-weight: 600; color: var(--text-muted);">0min assigned</div>
+        <div id="userMetrics" style="font-size: 11px; font-weight: 600; color: var(--text-muted); padding-right: 4px;">
+            0min assigned</div>
     </div>
 
     <script>
         let config = { pat: '', fileUrl: '' };
+        let autoFileKey = '';
         let latestData = null;
         let filters = {
             assignedToMe: false,
@@ -490,17 +524,17 @@
         window.onmessage = (event) => {
             const { type, payload } = event.data.pluginMessage;
             if (type === 'init') {
+                autoFileKey = payload.fileKey;
                 parent.postMessage({ pluginMessage: { type: 'get-settings' } }, '*');
             } else if (type === 'settings-loaded') {
                 config = payload;
-                if (config.pat && config.fileUrl) triggerSync();
+                if (config.pat) triggerSync();
                 else switchTab('settings');
             } else if (type === 'sync-complete') {
                 latestData = payload;
                 render();
             } else if (type === 'focus-task-found') {
                 locateNode(payload.nodeId);
-                // highlight logic in UI
             }
         };
 
@@ -540,21 +574,28 @@
         }
 
         async function triggerSync() {
-            if (!config.pat || !config.fileUrl) return;
+            if (!config.pat) return;
 
-            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (!fileKey) return alert("Invalid Figma URL");
+            let fileKey = autoFileKey;
+            if (config.fileUrl) {
+                const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+                if (match) fileKey = match;
+            }
 
-            document.getElementById('workboardContent').innerHTML = '<div style="padding:20px; text-align:center; font-size:12px; color:var(--text-muted);">Syncing with Figma...</div>';
+            if (!fileKey) return alert("Could not detect file key. Please enter URL manually in settings.");
+
+            document.getElementById('workboardContent').innerHTML = '<div style="padding:20px; text-align:center; font-size:12px; color:var(--text-muted); animation: pulse 2s infinite;">Syncing with Figma...</div>';
 
             try {
                 const resp = await fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, {
                     headers: { 'X-Figma-Token': config.pat }
                 });
                 const data = await resp.json();
+                if (data.status === 403) throw new Error("PAT invalid or no access.");
                 parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*');
             } catch (e) {
                 alert("Sync failed: " + e.message);
+                switchTab('settings');
             }
         }
 
