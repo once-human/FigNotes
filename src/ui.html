@@ -14,7 +14,7 @@
             --radius-main: 12px;
             --radius-sm: 8px;
 
-            /* Blue Theme (Corporate Apple-like) */
+            /* Blue Theme (Corporate) */
             --accent-blue: #0070F6;
             --accent-blue-soft: #EEF6FF;
             --accent-blue-outline: #CCE4FF;
@@ -31,12 +31,10 @@
             --accent-soft: var(--accent-blue-soft);
             --accent-outline: var(--accent-blue-outline);
             --transition-type: cubic-bezier(0.4, 0, 0.2, 1);
-            /* Precise Apple-like */
             --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             --radius: var(--radius-main);
             --bounce: none;
-            --hover-transform: translateY(-1px);
-            --pulse-anim: pulse-blue 0.4s ease-out;
+            --pulse-shadow: 0 0 15px rgba(0, 112, 246, 0.3);
         }
 
         body.theme-pink {
@@ -45,12 +43,10 @@
             --accent-outline: var(--accent-pink-outline);
             --bg: var(--bg-pink);
             --transition-type: cubic-bezier(0.68, -0.6, 0.32, 1.6);
-            /* Super playful bounce */
             --card-shadow: 0 4px 12px rgba(252, 151, 207, 0.2);
             --radius: 18px;
             --bounce: scale(1.05);
-            --hover-transform: translateY(-4px) rotate(1deg);
-            --pulse-anim: pulse-pink 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --pulse-shadow: 0 0 25px rgba(252, 151, 207, 0.5);
         }
 
         body {
@@ -106,10 +102,6 @@
             color: var(--accent);
             border-bottom-color: var(--accent);
             opacity: 1;
-        }
-
-        .theme-pink .p-tab.active {
-            transform: scale(1.1);
         }
 
         .header-actions {
@@ -178,7 +170,6 @@
             background: white;
             color: var(--accent);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transform: var(--bounce);
         }
 
         .filter-dropdown {
@@ -194,11 +185,6 @@
             color: var(--text-main);
             cursor: pointer;
             position: relative;
-            transition: all 0.2s;
-        }
-
-        .filter-dropdown:hover {
-            border-color: var(--accent-outline);
         }
 
         .progress-box {
@@ -272,7 +258,6 @@
         .task-card:hover {
             border-color: var(--accent-outline);
             box-shadow: var(--card-shadow);
-            transform: var(--hover-transform);
         }
 
         .task-card.resolved {
@@ -281,37 +266,25 @@
             border-style: dashed;
         }
 
-        /* Pulse Animations */
+        /* SHADOW PULSE */
+        @keyframes shadow-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+            }
+
+            50% {
+                box-shadow: var(--pulse-shadow);
+                transform: scale(0.99);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+                transform: scale(1);
+            }
+        }
+
         .task-card.pulsing {
-            animation: var(--pulse-anim);
-        }
-
-        @keyframes pulse-blue {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(0.98);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        @keyframes pulse-pink {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.08) rotate(1deg);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+            animation: shadow-pulse 0.4s ease-out;
         }
 
         .card-header {
@@ -341,6 +314,39 @@
             word-break: break-word;
         }
 
+        .card-efforts {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .effort-pill {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: #FCFCFC;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+
+        .effort-pill:hover {
+            border-color: var(--accent-outline);
+            background: #fff;
+            color: var(--accent);
+        }
+
+        .effort-pill.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
         .card-actions {
             display: flex;
             gap: 8px;
@@ -354,19 +360,18 @@
             gap: 6px;
             padding: 10px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             background: var(--accent-soft);
             color: var(--accent);
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s var(--transition-type);
+            transition: all 0.2s;
         }
 
         .btn-work:hover {
             background: var(--accent);
             color: white;
-            transform: var(--bounce);
         }
 
         .btn-work.active {
@@ -379,8 +384,8 @@
             align-items: center;
             gap: 6px;
             padding: 10px 16px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
             background: white;
             color: var(--text-muted);
             font-size: 12px;
@@ -392,13 +397,12 @@
         .btn-resolve:hover {
             border-color: #A5D6A7;
             color: #2E7D32;
-            transform: var(--bounce);
         }
 
-        /* --- THE CAT --- */
+        /* --- THE CAT (Positioned so legs show) --- */
         #cat-container {
             position: fixed;
-            bottom: 70px;
+            bottom: 85px;
             width: 100%;
             height: 60px;
             pointer-events: none;
@@ -433,11 +437,6 @@
 
         .cat-legs-walking {
             animation: leg-wiggle 0.35s infinite alternate ease-in-out;
-        }
-
-        .cat-tail {
-            transform-origin: left bottom;
-            animation: tail-flick 3s infinite ease-in-out;
         }
 
         .meow-bubble {
@@ -488,7 +487,6 @@
             animation: jump 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* --- Global Footer --- */
         .footer {
             position: fixed;
             bottom: 0;
@@ -517,7 +515,7 @@
             gap: 10px;
         }
 
-        /* --- Settings Overlay --- */
+        /* --- SETUP FLOW --- */
         .settings-overlay {
             position: fixed;
             top: 0;
@@ -528,55 +526,59 @@
             z-index: 3000;
             padding: 32px 24px;
             display: none;
+            overflow-y: auto;
         }
 
         .settings-overlay.active {
             display: block;
         }
 
-        .settings-field {
+        .setup-title {
+            font-size: 20px;
+            font-weight: 800;
             margin-bottom: 24px;
         }
 
-        .settings-field label {
-            display: block;
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            text-transform: uppercase;
+        .setup-step {
+            margin-bottom: 32px;
+            background: #F9F9F9;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
         }
 
-        .settings-field input {
+        .step-num {
+            font-size: 10px;
+            font-weight: 900;
+            background: var(--accent);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .step-text {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .setup-input {
             width: 100%;
             padding: 14px;
-            border: 1px solid var(--border);
+            border: 1.5px solid var(--border);
             border-radius: 12px;
             font-size: 14px;
+            font-family: inherit;
             box-sizing: border-box;
         }
 
-        .settings-help {
-            font-size: 11px;
-            color: var(--accent);
-            font-weight: 700;
-            margin-top: 8px;
-            display: inline-block;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        /* Empty State */
-        #emptyStateTitle {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        #emptyStateMsg {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
+        .setup-input:focus {
+            border-color: var(--accent);
+            outline: none;
+            background: white;
         }
     </style>
 </head>
@@ -688,22 +690,24 @@
             </svg> Sync</button></div>
 
     <div id="settingsView" class="settings-overlay">
-        <h2 style="font-weight: 800; margin-bottom: 24px;">Setup FigNotes</h2>
-        <div class="settings-field">
-            <label>Personal Access Token</label>
-            <input type="password" id="patInput" placeholder="Enter Token...">
-            <span class="settings-help"
-                onclick="window.open('https://www.figma.com/developers/api#access-tokens')">Where do I find this?</span>
+        <div class="setup-title">Setup FigNotes</div>
+
+        <div class="setup-step">
+            <span class="step-num">STEP 1</span>
+            <div class="step-text">Go to <b>Figma Settings > Account</b> and generate a new <b>Personal access
+                    token</b>.</div>
+            <input type="password" id="patInput" class="setup-input" placeholder="Paste Token here...">
         </div>
-        <div class="settings-field">
-            <label>File URL</label>
-            <input type="text" id="urlInput" placeholder="Paste Figma Link...">
-            <span class="settings-help" onclick="alert('Open any Figma file and copy the browser URL.')">How do I get
-                this?</span>
+
+        <div class="setup-step">
+            <span class="step-num">STEP 2</span>
+            <div class="step-text">Copy the URL of your current Figma file from the browser search bar.</div>
+            <input type="text" id="urlInput" class="setup-input" placeholder="Paste File URL here...">
         </div>
-        <button class="btn-sync" onclick="saveSettings()">Save & Sync</button>
-        <div style="text-align:center; margin-top:24px; cursor:pointer; font-size:12px; font-weight:700; color:var(--text-muted);"
-            onclick="toggleSettings(false)">Close</div>
+
+        <button class="btn-sync" onclick="saveSettings()" style="margin-bottom: 20px;">Save & Get Started</button>
+        <div style="text-align:center; cursor:pointer; font-size:12px; font-weight:700; color:var(--text-muted);"
+            onclick="toggleSettings(false)">Cancel</div>
     </div>
 
     <script>
@@ -742,7 +746,6 @@
 
         function animate() {
             const el = document.getElementById('the-cat');
-            const head = document.getElementById('cat-head');
             const legs = el.querySelector('.cat-legs');
             let dx = cat.targetX - cat.x;
             if (Math.abs(dx) > 2) {
@@ -753,8 +756,6 @@
                 legs.classList.remove('cat-legs-walking');
                 if (currentTheme === 'pink' && Math.random() < 0.005) { cat.targetX = Math.random() * (window.innerWidth - 80); }
             }
-            let lookX = Math.max(-12, Math.min(12, (mouseX - (cat.x + 40)) / 12));
-            head.style.transform = `translateX(${lookX}px)`;
             el.style.left = cat.x + 'px';
             el.style.transform = `scaleX(${cat.dir})`;
             requestAnimationFrame(animate);
@@ -766,12 +767,13 @@
         function updateEffortSelection(val) { effortFilter = val; document.getElementById('effortLabel').innerText = val === 'All' ? 'All Efforts' : val; render(); }
 
         function render() {
-            if (!latestData) {
+            if (!latestData || !config.pat) {
                 document.getElementById('content').innerHTML = `
-                    <div style="padding:160px 40px; text-align:center;">
-                        <h1 id="emptyStateTitle">👋 Welcome!</h1>
-                        <p id="emptyStateMsg">To start tracking your notes, please add your Figma Access Token in Settings.</p>
-                        <button class="btn-sync" onclick="toggleSettings(true)" style="width:auto; margin-top:20px; padding:12px 24px;">Open Settings</button>
+                    <div style="padding:150px 40px; text-align:center;">
+                        <div style="font-size:48px; margin-bottom:20px;">☕</div>
+                        <h2 style="font-weight:800; margin-bottom:12px;">Let's Get Started</h2>
+                        <p style="color:#888; font-size:14px; line-height:1.6; margin-bottom:28px;">Connect FigNotes to your file to start tracking your progress.</p>
+                        <button class="btn-sync" onclick="toggleSettings(true)" style="width:auto; padding:14px 32px;">Connect Account</button>
                     </div>`;
                 return;
             }
@@ -815,9 +817,9 @@
                 <div class="message">${t.message}</div>
                 ${!t.resolved ? `
                     <div class="card-efforts" onclick="event.stopPropagation()">
-                        <div class="effort-btn ${t.effort === 'Small' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Small')">S</div>
-                        <div class="effort-btn ${t.effort === 'Medium' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Medium')">M</div>
-                        <div class="effort-btn ${t.effort === 'Large' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Large')">L</div>
+                        <div class="effort-pill ${t.effort === 'Small' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Small')">S</div>
+                        <div class="effort-pill ${t.effort === 'Medium' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Medium')">M</div>
+                        <div class="effort-pill ${t.effort === 'Large' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Large')">L</div>
                     </div>
                     <div class="card-actions" onclick="event.stopPropagation()">
                         <button class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">
@@ -829,19 +831,15 @@
                             Done
                         </button>
                     </div>
-                ` : `
-                    <div style="display:flex; align-items:center; gap:6px; color:#2E7D32; font-size:11px; font-weight:800;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg>
-                        COMPLETED
-                    </div>
-                `}
+                ` : `<div style="display:flex; align-items:center; gap:6px; color:#2E7D32; font-size:11px; font-weight:800;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg> COMPLETED</div>`}
             </div>`;
         }
 
         function triggerPulse(id) {
             const card = document.getElementById('card-' + id);
+            if (!card) return;
             card.classList.remove('pulsing');
-            void card.offsetWidth; // Trigger reflow
+            void card.offsetWidth;
             card.classList.add('pulsing');
             locate(id);
         }
