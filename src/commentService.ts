@@ -4,7 +4,6 @@ export class CommentService {
     static async parseRestComments(rawComments: any[], currentUserHandle: string | null): Promise<Task[]> {
         try {
             const tasks: Task[] = [];
-            const now = new Date();
 
             for (const commentObj of rawComments) {
                 let nodeId = commentObj.client_meta?.node_id || null;
@@ -14,38 +13,40 @@ export class CommentService {
                 const frameNode = this.findFrameNode(nodeId);
 
                 const message = commentObj.message || "";
-                const author = commentObj.user?.handle || "Unknown";
+
+                // Extract Mentions: Looking for @username pattern
+                const mentionMatches = message.match(/@([a-zA-Z0-9_\-]+)/g) || [];
+                const mentions = mentionMatches.map((m: string) => m.substring(1));
+
                 let assignee = null;
+                const isMeMentioned = currentUserHandle && mentions.includes(currentUserHandle);
 
-                // Automatic Assignment
-                // 1. If mention found
-                if (currentUserHandle && message.includes(`@${currentUserHandle}`)) {
-                    assignee = currentUserHandle;
-                }
-                // 2. If current user is author (optional default as per request)
-                else if (currentUserHandle && author === currentUserHandle) {
-                    assignee = currentUserHandle;
-                }
+                // Logic:
+                // 1. If only current user is mentioned -> Assigned to Me
+                // 2. If multiple mentions including current user -> Discussion
+                // 3. Otherwise -> null (Pending)
 
-                const createdAt = commentObj.created_at;
-                const ageInDays = this.calculateAge(createdAt, now);
+                if (isMeMentioned) {
+                    if (mentions.length === 1) {
+                        assignee = currentUserHandle;
+                    }
+                }
 
                 tasks.push({
                     commentId: commentObj.id,
                     nodeId: nodeId,
                     frameId: frameNode?.id || null,
                     pageId: pageNode?.id || null,
-                    author: author,
-                    createdAt: createdAt,
+                    author: commentObj.user?.handle || "Unknown",
+                    createdAt: commentObj.created_at,
                     resolved: commentObj.resolved_at !== null && commentObj.resolved_at !== undefined,
-                    internalStatus: "Pending", // Default
-                    timeEstimateMinutes: 15, // Default
+                    effort: null, // Default
                     assignee: assignee,
                     message: message,
                     page: pageNode?.name || "Global",
                     frame: frameNode?.name || "Canvas",
-                    lastUpdatedAt: now.toISOString(),
-                    ageInDays: ageInDays
+                    isCurrentlyWorking: false,
+                    mentions: mentions
                 });
             }
 
@@ -54,12 +55,6 @@ export class CommentService {
             console.error("[FigNotes] Error parsing REST comments:", err);
             return [];
         }
-    }
-
-    private static calculateAge(createdAt: string, now: Date): number {
-        const created = new Date(createdAt).getTime();
-        const diff = now.getTime() - created;
-        return Math.floor(diff / (1000 * 60 * 60 * 24));
     }
 
     private static findPageNode(nodeId: string | null): PageNode | null {

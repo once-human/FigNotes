@@ -31,39 +31,32 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 const task = tasks[id];
                 if (task) {
                     (task as any)[key] = value;
-                    task.lastUpdatedAt = new Date().toISOString();
                     await StorageService.updateTask(task);
                     await broadcastState();
                 }
                 break;
             }
 
-            case "bulk-update": {
-                if (!msg.payload || !msg.payload.ids) throw new Error("Invalid bulk update payload");
-                const { ids, updates } = msg.payload;
-                const allTasks = await StorageService.getTasks();
-                const now = new Date().toISOString();
-                for (const taskId of ids) {
-                    if (allTasks[taskId]) {
-                        Object.assign(allTasks[taskId], updates);
-                        allTasks[taskId].lastUpdatedAt = now;
-                    }
+            case "set-working": {
+                if (!msg.payload) {
+                    await SyncService.clearWorking();
+                } else {
+                    await SyncService.setWorking(msg.payload);
                 }
-                await StorageService.saveTasks(allTasks);
                 await broadcastState();
                 break;
             }
 
-            case "focus-mode": {
-                const currentUserHandle = figma.currentUser?.name || "User";
-                const state = await SyncService.getState(currentUserHandle);
-                const focusTask = SyncService.getFocusTask(state.tasks, currentUserHandle);
-                if (focusTask) {
-                    figma.ui.postMessage({ type: "focus-task-found", payload: focusTask });
-                    // Trigger navigation immediately
-                    await navigateToTask(focusTask);
-                } else {
-                    figma.notify("No pending tasks found.");
+            case "resolve-comment": {
+                if (!msg.payload) return;
+                // Note: The actual REST call happens in the UI. 
+                // This handler updates local state immediately for responsiveness.
+                const tasks = await StorageService.getTasks();
+                if (tasks[msg.payload]) {
+                    tasks[msg.payload].resolved = true;
+                    tasks[msg.payload].isCurrentlyWorking = false;
+                    await StorageService.saveTasks(tasks);
+                    await broadcastState();
                 }
                 break;
             }
@@ -87,13 +80,6 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 const task = tasks[msg.payload];
                 if (task) {
                     await navigateToTask(task);
-                } else {
-                    // Fallback if task metadata not found but we have an ID
-                    const node = await figma.getNodeByIdAsync(msg.payload.replace('-', ':'));
-                    if (node) {
-                        figma.viewport.scrollAndZoomIntoView([node]);
-                        figma.currentPage.selection = [node as SceneNode];
-                    }
                 }
                 break;
             }
@@ -112,7 +98,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
 
 async function navigateToTask(task: Task) {
     try {
-        // Fallback Chain: Node -> Frame -> Page
+        // Fallback Chain: Node -> Frame -> Page -> Page Center
         let targetNode: BaseNode | null = null;
 
         if (task.nodeId) {
@@ -128,18 +114,26 @@ async function navigateToTask(task: Task) {
         }
 
         if (targetNode) {
-            // Ensure we are on the right page
+            // Ensure page is active
             let page = targetNode.parent;
             while (page && page.type !== "PAGE") page = page.parent;
-            if (page) await figma.setCurrentPageAsync(page as PageNode);
-
-            figma.viewport.scrollAndZoomIntoView([targetNode as SceneNode]);
+            if (page && figma.currentPage.id !== page.id) {
+                await figma.setCurrentPageAsync(page as PageNode);
+            } else if (targetNode.type === "PAGE") {
+                await figma.setCurrentPageAsync(targetNode as PageNode);
+            }
 
             if (targetNode.type !== "PAGE" && targetNode.type !== "DOCUMENT") {
+                figma.viewport.scrollAndZoomIntoView([targetNode as SceneNode]);
                 figma.currentPage.selection = [targetNode as SceneNode];
+            } else {
+                // If we landed on a page, just center the view
+                figma.viewport.center = { x: 0, y: 0 };
             }
         } else {
-            figma.notify("Could not locate node, frame, or page on canvas.", { timeout: 2000 });
+            // Absolute fallback: Center the current page
+            figma.viewport.center = { x: figma.viewport.center.x, y: figma.viewport.center.y };
+            figma.notify("Target not found. Centering view.", { timeout: 1000 });
         }
     } catch (err) {
         console.warn("[FigNotes] Navigation fallback failed", err);

@@ -1,4 +1,4 @@
-export type InternalStatus = "Pending" | "In Progress" | "Done";
+export type EffortSize = "Small" | "Medium" | "Large";
 
 export interface Task {
     commentId: string;
@@ -8,38 +8,21 @@ export interface Task {
     author: string;
     createdAt: string;
     resolved: boolean;
-    internalStatus: InternalStatus;
-    timeEstimateMinutes: number;
+    effort: EffortSize | null;
     assignee: string | null;
     message: string;
     page: string;
     frame: string;
-    lastUpdatedAt: string;
-    ageInDays: number;
-}
-
-export interface FlowMetrics {
-    flowId: string;
-    flowName: string;
-    totalTasks: number;
-    unresolvedTasks: number;
-    pendingTasks: number;
-    totalTimeEstimate: number;
+    isCurrentlyWorking: boolean;
+    mentions: string[];
 }
 
 export interface SyncResult {
     tasks: Task[];
-    metrics: FlowMetrics[];
-    fileMetrics: {
-        totalUnresolved: number;
-        personalPending: number;
-        unresolvedTimeEstimate: number;
-        completionPercentage: number;
-        currentUser?: string;
-    };
+    currentUser?: string;
 }
 
 export interface PluginMessage {
-    type: "sync" | "update-task" | "bulk-update" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "focus-mode";
+    type: "sync" | "update-task" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "resolve-comment" | "set-working";
     payload?: any;
 }

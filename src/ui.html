@@ -10,14 +10,13 @@
             --bg: #FFFFFF;
             --text-main: #111111;
             --text-muted: #666666;
-            --border: #E6E6E6;
-            --accent: #339933;
-            /* Progress Green */
-            --accent-soft: #EEF7EE;
-            --accent-muted: #C8E6C8;
-            --danger: #F24822;
-            --radius: 8px;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --border: #F3F3F3;
+            --accent: #FC97CF;
+            /* Designer Pink */
+            --accent-soft: #FFF0F7;
+            --accent-muted: #FFD6EA;
+            --radius: 12px;
+            --shadow: 0 2px 8px rgba(252, 151, 207, 0.1);
         }
 
         body {
@@ -33,53 +32,14 @@
             letter-spacing: -0.01em;
         }
 
-        /* --- Header & Summary --- */
-        .header {
-            padding: 16px 16px 8px;
-            background: white;
-            z-index: 10;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .metrics-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .metrics-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .progress-container {
-            height: 6px;
-            background: #F0F0F0;
-            border-radius: 100px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 100px;
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* --- Tabs & Filters --- */
+        /* --- Tabs --- */
         .nav {
             display: flex;
-            padding: 0 16px;
-            border-bottom: 1px solid var(--border);
+            padding: 12px 16px 0;
+            border-bottom: 2px solid var(--border);
             gap: 20px;
+            background: white;
+            z-index: 100;
         }
 
         .tab {
@@ -88,8 +48,9 @@
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
         }
 
         .tab.active {
@@ -97,81 +58,32 @@
             border-bottom-color: var(--accent);
         }
 
-        .filters {
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #FAFAFA;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .filter-chip {
-            padding: 5px 12px;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 100px;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            background: white;
-            transition: all 0.2s;
-        }
-
-        .filter-chip.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .settings-btn {
-            margin-left: auto;
-            cursor: pointer;
-            opacity: 0.6;
-        }
-
-        .settings-btn:hover {
-            opacity: 1;
-        }
-
         /* --- Scrollable Content --- */
         .viewport {
             flex: 1;
             overflow-y: auto;
             padding-bottom: 100px;
-            /* Space for footer */
+            background: white;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
         }
 
-        /* --- Hierarchy --- */
-        .group-header {
-            padding: 12px 16px;
-            background: #F5F5F5;
+        /* --- Pinned Section --- */
+        .pinned-section {
+            padding: 16px;
+            background: var(--accent-soft);
+            border-bottom: 1px solid var(--accent-muted);
+            margin-bottom: 8px;
+        }
+
+        .section-label {
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .frame-header {
-            padding: 10px 16px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-main);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .frame-meta {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-muted);
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: block;
         }
 
         /* --- Task Cards --- */
@@ -181,156 +93,126 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             background: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
             position: relative;
-            transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
         }
 
         .task-card:hover {
             border-color: var(--accent-muted);
-            box-shadow: 0 4px 12px rgba(51, 153, 51, 0.08);
+            box-shadow: var(--shadow);
+            transform: translateY(-1px);
         }
 
-        .task-card.in-progress {
-            border-left: 4px solid var(--accent);
-            background: var(--accent-soft);
-        }
-
-        .task-card.done {
-            opacity: 0.6;
-            background: #F9F9F9;
+        .task-card.resolved {
+            opacity: 0.5;
+            background: #FAFAFA;
         }
 
         .task-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             margin-bottom: 10px;
         }
 
-        .author-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .author-avatar {
-            width: 24px;
-            height: 24px;
-            background: #EEE;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 700;
-            color: #666;
+        .author {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-main);
             text-transform: uppercase;
         }
 
-        .author-name {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .task-age {
+        .meta {
             font-size: 11px;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
-        .task-message {
-            font-size: 13px;
+        .message {
+            font-size: 14px;
             line-height: 1.5;
             color: var(--text-main);
             margin-bottom: 16px;
             word-break: break-word;
         }
 
-        /* --- Card Actions --- */
-        .card-actions {
+        /* --- Effort UI --- */
+        .effort-row {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
-        .time-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .time-btn {
+        .effort-btn {
             flex: 1;
-            padding: 6px 0;
+            padding: 8px;
             font-size: 11px;
             font-weight: 700;
+            text-align: center;
+            border-radius: 8px;
             border: 1px solid var(--border);
             background: white;
-            border-radius: 6px;
             color: var(--text-muted);
             cursor: pointer;
-            text-align: center;
             transition: all 0.2s;
         }
 
-        .time-btn:hover {
-            border-color: #999;
+        .effort-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
-        .time-btn.active {
+        .effort-btn.active {
             background: var(--accent);
             color: white;
             border-color: var(--accent);
         }
 
-        .time-input-small {
-            width: 40px;
-            padding: 5px;
-            font-size: 11px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            outline: none;
-            text-align: center;
-        }
-
-        .status-row {
+        /* --- Actions --- */
+        .card-actions {
             display: flex;
             gap: 8px;
         }
 
-        .status-btn {
+        .btn-work {
             flex: 1;
-            padding: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
+            padding: 10px;
+            background: var(--accent-soft);
+            color: var(--accent);
             border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
             transition: all 0.2s;
         }
 
-        .btn-pending {
-            background: #F0F0F0;
-            color: #666;
+        .btn-work:hover {
+            background: var(--accent);
+            color: white;
         }
 
-        .btn-work {
-            background: #E1F5FE;
-            color: #0288D1;
+        .btn-work.active {
+            background: var(--accent);
+            color: white;
         }
 
-        .btn-done {
-            background: #E8F5E9;
+        .btn-resolve {
+            padding: 10px 16px;
+            background: white;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-resolve:hover {
             color: #2E7D32;
-        }
-
-        .status-btn:active {
-            transform: scale(0.98);
+            border-color: #A5D6A7;
+            background: #F1F8E9;
         }
 
         /* --- Footer --- */
@@ -342,46 +224,30 @@
             padding: 16px;
             background: white;
             border-top: 1px solid var(--border);
-            display: flex;
-            gap: 12px;
             z-index: 100;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
         }
 
-        .btn-main {
-            flex: 1;
-            padding: 12px;
-            background: var(--text-main);
+        .btn-sync {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
             color: white;
             border: none;
             border-radius: var(--radius);
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 800;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(252, 151, 207, 0.3);
         }
 
-        .btn-ghost {
-            padding: 12px 20px;
-            background: white;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
+        .btn-sync:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(252, 151, 207, 0.4);
         }
 
-        .btn-main:hover {
-            opacity: 0.95;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-ghost:hover {
-            background: #F9F9F9;
+        .btn-sync:active {
+            transform: translateY(0);
         }
 
         /* --- Settings --- */
@@ -420,80 +286,35 @@
             padding: 12px;
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            font-size: 13px;
+            font-size: 14px;
             box-sizing: border-box;
             outline: none;
         }
 
         input:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px var(--accent-soft);
+            background: var(--accent-soft);
         }
 
-        .help-card {
-            background: #F8F9FA;
-            padding: 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            line-height: 1.6;
-            color: #666;
-            margin-top: 32px;
-        }
-
-        /* --- Animations --- */
-        @keyframes highlight {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(51, 153, 51, 0.4);
-            }
-
-            50% {
-                transform: scale(1.02);
-                box-shadow: 0 0 0 10px rgba(51, 153, 51, 0);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .highlight-anim {
-            animation: highlight 0.6s ease-out;
+        .config-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Header & Summary -->
-    <div class="header">
-        <div class="summary-row">
-            <div>
-                <div class="metrics-label" id="summaryText">30 unresolved comments</div>
-                <div class="metrics-sub" id="timeRemaining">7h 30m estimated remaining</div>
-            </div>
-            <div style="text-align: right;">
-                <div class="metrics-label" id="completionText">9% complete</div>
-                <div class="metrics-sub" id="personalText">12 personal pending</div>
-            </div>
-        </div>
-        <div class="progress-container">
-            <div class="progress-fill" id="progressBar" style="width: 9%;"></div>
-        </div>
-    </div>
-
-    <!-- Navigation Tabs -->
+    <!-- Tabs -->
     <div class="nav">
         <div class="tab active" id="tabPending" onclick="switchTab('pending')">Pending</div>
-        <div class="tab" id="tabDone" onclick="switchTab('done')">Done</div>
+        <div class="tab" id="tabMe" onclick="switchTab('me')">Assigned to Me</div>
+        <div class="tab" id="tabDiscussion" onclick="switchTab('discussion')">Discussion</div>
         <div class="tab" id="tabResolved" onclick="switchTab('resolved')">Resolved</div>
-    </div>
-
-    <!-- Filters -->
-    <div class="filters">
-        <div class="filter-chip active" id="filterAll" onclick="setFilter('all')">All</div>
-        <div class="filter-chip" id="filterMe" onclick="setFilter('me')">Assigned to Me</div>
-        <div class="settings-btn" onclick="toggleSettings(true)">⚙️</div>
+        <div style="flex:1;"></div>
+        <div style="padding: 12px 0; cursor: pointer;" onclick="toggleSettings(true)">⚙️</div>
     </div>
 
     <!-- Scrollable Content -->
@@ -503,47 +324,30 @@
 
     <!-- Footer -->
     <div class="footer">
-        <button class="btn-ghost" onclick="triggerSync()">Sync</button>
-        <button class="btn-main" onclick="startWorking()">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M11.5 7L5.5 10.5V3.5L11.5 7Z" fill="white" />
-            </svg>
-            Start Working
-        </button>
+        <button class="btn-sync" onclick="triggerSync()">Sync</button>
     </div>
 
     <!-- Settings Overlay -->
     <div id="settingsView" class="settings-overlay">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
-            <h2 style="margin:0; font-size:20px; font-weight:800;">Settings</h2>
-            <div style="cursor:pointer; font-size:20px; font-weight:700;" onclick="toggleSettings(false)">×</div>
-        </div>
-
+        <h2 style="font-weight: 800; margin-bottom: 32px;">Configure FigNotes</h2>
         <div class="input-group">
             <span class="input-label">Figma Access Token</span>
             <input type="password" id="patInput" placeholder="figp_...">
         </div>
-
         <div class="input-group">
             <span class="input-label">Figma File URL</span>
             <input type="text" id="urlInput" placeholder="https://www.figma.com/design/...">
         </div>
-
-        <button class="btn-main" style="width:100%;" onclick="saveSettings()">Save & Sync</button>
-
-        <div class="help-card">
-            <strong>Where to find keys:</strong><br>
-            • <b>Figma PAT:</b> Settings -> Personal Access Tokens.<br>
-            • <b>File URL:</b> Copy from browser bar or Share -> Copy Link.
-        </div>
+        <button class="btn-sync" onclick="saveSettings()">Save & Sync</button>
+        <p style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:24px;">
+            <span class="config-link" onclick="toggleSettings(false)">Back to Workboard</span>
+        </p>
     </div>
 
     <script>
         let latestData = null;
         let config = { pat: '', fileUrl: '' };
-        let activeTab = 'pending'; // pending, done, resolved
-        let filterMode = 'all'; // all, me
-        let highlightedTaskId = null;
+        let activeTab = 'pending'; // pending, me, discussion, resolved
 
         // --- Communication ---
         window.onmessage = (event) => {
@@ -557,14 +361,9 @@
             } else if (type === 'sync-complete') {
                 latestData = payload;
                 render();
-            } else if (type === 'focus-task-found') {
-                highlightedTaskId = payload.commentId;
-                render();
-                scrollToTask(payload.commentId);
             }
         };
 
-        // Initialize Settings
         parent.postMessage({ pluginMessage: { type: 'init' } }, '*');
 
         function toggleSettings(show) {
@@ -584,7 +383,7 @@
             const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
             if (!match) return;
 
-            document.getElementById('content').innerHTML = '<div style="padding:40px; text-align:center; font-size:13px; color:var(--text-muted);">Syncing...</div>';
+            document.getElementById('content').innerHTML = '<div style="padding:40px; text-align:center; font-size:14px; font-weight:700; color:var(--accent);">Syncing comments...</div>';
 
             fetch(`https://api.figma.com/v1/files/${match}/comments`, {
                 headers: { 'X-Figma-Token': config.pat }
@@ -603,140 +402,115 @@
             render();
         }
 
-        function setFilter(f) {
-            filterMode = f;
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1)).classList.add('active');
-            render();
+        async function resolveComment(commentId) {
+            if (!config.pat || !config.fileUrl) return;
+            const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            if (!match) return;
+
+            // Optimistic update
+            parent.postMessage({ pluginMessage: { type: 'resolve-comment', payload: commentId } }, '*');
+
+            try {
+                await fetch(`https://api.figma.com/v1/files/${match}/comments/${commentId}`, {
+                    method: 'POST',
+                    headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resolved: true })
+                });
+            } catch (e) {
+                console.error("REST resolve failed", e);
+            }
         }
 
-        function updateStatus(id, status) {
-            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'internalStatus', value: status } } }, '*');
+        function updateEffort(id, effort) {
+            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: effort } } }, '*');
         }
 
-        function updateTime(id, mins) {
-            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'timeEstimateMinutes', value: mins } } }, '*');
+        function setWorking(id) {
+            parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*');
         }
 
-        function startWorking() {
-            parent.postMessage({ pluginMessage: { type: 'focus-mode' } }, '*');
-        }
-
-        function locateNode(commentId) {
-            highlightedTaskId = commentId;
-            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: commentId } }, '*');
-            render();
-        }
-
-        function scrollToTask(id) {
-            setTimeout(() => {
-                const el = document.getElementById('task-' + id);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+        function locateNode(id) {
+            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*');
         }
 
         // --- Rendering ---
         function render() {
             if (!latestData) return;
 
-            const m = latestData.fileMetrics;
-            document.getElementById('summaryText').innerText = `${m.totalUnresolved} unresolved comments`;
-            document.getElementById('timeRemaining').innerText = m.unresolvedTimeEstimate >= 60
-                ? `${Math.floor(m.unresolvedTimeEstimate / 60)}h ${m.unresolvedTimeEstimate % 60}m estimated remaining`
-                : `${m.unresolvedTimeEstimate}m estimated remaining`;
-            document.getElementById('completionText').innerText = `${m.completionPercentage}% complete`;
-            document.getElementById('personalText').innerText = `${m.personalPending} personal pending`;
-            document.getElementById('progressBar').style.width = m.completionPercentage + '%';
-
             const container = document.getElementById('content');
+            const currentUser = latestData.currentUser;
 
-            // Filter logic
-            let tasks = latestData.tasks.filter(t => {
-                // Tab filter
+            // Sorting & Filtering
+            let tasks = latestData.tasks;
+
+            // 1. Split pinned
+            const workingTask = tasks.find(t => t.isCurrentlyWorking);
+
+            // 2. Tab Filter
+            let filteredTasks = tasks.filter(t => {
                 if (activeTab === 'resolved') return t.resolved;
-                if (t.resolved) return false; // Hide resolved in Pending/Done tabs
+                if (t.resolved) return false;
 
-                if (activeTab === 'pending') return t.internalStatus !== 'Done';
-                if (activeTab === 'done') return t.internalStatus === 'Done';
+                if (activeTab === 'me') return t.assignee === currentUser;
+                if (activeTab === 'discussion') return t.mentions.includes(currentUser) && t.mentions.length > 1;
+                // Pending: Not assigned, not a multi-mention discussion
+                if (activeTab === 'pending') {
+                    const isMultiMention = t.mentions.includes(currentUser) && t.mentions.length > 1;
+                    return t.assignee !== currentUser && !isMultiMention;
+                }
                 return true;
             });
 
-            if (filterMode === 'me') {
-                tasks = tasks.filter(t => t.assignee === m.currentUser);
+            // Prevent duplicate in pinned vs list?
+            // Actually, keep it in list but mute it? User says: "Pin comment moves to top".
+            // So we'll remove it from the filtered list if it's pinned.
+            const listTasks = filteredTasks.filter(t => !t.isCurrentlyWorking);
+
+            let html = '';
+
+            // Pinned Section
+            if (workingTask && !workingTask.resolved) {
+                html += `
+                    <div class="pinned-section">
+                        <span class="section-label">Currently Working On</span>
+                        ${renderTaskCard(workingTask, true)}
+                    </div>
+                `;
             }
 
-            if (tasks.length === 0) {
-                container.innerHTML = `<div style="padding:80px 40px; text-align:center; font-size:14px; color:var(--text-muted);">
-                    ${activeTab === 'pending' ? 'Zero pending tasks! Nice work.' : 'Nothing to show here.'}
-                </div>`;
-                return;
+            if (listTasks.length === 0) {
+                html += `<div style="padding:60px 40px; text-align:center; font-size:14px; color:var(--text-muted);">Tab is empty.</div>`;
+            } else {
+                html += listTasks.map(t => renderTaskCard(t, false)).join('');
             }
 
-            // Grouping: Page -> Frame
-            const pages = {};
-            tasks.forEach(t => {
-                if (!pages[t.page]) pages[t.page] = {};
-                if (!pages[t.page][t.frame]) pages[t.page][t.frame] = [];
-                pages[t.page][t.frame].push(t);
-            });
-
-            container.innerHTML = Object.entries(pages).map(([pageName, frames]) => `
-                <div class="group-header">
-                    <span>${pageName}</span>
-                </div>
-                ${Object.entries(frames).map(([frameName, fTasks]) => {
-                const unresolved = fTasks.filter(tx => !tx.resolved);
-                const pending = unresolved.filter(tx => tx.internalStatus !== 'Done');
-                const time = pending.reduce((acc, tx) => acc + tx.timeEstimateMinutes, 0);
-                return `
-                        <div class="frame-header">
-                            <span>${frameName}</span>
-                            <span class="frame-meta">${pending.length} pending • ${time}m</span>
-                        </div>
-                        ${fTasks.map(t => renderTaskCard(t)).join('')}
-                    `;
-            }).join('')}
-            `).join('');
+            container.innerHTML = html;
         }
 
-        function renderTaskCard(t) {
-            const initials = t.author.split(' ').map(n => n[0]).join('').slice(0, 2);
-            const presets = [5, 15, 30, 60, 120];
-            const isHighlighted = highlightedTaskId === t.commentId;
-            const statusClass = t.internalStatus === 'In Progress' ? 'in-progress' : (t.internalStatus === 'Done' ? 'done' : '');
-
+        function renderTaskCard(t, isPinned) {
             return `
-                <div id="task-${t.commentId}" class="task-card ${statusClass} ${isHighlighted ? 'highlight-anim' : ''}" onclick="locateNode('${t.commentId}')">
+                <div class="task-card ${t.resolved ? 'resolved' : ''}" onclick="locateNode('${t.commentId}')">
                     <div class="task-header">
-                        <div class="author-box">
-                            <div class="author-avatar">${initials}</div>
-                            <div class="author-name">${t.author}</div>
-                        </div>
-                        <div class="task-age">${t.ageInDays === 0 ? 'Today' : t.ageInDays + 'd ago'}</div>
+                        <span class="author">${t.author}</span>
+                        <span class="meta">${t.page} / ${t.frame}</span>
                     </div>
+                    <div class="message">${t.message}</div>
                     
-                    <div class="task-message">${t.message}</div>
-                    
-                    <div class="card-actions">
-                        <div class="time-row" onclick="event.stopPropagation()">
-                            ${presets.map(p => `
-                                <div class="time-btn ${t.timeEstimateMinutes === p ? 'active' : ''}" onclick="updateTime('${t.commentId}', ${p})">${p}m</div>
-                            `).join('')}
-                            <input type="number" class="time-input-small" value="${t.timeEstimateMinutes}" onchange="updateTime('${t.commentId}', parseInt(this.value))">
+                    ${!t.resolved ? `
+                        <div class="effort-row" onclick="event.stopPropagation()">
+                            <div class="effort-btn ${t.effort === 'Small' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', 'Small')">Small</div>
+                            <div class="effort-btn ${t.effort === 'Medium' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', 'Medium')">Medium</div>
+                            <div class="effort-btn ${t.effort === 'Large' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', 'Large')">Large</div>
                         </div>
-                        
-                        <div class="status-row" onclick="event.stopPropagation()">
-                            <button class="status-btn btn-pending" onclick="updateStatus('${t.commentId}', 'Pending')">Reset</button>
-                            <button class="status-btn btn-work" onclick="updateStatus('${t.commentId}', 'In Progress')">Work</button>
-                            <button class="status-btn btn-done" onclick="updateStatus('${t.commentId}', 'Done')">
-                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                Done
+                        <div class="card-actions" onclick="event.stopPropagation()">
+                            <button class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">
+                                ${t.isCurrentlyWorking ? 'Current Goal' : 'Work on this'}
                             </button>
+                            <button class="btn-resolve" onclick="resolveComment('${t.commentId}')">Resolve</button>
                         </div>
-                    </div>
-
-                    ${t.assignee === latestData.fileMetrics.currentUser ?
-                    `<div style="position:absolute; top:12px; right:12px; width:8px; height:8px; background:var(--accent); border-radius:50%; border:2px solid white;" title="Assigned to me"></div>` : ''}
+                    ` : `
+                        <div style="font-size:11px; font-weight:800; color:#2E7D32;">RESOLVED</div>
+                    `}
                 </div>
             `;
         }

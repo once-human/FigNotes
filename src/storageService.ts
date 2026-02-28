@@ -1,6 +1,6 @@
 import { Task } from "./types";
 
-export const STORAGE_KEY = "fignotes_tasks_v5";
+export const STORAGE_KEY = "fignotes_tasks_v6";
 
 export class StorageService {
     static async getTasks(): Promise<Record<string, Task>> {
