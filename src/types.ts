@@ -1,5 +1,6 @@
 export type Priority = "Low" | "Medium" | "High" | "Critical";
 export type InternalStatus = "Critical" | "Needs Review" | "In Progress" | "Blocked" | "Approved" | "Done";
+export type ShipStatus = "Ready" | "Needs Cleanup" | "High Risk";
 
 export interface Task {
     commentId: string;
@@ -31,8 +32,10 @@ export interface FlowMetrics {
     flowName: string;
     totalTasks: number;
     unresolvedTasks: number;
+    criticalTasks: number;
     totalTimeEstimate: number;
-    healthScore: number;    // 0-100 (resolved ratio)
+    healthScore: number;    // 0-100 (weighted formula)
+    intensity: number;      // 0-1 (heatmap density)
 }
 
 export interface SyncResult {
@@ -41,11 +44,15 @@ export interface SyncResult {
     fileMetrics: {
         totalTime: number;
         userTime: number;
+        totalUnresolved: number;
+        totalCritical: number;
+        oldestUnresolvedAge: number;
+        shipReadiness: ShipStatus;
     };
     weeklySummary: string;
 }
 
 export interface PluginMessage {
-    type: "sync" | "update-task" | "notify" | "export" | "save-settings" | "get-settings" | "init" | "locate-node" | "focus-mode";
+    type: "sync" | "update-task" | "bulk-update" | "notify" | "export" | "save-settings" | "get-settings" | "init" | "locate-node" | "focus-mode";
     payload?: any;
 }

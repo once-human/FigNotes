@@ -39,6 +39,19 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 }
                 break;
 
+            case "bulk-update":
+                if (!msg.payload || !msg.payload.ids) throw new Error("Invalid bulk update payload");
+                const { ids, updates } = msg.payload;
+                const allTasks = await StorageService.getTasks();
+                for (const taskId of ids) {
+                    if (allTasks[taskId]) {
+                        Object.assign(allTasks[taskId], updates);
+                    }
+                }
+                await StorageService.saveTasks(allTasks);
+                await broadcastState();
+                break;
+
             case "focus-mode":
                 const state = await SyncService.getState();
                 const focusTask = SyncService.getFocusTask(state.tasks, null);
