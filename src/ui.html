@@ -36,6 +36,7 @@
             --radius: var(--radius-main);
             --bounce: none;
             --hover-transform: translateY(-1px);
+            --pulse-anim: pulse-blue 0.4s ease-out;
         }
 
         body.theme-pink {
@@ -49,6 +50,7 @@
             --radius: 18px;
             --bounce: scale(1.05);
             --hover-transform: translateY(-4px) rotate(1deg);
+            --pulse-anim: pulse-pink 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         body {
@@ -65,7 +67,7 @@
             transition: background 0.4s ease;
         }
 
-        /* --- New Integrated Header --- */
+        /* --- Integrated Header --- */
         .page-header {
             background: white;
             z-index: 1000;
@@ -76,7 +78,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 4px 16px 0;
+            padding: 6px 16px 0;
             gap: 8px;
         }
 
@@ -244,7 +246,7 @@
         }
 
         .label {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -264,6 +266,7 @@
             transition: all 0.4s var(--transition-type);
             cursor: pointer;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            position: relative;
         }
 
         .task-card:hover {
@@ -276,6 +279,39 @@
             opacity: 0.5;
             background: #FAFAFA;
             border-style: dashed;
+        }
+
+        /* Pulse Animations */
+        .task-card.pulsing {
+            animation: var(--pulse-anim);
+        }
+
+        @keyframes pulse-blue {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(0.98);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse-pink {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08) rotate(1deg);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .card-header {
@@ -303,33 +339,6 @@
             color: var(--text-main);
             margin-bottom: 16px;
             word-break: break-word;
-        }
-
-        .card-efforts {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 16px;
-        }
-
-        .effort-btn {
-            flex: 1;
-            padding: 6px;
-            text-align: center;
-            font-size: 10px;
-            font-weight: 800;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.3s var(--transition-type);
-            background: white;
-            color: var(--text-muted);
-        }
-
-        .effort-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            transform: var(--bounce);
         }
 
         .card-actions {
@@ -386,10 +395,10 @@
             transform: var(--bounce);
         }
 
-        /* --- THE CAT (Bigger & Lower) --- */
+        /* --- THE CAT --- */
         #cat-container {
             position: fixed;
-            bottom: 50px;
+            bottom: 70px;
             width: 100%;
             height: 60px;
             pointer-events: none;
@@ -404,8 +413,8 @@
 
         .cat {
             position: absolute;
-            width: 62px;
-            height: 46px;
+            width: 68px;
+            height: 50px;
             cursor: pointer;
             pointer-events: auto;
             will-change: transform, left;
@@ -431,24 +440,18 @@
             animation: tail-flick 3s infinite ease-in-out;
         }
 
-        .cat-head {
-            transform-origin: center center;
-            transition: transform 0.15s ease-out;
-        }
-
-        /* Meow Bubble */
         .meow-bubble {
             position: absolute;
-            top: -30px;
-            left: 20px;
+            top: -35px;
+            left: 25px;
             background: white;
             color: var(--accent);
-            padding: 4px 10px;
-            border-radius: 10px;
-            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 13px;
             font-weight: 800;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--accent-outline);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            border: 2px solid var(--accent-outline);
             animation: meow-float 1s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
             opacity: 0;
@@ -462,53 +465,22 @@
 
             20% {
                 opacity: 1;
-                transform: translateY(-10px) scale(1.1);
-            }
-
-            80% {
-                opacity: 1;
-                transform: translateY(-20px) scale(1);
+                transform: translateY(-12px) scale(1.1);
             }
 
             100% {
                 opacity: 0;
-                transform: translateY(-30px) scale(0.9);
+                transform: translateY(-35px) scale(0.9);
             }
         }
 
         @keyframes leg-wiggle {
             0% {
-                transform: rotate(-8deg);
+                transform: rotate(-7deg);
             }
 
             100% {
-                transform: rotate(8deg);
-            }
-        }
-
-        @keyframes tail-flick {
-
-            0%,
-            100% {
-                transform: rotate(0deg);
-            }
-
-            50% {
-                transform: rotate(15deg);
-            }
-        }
-
-        @keyframes jump {
-            0% {
-                transform: translateY(0) scale(1, 1);
-            }
-
-            40% {
-                transform: translateY(-40px) scale(0.95, 1.05);
-            }
-
-            100% {
-                transform: translateY(0) scale(1, 1);
+                transform: rotate(7deg);
             }
         }
 
@@ -516,6 +488,7 @@
             animation: jump 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        /* --- Global Footer --- */
         .footer {
             position: fixed;
             bottom: 0;
@@ -544,11 +517,7 @@
             gap: 10px;
         }
 
-        .btn-sync:hover {
-            transform: var(--bounce);
-            filter: brightness(1.05);
-        }
-
+        /* --- Settings Overlay --- */
         .settings-overlay {
             position: fixed;
             top: 0;
@@ -563,6 +532,51 @@
 
         .settings-overlay.active {
             display: block;
+        }
+
+        .settings-field {
+            margin-bottom: 24px;
+        }
+
+        .settings-field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .settings-field input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .settings-help {
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 700;
+            margin-top: 8px;
+            display: inline-block;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Empty State */
+        #emptyStateTitle {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        #emptyStateMsg {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -674,15 +688,21 @@
             </svg> Sync</button></div>
 
     <div id="settingsView" class="settings-overlay">
-        <h2 style="font-weight: 800; margin-bottom: 24px;">Settings</h2>
-        <div style="margin-bottom:20px;"><input type="password" id="patInput" placeholder="Figma Access Token"
-                style="width:100%; padding:14px; border:1px solid #F0F0F0; border-radius:12px; font-size:14px; box-sizing:border-box;">
+        <h2 style="font-weight: 800; margin-bottom: 24px;">Setup FigNotes</h2>
+        <div class="settings-field">
+            <label>Personal Access Token</label>
+            <input type="password" id="patInput" placeholder="Enter Token...">
+            <span class="settings-help"
+                onclick="window.open('https://www.figma.com/developers/api#access-tokens')">Where do I find this?</span>
         </div>
-        <div style="margin-bottom:24px;"><input type="text" id="urlInput" placeholder="Figma File URL"
-                style="width:100%; padding:14px; border:1px solid #F0F0F0; border-radius:12px; font-size:14px; box-sizing:border-box;">
+        <div class="settings-field">
+            <label>File URL</label>
+            <input type="text" id="urlInput" placeholder="Paste Figma Link...">
+            <span class="settings-help" onclick="alert('Open any Figma file and copy the browser URL.')">How do I get
+                this?</span>
         </div>
         <button class="btn-sync" onclick="saveSettings()">Save & Sync</button>
-        <div style="text-align:center; margin-top:24px; cursor:pointer; font-size:12px; font-weight:700;"
+        <div style="text-align:center; margin-top:24px; cursor:pointer; font-size:12px; font-weight:700; color:var(--text-muted);"
             onclick="toggleSettings(false)">Close</div>
     </div>
 
@@ -710,15 +730,12 @@
         function catMeow() {
             if (cat.jumping) return;
             cat.jumping = true;
-
-            // Spawn Meow Bubble
             const bubble = document.createElement('div');
             bubble.className = 'meow-bubble';
             bubble.innerText = 'Meoww!';
             const el = document.getElementById('the-cat');
             el.appendChild(bubble);
             setTimeout(() => bubble.remove(), 1000);
-
             el.classList.add('cat-jumping');
             setTimeout(() => { el.classList.remove('cat-jumping'); cat.jumping = false; }, 500);
         }
@@ -749,7 +766,15 @@
         function updateEffortSelection(val) { effortFilter = val; document.getElementById('effortLabel').innerText = val === 'All' ? 'All Efforts' : val; render(); }
 
         function render() {
-            if (!latestData) return;
+            if (!latestData) {
+                document.getElementById('content').innerHTML = `
+                    <div style="padding:160px 40px; text-align:center;">
+                        <h1 id="emptyStateTitle">👋 Welcome!</h1>
+                        <p id="emptyStateMsg">To start tracking your notes, please add your Figma Access Token in Settings.</p>
+                        <button class="btn-sync" onclick="toggleSettings(true)" style="width:auto; margin-top:20px; padding:12px 24px;">Open Settings</button>
+                    </div>`;
+                return;
+            }
             const container = document.getElementById('content');
             const currentUser = latestData.currentUser;
 
@@ -785,7 +810,7 @@
         }
 
         function renderCard(t) {
-            return `<div class="task-card ${t.resolved ? 'resolved' : ''}" onclick="locate('${t.commentId}')">
+            return `<div class="task-card ${t.resolved ? 'resolved' : ''}" id="card-${t.commentId}" onclick="triggerPulse('${t.commentId}')">
                 <div class="card-header"><b>${t.author}</b> <span class="meta">${t.page}/${t.frame}</span></div>
                 <div class="message">${t.message}</div>
                 ${!t.resolved ? `
@@ -813,6 +838,14 @@
             </div>`;
         }
 
+        function triggerPulse(id) {
+            const card = document.getElementById('card-' + id);
+            card.classList.remove('pulsing');
+            void card.offsetWidth; // Trigger reflow
+            card.classList.add('pulsing');
+            locate(id);
+        }
+
         function locate(id) { parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*'); }
         function resolve(id) {
             const task = latestData.tasks.find(t => t.commentId === id);
@@ -833,12 +866,26 @@
             });
         }
         function toggleTheme() { const nt = currentTheme === 'blue' ? 'pink' : 'blue'; applyTheme(nt); parent.postMessage({ pluginMessage: { type: 'set-theme', payload: nt } }, '*'); }
-        function toggleSettings(s) { document.getElementById('settingsView').style.display = s ? 'block' : 'none'; }
-        function saveSettings() { config.pat = document.getElementById('patInput').value; config.fileUrl = document.getElementById('urlInput').value; parent.postMessage({ pluginMessage: { type: 'save-settings', payload: config } }, '*'); toggleSettings(false); triggerSync(); }
+        function toggleSettings(s) { document.getElementById('settingsView').classList.toggle('active', s); }
+        function saveSettings() {
+            config.pat = document.getElementById('patInput').value;
+            config.fileUrl = document.getElementById('urlInput').value;
+            parent.postMessage({ pluginMessage: { type: 'save-settings', payload: config } }, '*');
+            toggleSettings(false);
+            if (config.pat && config.fileUrl) triggerSync();
+        }
+
+        window.onload = () => { parent.postMessage({ pluginMessage: { type: 'get-settings' } }, '*'); };
 
         window.onmessage = (e) => {
             const { type, payload } = e.data.pluginMessage;
-            if (type === 'settings-loaded') { config = payload; if (config.pat && config.fileUrl) triggerSync(); }
+            if (type === 'settings-loaded') {
+                config = payload || { pat: '', fileUrl: '' };
+                document.getElementById('patInput').value = config.pat || '';
+                document.getElementById('urlInput').value = config.fileUrl || '';
+                if (config.pat && config.fileUrl) triggerSync();
+                else render();
+            }
             else if (type === 'sync-complete') { latestData = payload; if (payload.theme) applyTheme(payload.theme); render(); }
         };
     </script>
