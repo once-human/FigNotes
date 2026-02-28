@@ -1,7 +1,7 @@
 {
     "name": "FigNotes",
     "id": "fig-notes-plugin",
-    "api": "1.0.0",
+    "api": "1.70.0",
     "main": "dist/code.js",
     "ui": "src/ui.html",
     "editorType": [

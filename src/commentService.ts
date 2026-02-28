@@ -4,7 +4,6 @@ export class CommentService {
     static async fetchAllComments(): Promise<Task[]> {
         try {
             console.log("[FigNotes] figma.apiVersion:", (figma as any).apiVersion);
-            console.log("[FigNotes] figma.currentUser:", (figma as any).currentUser?.name || "Anonymous/Null");
 
             let threadsMethod = (figma as any).getCommentThreadsAsync ||
                 ((figma as any).comments && (figma as any).comments.getThreadsAsync);
