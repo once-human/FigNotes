@@ -4,13 +4,14 @@
   "description": "Figma comment execution dashboard",
   "main": "code.js",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w"
+    "build": "tsc --noEmit && esbuild src/code.ts --bundle --outfile=dist/code.js",
+    "watch": "esbuild src/code.ts --bundle --outfile=dist/code.js --watch"
   },
   "author": "Antigravity",
   "license": "MIT",
   "devDependencies": {
     "@figma/plugin-typings": "^1.83.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "esbuild": "^0.20.0"
   }
 }
