@@ -1,19 +1,18 @@
 import { Task } from "./types";
 
 export class CommentService {
-    static isSupported = true;
-
     static async fetchAllComments(): Promise<Task[]> {
         try {
-            let threadsMethod = (figma as any).getCommentThreadsAsync ||
+            // Modern Figma API check
+            const threadsMethod = (figma as any).getCommentThreadsAsync ||
                 ((figma as any).comments && (figma as any).comments.getThreadsAsync);
 
             if (!threadsMethod) {
-                console.warn("[FigNotes] Comment API not supported in this Figma environment (apiVersion: " + (figma as any).apiVersion + ").");
-                CommentService.isSupported = false;
+                console.warn("[FigNotes] Comment API not found. Ensure you are on a modern Figma version.");
                 return [];
             }
 
+            // Call the matched method
             const allThreads = await threadsMethod.call(threadsMethod === (figma as any).getCommentThreadsAsync ? figma : (figma as any).comments);
             const tasks: Task[] = [];
             const now = new Date().toISOString();
@@ -37,14 +36,14 @@ export class CommentService {
                     discussionStatus: "pending",
                     createdAt: firstComment.createdAt,
                     lastUpdatedAt: now,
-                    ageInDays: 0, // Calculated during sync
-                    isAvoidance: false // Calculated during sync
+                    ageInDays: 0,
+                    isAvoidance: false
                 });
             }
 
             return tasks;
         } catch (err) {
-            console.error("Error fetching Figma comments", err);
+            console.error("[FigNotes] Error fetching comments:", err);
             return [];
         }
     }

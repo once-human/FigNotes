@@ -14,7 +14,7 @@ export interface Task {
     createdAt: string;
     lastUpdatedAt: string;
 
-    // New Enhanced Fields
+    // Enhanced Fields
     ageInDays: number;
     isAvoidance: boolean;
 }
@@ -40,7 +40,6 @@ export interface SyncResult {
     metrics: FlowMetrics[];
     weeklySummary: string;
     allResolvedByUser: UserBreakdown[];
-    isUnsupported?: boolean;
 }
 
 export interface PluginMessage {

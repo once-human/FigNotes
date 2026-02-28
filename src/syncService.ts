@@ -2,13 +2,6 @@ import { Task, FlowMetrics, UserBreakdown, SyncResult, HealthStatus } from "./ty
 import { StorageService } from "./storageService";
 import { CommentService } from "./commentService";
 
-/**
- * PRODUCTION HARDENING:
- * - Deterministic reconciliation
- * - Stable sorting (multi-key)
- * - Defensive null checks
- * - Immutability (returns new result)
- */
 export class SyncService {
     static async sync(): Promise<SyncResult> {
         const liveTasks = await CommentService.fetchAllComments();
@@ -18,7 +11,6 @@ export class SyncService {
         const now = new Date();
         const nowIso = now.toISOString();
 
-        // 1. Reconcile with defensive checks
         for (const live of liveTasks) {
             if (!live || !live.commentId) continue;
 
@@ -26,7 +18,6 @@ export class SyncService {
 
             const task: Task = stored ? {
                 ...stored,
-                // Figma-owned properties
                 message: live.message ?? stored.message,
                 page: live.page ?? stored.page,
                 frame: live.frame ?? stored.frame,
@@ -35,29 +26,20 @@ export class SyncService {
                 lastUpdatedAt: nowIso
             } : { ...live };
 
-            // Re-calculate derived fields
             const createdDate = new Date(task.createdAt || nowIso);
             const diffTime = Math.max(0, now.getTime() - createdDate.getTime());
             task.ageInDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-            // Avoidance Detection: Large effort + >5 days unresolved
             task.isAvoidance = !task.resolved && (task.effort === 3) && (task.ageInDays > 5);
 
             reconciledTasks[task.commentId] = task;
         }
 
-        // Atomic Save
         await StorageService.saveTasks(reconciledTasks);
 
-        // 2. Stable Sort: Unresolved -> Effort -> Age -> ID (tie breaker)
         const taskList = Object.values(reconciledTasks).sort((a, b) => {
-            // Unresolved first
             if (a.resolved !== b.resolved) return a.resolved ? 1 : -1;
-            // High effort first
             if (a.effort !== b.effort) return b.effort - a.effort;
-            // Oldest first
             if (a.ageInDays !== b.ageInDays) return b.ageInDays - a.ageInDays;
-            // Stable tie-breaker
             return a.commentId.localeCompare(b.commentId);
         });
 
@@ -69,8 +51,7 @@ export class SyncService {
             tasks: taskList,
             metrics,
             weeklySummary,
-            allResolvedByUser,
-            isUnsupported: !CommentService.isSupported
+            allResolvedByUser
         };
     }
 
@@ -89,10 +70,8 @@ export class SyncService {
         flowGroups.forEach((flowTasks, flowName) => {
             const totalTasks = flowTasks.length;
             const resolvedTasks = flowTasks.filter(t => t.resolved).length;
-
             const totalEffort = flowTasks.reduce((sum, t) => sum + (t.effort || 1), 0);
             const completedEffort = flowTasks.reduce((sum, t) => sum + (t.resolved ? (t.effort || 1) : 0), 0);
-
             const weightedCompletion = totalEffort > 0 ? (completedEffort / totalEffort) * 100 : 0;
 
             let health: HealthStatus = "Healthy";
@@ -126,8 +105,7 @@ export class SyncService {
         const avgCompletion = metrics.length > 0
             ? metrics.reduce((sum, m) => sum + m.weightedCompletion, 0) / metrics.length
             : 0;
-
-        return `Project analysis: ${resolvedCount} tasks resolved across ${metrics.length} flows. Average completion: ${Math.round(avgCompletion)}%.`;
+        return `Project Status: ${resolvedCount} tasks resolved. Average completion: ${Math.round(avgCompletion)}%.`;
     }
 
     private static getGlobalUserBreakdown(tasks: Task[]): UserBreakdown[] {
