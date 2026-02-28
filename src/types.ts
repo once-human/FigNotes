@@ -40,6 +40,7 @@ export interface SyncResult {
     metrics: FlowMetrics[];
     weeklySummary: string;
     allResolvedByUser: UserBreakdown[];
+    isUnsupported?: boolean;
 }
 
 export interface PluginMessage {

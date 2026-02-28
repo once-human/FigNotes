@@ -1,25 +1,17 @@
 import { Task } from "./types";
 
 export class CommentService {
+    static isSupported = true;
+
     static async fetchAllComments(): Promise<Task[]> {
         try {
-            console.log("[FigNotes] figma.apiVersion:", (figma as any).apiVersion);
-
             let threadsMethod = (figma as any).getCommentThreadsAsync ||
                 ((figma as any).comments && (figma as any).comments.getThreadsAsync);
 
             if (!threadsMethod) {
-                const getDeepKeys = (obj: any) => {
-                    let keys = new Set<string>();
-                    while (obj) {
-                        Object.getOwnPropertyNames(obj).forEach(k => keys.add(k));
-                        obj = Object.getPrototypeOf(obj);
-                    }
-                    return Array.from(keys);
-                };
-                const allKeys = getDeepKeys(figma);
-                console.warn("[FigNotes] Scanned for 'get' methods:", allKeys.filter(k => k.startsWith('get')));
-                throw new Error("Figma Comment API not found. Please ensure your Figma version is up to date.");
+                console.warn("[FigNotes] Comment API not supported in this Figma environment (apiVersion: " + (figma as any).apiVersion + ").");
+                CommentService.isSupported = false;
+                return [];
             }
 
             const allThreads = await threadsMethod.call(threadsMethod === (figma as any).getCommentThreadsAsync ? figma : (figma as any).comments);

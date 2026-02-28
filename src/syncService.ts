@@ -69,7 +69,8 @@ export class SyncService {
             tasks: taskList,
             metrics,
             weeklySummary,
-            allResolvedByUser
+            allResolvedByUser,
+            isUnsupported: !CommentService.isSupported
         };
     }
 

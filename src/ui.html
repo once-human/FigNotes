@@ -198,6 +198,24 @@
         }
 
         function render() {
+            if (latestData && latestData.isUnsupported) {
+                main.innerHTML = `
+                    <div style="padding: 24px; text-align: center; background: #FFF1F1; border: 1px solid #FFE4E4; border-radius: 12px; margin-bottom: 20px;">
+                        <div style="font-weight: 700; color: #E76F51; margin-bottom: 8px; font-size: 14px;">Environment Limitation</div>
+                        <p style="font-size: 12px; line-height: 1.5; color: #666; margin: 0 0 16px 0;">
+                            Your current Figma app version is too old to support <b>Comment Extraction</b>. 
+                        </p>
+                        <div style="text-align: left; background: white; padding: 12px; border-radius: 8px; font-size: 11px;">
+                            <b style="display: block; margin-bottom: 4px;">To fix this:</b>
+                            1. Open this file in <b>Google Chrome</b> or Firefox.<br>
+                            2. Right-click > Plugins > Development > FigNotes.<br>
+                            3. Sync will work perfectly there!
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
             if (!latestData || !latestData.metrics.length) {
                 main.innerHTML = '<div style="text-align:center; padding: 40px; color: #999;">No comments found in this file.</div>';
                 return;
