@@ -110,7 +110,29 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 break;
 
             case "export":
-                // Handled by generation logic if needed
+                if (!msg.payload) return;
+                const { format, data } = msg.payload;
+                if (!data) return;
+
+                let content = "";
+                if (format === 'csv') {
+                    content = "ID,Message,Page,Frame,Resolved,ResolvedBy,Effort,Age(Days),Avoidance\n";
+                    data.tasks.forEach((t: any) => {
+                        const safeMsg = t.message.replace(/"/g, '""');
+                        content += `${t.commentId},"${safeMsg}",${t.page},${t.frame},${t.resolved},${t.resolvedBy || ''},${t.effort},${t.ageInDays},${t.isAvoidance}\n`;
+                    });
+                } else {
+                    content = `# FigNotes Export\n\n${data.weeklySummary}\n\n`;
+                    data.metrics.forEach((m: any) => {
+                        content += `## ${m.flowName} - ${m.health} (${Math.round(m.weightedCompletion)}%)\n`;
+                        data.tasks.filter((t: any) => t.page === m.flowName).forEach((t: any) => {
+                            content += `- [${t.resolved ? 'x' : ' '}] **${t.frame}** (Effort: ${t.effort}, Age: ${t.ageInDays}d): ${t.message}\n`;
+                        });
+                        content += '\n';
+                    });
+                }
+
+                figma.ui.postMessage({ type: "export-data", payload: { format, content } });
                 break;
         }
     } catch (err: any) {

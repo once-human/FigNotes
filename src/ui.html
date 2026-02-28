@@ -175,6 +175,158 @@
             outline: none;
             background: var(--bg);
         }
+
+        /* Tabs & Dashboard Styles */
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .summary-block {
+            padding: 16px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .metric-row {
+            padding: 0 16px 16px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Analytics Tab Styles */
+        .analytics-panel {
+            padding: 20px;
+        }
+
+        .user-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .user-label {
+            width: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .user-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .user-count {
+            width: 24px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .export-group {
+            padding: 16px 20px;
+            display: flex;
+            gap: 12px;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .btn-outline {
+            flex: 1;
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .health-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .health-Healthy {
+            background: #E2F5EC;
+            color: #1BC47D;
+        }
+
+        .health-At-Risk {
+            background: #FFF1E5;
+            color: #F2994A;
+        }
+
+        .health-Critical {
+            background: #FCEAEA;
+            color: #EB5757;
+        }
     </style>
 </head>
 
@@ -216,14 +368,35 @@
 
     <!-- MAIN SYNC VIEW -->
     <div id="mainView" class="view-section">
-        <div class="filter-bar">
-            <div class="chip active" onclick="setFilter('all')">All</div>
-            <div class="chip" onclick="setFilter('unresolved')">Unresolved</div>
-            <div class="chip" onclick="setFilter('discussion')">Discussion</div>
+        <div class="nav-tabs">
+            <div class="tab active" onclick="switchTab('flow')">Flow Execution</div>
+            <div class="tab" onclick="switchTab('discussion')">Discussion Board</div>
+            <div class="tab" onclick="switchTab('analytics')">Analytics</div>
         </div>
 
-        <div id="mainContent" class="content">
-            <!-- Rendered by JS -->
+        <div id="summary" class="summary-block" style="display:none;"></div>
+
+        <div id="flow-view" class="content">
+            <div class="filter-bar">
+                <div class="chip active" onclick="setFilter('all')">All</div>
+                <div class="chip" onclick="setFilter('unresolved')">Unresolved</div>
+                <div class="chip" onclick="setFilter('discussion')">Discussion</div>
+            </div>
+            <div id="flowContent"></div>
+        </div>
+
+        <div id="discussion-view" class="content" style="display:none;">
+            <div id="discussionContent"></div>
+        </div>
+
+        <div id="analytics-view" class="content" style="display:none;">
+            <h3 style="margin-top:0; font-size:14px;">Resolution Analytics</h3>
+            <div id="userAnalytics" class="analytics-panel"></div>
+        </div>
+
+        <div class="export-group">
+            <button class="btn-outline" onclick="exportData('markdown')">Export Markdown</button>
+            <button class="btn-outline" onclick="exportData('csv')">Export CSV</button>
         </div>
     </div>
 
@@ -236,7 +409,10 @@
 
         const patInput = document.getElementById('patInput');
         const urlInput = document.getElementById('urlInput');
-        const mainContent = document.getElementById('mainContent');
+        const flowContent = document.getElementById('flowContent');
+        const discContent = document.getElementById('discussionContent');
+        const userAnalytics = document.getElementById('userAnalytics');
+        const summaryEl = document.getElementById('summary');
 
         let currentFilter = 'all';
         let latestData = null;
@@ -262,6 +438,8 @@
         // --- Messages from Code.ts ---
         window.onmessage = (event) => {
             const { type, payload } = event.data.pluginMessage;
+
+            if (!type) return;
 
             if (type === 'init') {
                 if (payload && payload.fileKey) {
@@ -291,6 +469,9 @@
             else if (type === 'sync-error') {
                 renderError(payload || "Unknown error occurred.");
                 setSyncingState(false);
+            }
+            else if (type === 'export-data') {
+                downloadFile(payload.content, `fignotes_export.${payload.format}`);
             }
         };
 
@@ -327,7 +508,7 @@
             }
 
             setSyncingState(true);
-            mainContent.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-secondary);">Fetching comments from Figma API...</div>`;
+            flowContent.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-secondary);">Fetching comments from Figma API...</div>`;
 
             let fileKey = nativeFileKey;
             if (!fileKey) {
@@ -368,6 +549,15 @@
         }
 
         // --- View Logic ---
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('flow-view').style.display = tab === 'flow' ? 'block' : 'none';
+            document.getElementById('discussion-view').style.display = tab === 'discussion' ? 'block' : 'none';
+            document.getElementById('analytics-view').style.display = tab === 'analytics' ? 'block' : 'none';
+        }
+
         function setFilter(f) {
             currentFilter = f;
             document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
@@ -377,58 +567,107 @@
 
         function renderTasks() {
             if (!latestData || !latestData.metrics || latestData.metrics.length === 0) {
-                mainContent.innerHTML = `
+                flowContent.innerHTML = `
                     <div style="text-align:center; padding: 80px 40px; color: var(--text-secondary);">
                         <div style="font-size: 32px; margin-bottom: 16px;">💬</div>
                         <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">No comments found</div>
                         <div style="font-size: 13px; opacity: 0.7;">Ensure the URL points to this exact file.</div>
                     </div>
                 `;
+                summaryEl.style.display = 'none';
                 return;
             }
 
+            // Summary
+            summaryEl.style.display = 'block';
+            summaryEl.innerText = latestData.weeklySummary;
+
+            // Flow Execution View
             let html = '';
             latestData.metrics.forEach(flow => {
                 const tasks = latestData.tasks.filter(t => t.page === flow.flowName && matchesFilter(t));
                 if (tasks.length === 0 && currentFilter !== 'all') return;
 
+                const healthClass = flow.health.replace(' ', '-');
+                const progressColor = flow.health === 'Healthy' ? '#1BC47D' : (flow.health === 'At Risk' ? '#F2994A' : '#EB5757');
+
                 html += `
                     <div class="card">
                         <div class="card-header">
-                            <div>
-                                <div style="font-weight: 600; font-size: 15px;">${flow.flowName}</div>
-                                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-                                    ${flow.health} • ${Math.round(flow.weightedCompletion)}% Complete
+                            <div style="flex:1;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="font-weight: 600; font-size: 15px;">${flow.flowName}</div>
+                                    <span class="health-badge health-${healthClass}">${flow.health}</span>
                                 </div>
                             </div>
-                            <div style="font-size: 12px; font-weight: 700; background: var(--accent-soft); padding: 4px 8px; border-radius: 6px; color: var(--accent);">
-                                ${flow.resolvedTasks}/${flow.totalTasks}
+                        </div>
+                        <div class="metric-row">
+                            <div class="progress-info">
+                                <span>Completion</span>
+                                <span>${Math.round(flow.weightedCompletion)}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${flow.weightedCompletion}%; background: ${progressColor}"></div>
                             </div>
                         </div>
                         <div class="tasks">
-                            ${tasks.map(t => `
-                                <div class="task-item">
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 500; font-size: 13px; line-height: 1.4; ${t.resolved ? 'text-decoration: line-through; opacity: 0.5;' : ''}">${t.message}</div>
-                                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; display: flex; gap: 8px; align-items: center;">
-                                            <span>🏠 ${t.frame}</span>
-                                            ${t.nodeId ? `<button onclick="locateNode('${t.nodeId}')" style="background:none; border:none; cursor:pointer; font-size:14px; padding:0; color:var(--accent);" title="Locate on Canvas">⌖</button>` : ''}
-                                            <span>⏳ ${t.ageInDays}d old</span>
-                                        </div>
-                                    </div>
-                                    <select onchange="updateTask('${t.commentId}', 'effort', parseInt(this.value))">
-                                        <option value="1" ${t.effort == 1 ? 'selected' : ''}>S</option>
-                                        <option value="2" ${t.effort == 2 ? 'selected' : ''}>M</option>
-                                        <option value="3" ${t.effort == 3 ? 'selected' : ''}>L</option>
-                                    </select>
-                                </div>
-                            `).join('')}
+                            ${tasks.map(t => renderTaskItem(t)).join('')}
                         </div>
                     </div>
                 `;
             });
 
-            mainContent.innerHTML = html;
+            flowContent.innerHTML = html;
+
+            // Discussion View
+            const discTasks = latestData.tasks.filter(t => t.discussionStatus !== 'pending' || t.isAvoidance);
+            discContent.innerHTML = discTasks.length
+                ? discTasks.map(t => `<div class="card" style="margin-bottom:8px;"><div class="tasks">${renderTaskItem(t)}</div></div>`).join('')
+                : '<p style="text-align:center; padding: 20px; color: var(--text-secondary);">No active discussions or blocked items.</p>';
+
+            // Analytics View
+            if (latestData.allResolvedByUser && latestData.allResolvedByUser.length > 0) {
+                const maxCount = Math.max(...latestData.allResolvedByUser.map(u => u.count), 1);
+                userAnalytics.innerHTML = latestData.allResolvedByUser.map(u => `
+                    <div class="user-bar-row">
+                        <span class="user-label" title="${u.user}">${u.user}</span>
+                        <div class="user-bar-bg">
+                            <div class="user-bar-fill" style="width: ${(u.count / maxCount) * 100}%"></div>
+                        </div>
+                        <span class="user-count">${u.count}</span>
+                    </div>
+                `).join('');
+            } else {
+                userAnalytics.innerHTML = '<p style="color: var(--text-secondary);">No resolutions recorded yet.</p>';
+            }
+        }
+
+        function renderTaskItem(t) {
+            return `
+                <div class="task-item">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 500; font-size: 13px; line-height: 1.4; ${t.resolved ? 'text-decoration: line-through; opacity: 0.5;' : ''}">${t.message}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; display: flex; gap: 8px; align-items: center;">
+                            <span>🏠 ${t.frame}</span>
+                            ${t.nodeId ? `<button onclick="locateNode('${t.nodeId}')" style="background:none; border:none; cursor:pointer; font-size:14px; padding:0; color:var(--accent);" title="Locate on Canvas">⌖</button>` : ''}
+                            <span style="${t.ageInDays > 5 ? 'color: var(--danger); font-weight:600;' : ''}">⏳ ${t.ageInDays}d old</span>
+                            ${t.isAvoidance ? '<span style="color:var(--danger); font-weight:600;">(High Avoidance)</span>' : ''}
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <select onchange="updateTask('${t.commentId}', 'effort', parseInt(this.value))">
+                            <option value="1" ${t.effort == 1 ? 'selected' : ''}>S Effort</option>
+                            <option value="2" ${t.effort == 2 ? 'selected' : ''}>M Effort</option>
+                            <option value="3" ${t.effort == 3 ? 'selected' : ''}>L Effort</option>
+                        </select>
+                        <select onchange="updateTask('${t.commentId}', 'discussionStatus', this.value)">
+                            <option value="pending" ${t.discussionStatus == 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="discussion" ${t.discussionStatus == 'discussion' ? 'selected' : ''}>Discuss</option>
+                            <option value="blocked" ${t.discussionStatus == 'blocked' ? 'selected' : ''}>Blocked</option>
+                        </select>
+                    </div>
+                </div>
+            `;
         }
 
         function matchesFilter(t) {
@@ -447,13 +686,26 @@
         }
 
         function renderError(err) {
-            mainContent.innerHTML = `
+            flowContent.innerHTML = `
                 <div class="error-state" style="padding: 40px; text-align: center;">
                     <div style="font-size: 32px; margin-bottom: 16px;">⚠️</div>
                     <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: var(--danger);">Error</div>
                     <div style="font-size: 13px; opacity: 0.7; word-break: break-all;">${err}</div>
                 </div>
             `;
+        }
+
+        function exportData(format) {
+            parent.postMessage({ pluginMessage: { type: 'export', payload: { format, data: latestData } } }, '*');
+        }
+
+        function downloadFile(content, fileName) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
         }
     </script>
 </body>
