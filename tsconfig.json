@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "lib": [
+            "ES2017",
+            "DOM"
+        ],
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "strict": true,
+        "typeRoots": [
+            "./node_modules/@figma"
+        ],
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "src/**/*"
+    ]
+}

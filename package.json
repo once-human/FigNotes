@@ -1,0 +1,16 @@
+{
+  "name": "fig-notes",
+  "version": "1.0.0",
+  "description": "Figma comment execution dashboard",
+  "main": "code.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "author": "Antigravity",
+  "license": "MIT",
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.83.0",
+    "typescript": "^5.0.0"
+  }
+}

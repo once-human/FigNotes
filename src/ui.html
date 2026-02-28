@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>FigNotes Professional</title>
+    <style>
+        :root {
+            --bg: var(--figma-color-bg);
+            --text: var(--figma-color-text);
+            --border: var(--figma-color-border);
+            --accent: #18A0FB;
+            --success: #1BC47D;
+            --warning: #F2994A;
+            --danger: #EB5757;
+            --subtext: rgba(255, 255, 255, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body.light {
+            --subtext: rgba(0, 0, 0, 0.5);
+            --card-bg: rgba(0, 0, 0, 0.02);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            font-size: 13px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 10;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .title-group h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.02em;
+        }
+
+        .title-group p {
+            margin: 2px 0 0 0;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--subtext);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .tab {
+            cursor: pointer;
+            opacity: 0.5;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .tab.active {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        .summary-block {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-style: italic;
+            border-left: 4px solid var(--accent);
+        }
+
+        .flow-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            background: var(--card-bg);
+        }
+
+        .flow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .flow-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .health-badge {
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 800;
+        }
+
+        .health-Healthy {
+            background: var(--success);
+            color: white;
+        }
+
+        .health-At-Risk {
+            background: var(--warning);
+            color: black;
+        }
+
+        .health-Critical {
+            background: var(--danger);
+            color: white;
+        }
+
+        .metric-row {
+            margin-bottom: 16px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 4px;
+            color: var(--subtext);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.6s ease;
+        }
+
+        .task-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-top {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .age-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .age-fresh {
+            background: var(--border);
+        }
+
+        .age-warn {
+            background: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+
+        .age-danger {
+            background: var(--danger);
+            box-shadow: 0 0 8px var(--danger);
+        }
+
+        .avoidance-badge {
+            background: #7B61FF;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .task-msg {
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .task-meta {
+            font-size: 11px;
+            color: var(--subtext);
+            margin-bottom: 8px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        select {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .analytics-panel {
+            margin-top: 20px;
+        }
+
+        .user-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .user-label {
+            width: 80px;
+            font-size: 11px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .user-bar-bg {
+            flex: 1;
+            height: 12px;
+            background: var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .user-bar-fill {
+            height: 100%;
+            background: var(--accent);
+        }
+
+        .user-count {
+            width: 20px;
+            font-size: 11px;
+            text-align: right;
+        }
+
+        .export-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        #discussion-view {
+            display: none;
+        }
+    </style>
+</head>
+
+<body id="body">
+    <div class="header">
+        <div class="title-group">
+            <h1>FigNotes PRO</h1>
+            <p id="lastSync">Live Dashboard</p>
+        </div>
+        <button id="syncBtn"
+            style="background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer;">Sync</button>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="tab active" onclick="switchTab('flow')">Flow Execution</div>
+        <div class="tab" onclick="switchTab('discussion')">Discussion Board</div>
+        <div class="tab" onclick="switchTab('analytics')">Analytics</div>
+    </div>
+
+    <div id="summary" class="summary-block">Loading execution summary...</div>
+
+    <div id="flow-view">
+        <div id="dashboard"></div>
+    </div>
+
+    <div id="discussion-view">
+        <div id="discussion-list"></div>
+    </div>
+
+    <div id="analytics-view" style="display: none;">
+        <h3>Resolution Analytics</h3>
+        <div id="user-analytics" class="analytics-panel"></div>
+    </div>
+
+    <div class="export-group">
+        <button class="btn-outline" onclick="exportData('markdown')">Export Markdown</button>
+        <button class="btn-outline" onclick="exportData('csv')">Export CSV</button>
+    </div>
+
+    <script>
+        let currentData = null;
+        const dashboard = document.getElementById('dashboard');
+        const summaryEl = document.getElementById('summary');
+        const discList = document.getElementById('discussion-list');
+        const userAnalytics = document.getElementById('user-analytics');
+
+        window.onmessage = (event) => {
+            const { type, payload } = event.data.pluginMessage;
+            if (type === 'sync-complete') {
+                currentData = payload;
+                render();
+            } else if (type === 'export-data') {
+                downloadFile(payload.content, `fignotes_export.${payload.format}`);
+            }
+        };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('flow-view').style.display = tab === 'flow' ? 'block' : 'none';
+            document.getElementById('discussion-view').style.display = tab === 'discussion' ? 'block' : 'none';
+            document.getElementById('analytics-view').style.display = tab === 'analytics' ? 'block' : 'none';
+        }
+
+        function render() {
+            if (!currentData) return;
+
+            summaryEl.innerText = currentData.weeklySummary;
+
+            // Flow Execution View
+            dashboard.innerHTML = currentData.metrics.map(flow => `
+                <div class="flow-card">
+                    <div class="flow-header">
+                        <span class="flow-title">${flow.flowName}</span>
+                        <span class="health-badge health-${flow.health.replace(' ', '-')}">${flow.health}</span>
+                    </div>
+                    <div class="metric-row">
+                        <div class="progress-info">
+                            <span>Completion</span>
+                            <span>${Math.round(flow.weightedCompletion)}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${flow.weightedCompletion}%; background: ${getHealthColor(flow.health)}"></div>
+                        </div>
+                    </div>
+                    <div class="task-list">
+                        ${currentData.tasks.filter(t => t.page === flow.flowName).map(t => renderTask(t)).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Discussion View
+            const discTasks = currentData.tasks.filter(t => t.discussionStatus !== 'pending' || t.isAvoidance);
+            discList.innerHTML = discTasks.length ? discTasks.map(t => renderTask(t)).join('') : '<p style="text-align:center; padding: 20px; opacity: 0.5;">No active discussions or blocked items.</p>';
+
+            // Analytics View
+            const maxCount = Math.max(...currentData.allResolvedByUser.map(u => u.count), 1);
+            userAnalytics.innerHTML = currentData.allResolvedByUser.map(u => `
+                <div class="user-bar-row">
+                    <span class="user-label">${u.user}</span>
+                    <div class="user-bar-bg">
+                        <div class="user-bar-fill" style="width: ${(u.count / maxCount) * 100}%"></div>
+                    </div>
+                    <span class="user-count">${u.count}</span>
+                </div>
+            `).join('') || '<p style="opacity: 0.5;">None resolved yet.</p>';
+        }
+
+        function renderTask(t) {
+            const ageColor = t.ageInDays > 7 ? 'warn' : (t.ageInDays > 3 ? 'warn' : 'fresh'); // Fixed logic: 7+ danger, 3+ warn
+            const ageClass = t.ageInDays > 7 ? 'age-danger' : (t.ageInDays > 3 ? 'age-warn' : 'age-fresh');
+
+            return `
+                <div class="task-item">
+                    ${t.isAvoidance ? '<div class="avoidance-badge">HIGH COGNITIVE LOAD</div>' : ''}
+                    <div class="task-top">
+                        <div class="age-dot ${ageClass}" title="${t.ageInDays} days old"></div>
+                        <div style="flex:1">
+                            <span class="task-meta">${t.frame} • ${t.ageInDays}d old</span>
+                            <div class="task-msg">${t.message}</div>
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <select onchange="updateTask('${t.commentId}', 'effort', parseInt(this.value))">
+                            <option value="1" ${t.effort == 1 ? 'selected' : ''}>S (1)</option>
+                            <option value="2" ${t.effort == 2 ? 'selected' : ''}>M (2)</option>
+                            <option value="3" ${t.effort == 3 ? 'selected' : ''}>L (3)</option>
+                        </select>
+                        <select onchange="updateTask('${t.commentId}', 'discussionStatus', this.value)">
+                            <option value="pending" ${t.discussionStatus == 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="discussion" ${t.discussionStatus == 'discussion' ? 'selected' : ''}>Discuss</option>
+                            <option value="blocked" ${t.discussionStatus == 'blocked' ? 'selected' : ''}>Blocked</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getHealthColor(health) {
+            if (health === 'Healthy') return '#1BC47D';
+            if (health === 'At Risk') return '#F2994A';
+            return '#EB5757';
+        }
+
+        function updateTask(id, key, value) {
+            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key, value } } }, '*');
+        }
+
+        function exportData(format) {
+            parent.postMessage({ pluginMessage: { type: 'export', payload: { format, data: currentData } } }, '*');
+        }
+
+        function downloadFile(content, fileName) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+        }
+
+        document.getElementById('syncBtn').onclick = () => {
+            parent.postMessage({ pluginMessage: { type: 'sync' } }, '*');
+        };
+    </script>
+</body>
+
+</html>
