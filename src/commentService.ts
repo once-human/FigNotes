@@ -7,8 +7,15 @@ export class CommentService {
                 ((figma as any).comments && (figma as any).comments.getThreadsAsync);
 
             if (!threadsMethod) {
-                const keys = Object.keys(figma).filter(k => k.toLowerCase().includes('comment') || k.toLowerCase().includes('thread'));
-                console.warn("[FigNotes] Comment API not found. Available keys:", keys);
+                const scannedKeys: string[] = [];
+                for (const key in figma) {
+                    if (key.toLowerCase().includes('comment') || key.toLowerCase().includes('thread')) {
+                        scannedKeys.push(key);
+                    }
+                }
+                console.warn("[FigNotes] Comment API not found.");
+                console.warn("[FigNotes] Scanned for keys:", scannedKeys);
+                console.warn("[FigNotes] figma.apiVersion:", (figma as any).apiVersion);
                 throw new Error("Figma Comment API not accessible in this environment.");
             }
 
