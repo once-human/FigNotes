@@ -47,6 +47,7 @@
             --radius: 18px;
             --bounce: scale(1.05);
             --pulse-shadow: 0 0 25px rgba(252, 151, 207, 0.5);
+            --work-bounce: work-pop 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
         }
 
         body {
@@ -379,6 +380,25 @@
             color: white;
         }
 
+        /* Work Button Bounce (Pink Mode) */
+        @keyframes work-pop {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15) rotate(-2deg);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .theme-pink .btn-work.popping {
+            animation: var(--work-bounce);
+        }
+
         .btn-resolve {
             display: flex;
             align-items: center;
@@ -399,10 +419,10 @@
             color: #2E7D32;
         }
 
-        /* --- THE CAT (Positioned so legs show) --- */
+        /* --- THE CAT (Lowered & Leggy) --- */
         #cat-container {
             position: fixed;
-            bottom: 85px;
+            bottom: 65px;
             width: 100%;
             height: 60px;
             pointer-events: none;
@@ -515,7 +535,7 @@
             gap: 10px;
         }
 
-        /* --- SETUP FLOW --- */
+        /* --- SETUP FLOW (Refined Layout) --- */
         .settings-overlay {
             position: fixed;
             top: 0;
@@ -524,13 +544,14 @@
             bottom: 0;
             background: white;
             z-index: 3000;
-            padding: 32px 24px;
+            padding: 24px 24px;
             display: none;
             overflow-y: auto;
         }
 
         .settings-overlay.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
 
         .setup-title {
@@ -539,30 +560,17 @@
             margin-bottom: 24px;
         }
 
-        .setup-step {
-            margin-bottom: 32px;
-            background: #F9F9F9;
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
+        .setup-top-inputs {
+            margin-bottom: 24px;
         }
 
-        .step-num {
-            font-size: 10px;
-            font-weight: 900;
-            background: var(--accent);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            display: inline-block;
-        }
-
-        .step-text {
-            font-size: 14px;
-            font-weight: 600;
-            line-height: 1.5;
-            margin-bottom: 16px;
+        .setup-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            display: block;
         }
 
         .setup-input {
@@ -571,14 +579,41 @@
             border: 1.5px solid var(--border);
             border-radius: 12px;
             font-size: 14px;
-            font-family: inherit;
             box-sizing: border-box;
+            margin-bottom: 16px;
         }
 
         .setup-input:focus {
             border-color: var(--accent);
             outline: none;
-            background: white;
+        }
+
+        .setup-instructions {
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 2px dashed var(--border);
+        }
+
+        .setup-step {
+            margin-bottom: 16px;
+        }
+
+        .step-num {
+            font-size: 9px;
+            font-weight: 900;
+            background: var(--border);
+            color: var(--text-muted);
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        .step-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -658,8 +693,8 @@
         <div id="the-cat" class="cat" onclick="catMeow()">
             <svg class="cat-svg" viewBox="0 0 600 400">
                 <g class="cat-legs">
-                    <path d="M225,260v78" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
-                    <path d="M340,260v78" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                    <path d="M225,260v95" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                    <path d="M340,260v95" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
                 </g>
                 <g class="cat-body">
                     <path class="cat-tail" d="M208,240s-35.8-1.5-46-42c-5.5-25.3-9.2-40.5-32-48"
@@ -692,22 +727,30 @@
     <div id="settingsView" class="settings-overlay">
         <div class="setup-title">Setup FigNotes</div>
 
-        <div class="setup-step">
-            <span class="step-num">STEP 1</span>
-            <div class="step-text">Go to <b>Figma Settings > Account</b> and generate a new <b>Personal access
-                    token</b>.</div>
+        <div class="setup-top-inputs">
+            <span class="setup-label">Personal Access Token</span>
             <input type="password" id="patInput" class="setup-input" placeholder="Paste Token here...">
-        </div>
 
-        <div class="setup-step">
-            <span class="step-num">STEP 2</span>
-            <div class="step-text">Copy the URL of your current Figma file from the browser search bar.</div>
+            <span class="setup-label">Figma Link</span>
             <input type="text" id="urlInput" class="setup-input" placeholder="Paste File URL here...">
+
+            <button class="btn-sync" onclick="saveSettings()">Save & Get Started</button>
+            <div style="text-align:center; cursor:pointer; font-size:12px; font-weight:700; color:var(--text-muted); padding: 12px;"
+                onclick="toggleSettings(false)">Cancel</div>
         </div>
 
-        <button class="btn-sync" onclick="saveSettings()" style="margin-bottom: 20px;">Save & Get Started</button>
-        <div style="text-align:center; cursor:pointer; font-size:12px; font-weight:700; color:var(--text-muted);"
-            onclick="toggleSettings(false)">Cancel</div>
+        <div class="setup-instructions">
+            <div class="setup-step">
+                <span class="step-num">STEP 1</span>
+                <div class="step-text">Go to <b>Figma Settings > Account</b> and generate a new <b>Personal access
+                        token</b>.</div>
+            </div>
+
+            <div class="setup-step">
+                <span class="step-num">STEP 2</span>
+                <div class="step-text">Copy the URL of your current Figma file from the browser search bar.</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -822,7 +865,7 @@
                         <div class="effort-pill ${t.effort === 'Large' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Large')">L</div>
                     </div>
                     <div class="card-actions" onclick="event.stopPropagation()">
-                        <button class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">
+                        <button id="work-${t.commentId}" class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                             ${t.isCurrentlyWorking ? 'Focusing' : 'Work'}
                         </button>
@@ -855,7 +898,16 @@
             }).catch(e => console.error(e));
         }
 
-        function setWorking(id) { parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*'); }
+        function setWorking(id) {
+            if (id && currentTheme === 'pink') {
+                const btn = document.getElementById('work-' + id);
+                if (btn) {
+                    btn.classList.add('popping');
+                    setTimeout(() => btn.classList.remove('popping'), 400);
+                }
+            }
+            parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*');
+        }
         function setEffort(id, val) { parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: val } } }, '*'); }
         function triggerSync() {
             const key = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
