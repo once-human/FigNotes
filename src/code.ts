@@ -50,8 +50,6 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
             case "set-theme": {
                 if (!msg.payload) return;
                 await SyncService.setTheme(msg.payload);
-                // No need to broadcast full state for theme change usually, 
-                // but let's do it to ensure UI is in sync
                 await broadcastState();
                 break;
             }
@@ -62,6 +60,17 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 if (tasks[msg.payload]) {
                     tasks[msg.payload].resolved = true;
                     tasks[msg.payload].isCurrentlyWorking = false;
+                    await StorageService.saveTasks(tasks);
+                    await broadcastState();
+                }
+                break;
+            }
+
+            case "unresolve-comment": {
+                if (!msg.payload) return;
+                const tasks = await StorageService.getTasks();
+                if (tasks[msg.payload]) {
+                    tasks[msg.payload].resolved = false;
                     await StorageService.saveTasks(tasks);
                     await broadcastState();
                 }
@@ -129,16 +138,17 @@ async function navigateToTask(task: Task) {
             }
 
             if (targetNode.type !== "PAGE" && targetNode.type !== "DOCUMENT") {
-                // Smooth zoom/scroll using scrollAndZoomIntoView
+                // Smooth zoom using scrollAndZoomIntoView
+                // We pass an array of nodes to zoom to. If the node is small, it provides a nice context.
                 figma.viewport.scrollAndZoomIntoView([targetNode as SceneNode]);
                 figma.currentPage.selection = [targetNode as SceneNode];
             } else {
                 figma.viewport.center = { x: 0, y: 0 };
             }
         } else {
-            // Fallback to center of current page
+            // Safe center fallback
             figma.viewport.center = { x: figma.viewport.center.x, y: figma.viewport.center.y };
-            figma.notify("Focusing canvas...", { timeout: 1000 });
+            figma.notify("Node not found. Focusing canvas.", { timeout: 1000 });
         }
     } catch (err) {
         console.warn("[FigNotes] Navigation fallback failed", err);

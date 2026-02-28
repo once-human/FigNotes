@@ -25,6 +25,6 @@ export interface SyncResult {
 }
 
 export interface PluginMessage {
-    type: "sync" | "update-task" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "resolve-comment" | "set-working" | "set-theme";
+    type: "sync" | "update-task" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "resolve-comment" | "unresolve-comment" | "set-working" | "set-theme";
     payload?: any;
 }
