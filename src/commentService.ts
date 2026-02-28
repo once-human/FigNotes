@@ -7,25 +7,27 @@ export class CommentService {
             const now = new Date().toISOString();
 
             for (const commentObj of rawComments) {
-                // Usually REST API gives `client_meta.node_id` or similar for location
-                const nodeId = commentObj.client_meta?.node_id || commentObj.file_key /* fallback */ || null;
-                const page = this.findPage(nodeId);
-                const frame = this.findFrame(nodeId);
+                const nodeId = commentObj.client_meta?.node_id || null;
+                const pageNode = this.findPageNode(nodeId);
+                const frameNode = this.findFrameNode(nodeId);
 
                 tasks.push({
                     commentId: commentObj.id,
                     nodeId: nodeId,
-                    message: commentObj.message,
-                    page: page?.name || "Global / Unassigned",
-                    frame: frame?.name || "Canvas",
-                    resolved: commentObj.resolved_at !== null && commentObj.resolved_at !== undefined,
-                    resolvedBy: commentObj.resolved_at ? "Figma User" : null,
-                    effort: 1,
-                    discussionStatus: "pending",
+                    frameId: frameNode?.id || null,
+                    pageId: pageNode?.id || null,
+                    author: commentObj.user?.handle || "Unknown",
                     createdAt: commentObj.created_at,
+                    resolved: commentObj.resolved_at !== null && commentObj.resolved_at !== undefined,
+                    internalStatus: commentObj.resolved_at ? "Done" : "In Progress",
+                    timeEstimateMinutes: 15, // Default
+                    assignee: null,
+                    priority: "Medium",
+                    message: commentObj.message,
+                    page: pageNode?.name || "Global",
+                    frame: frameNode?.name || "Canvas",
                     lastUpdatedAt: now,
-                    ageInDays: 0,
-                    isAvoidance: false
+                    ageInDays: 0
                 });
             }
 
@@ -36,7 +38,7 @@ export class CommentService {
         }
     }
 
-    private static findPage(nodeId: string | null): PageNode | null {
+    private static findPageNode(nodeId: string | null): PageNode | null {
         if (!nodeId) return null;
         try {
             let node = figma.getNodeById(nodeId);
@@ -49,7 +51,7 @@ export class CommentService {
         }
     }
 
-    private static findFrame(nodeId: string | null): FrameNode | null {
+    private static findFrameNode(nodeId: string | null): FrameNode | null {
         if (!nodeId) return null;
         try {
             let node = figma.getNodeById(nodeId);

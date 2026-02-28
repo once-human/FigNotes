@@ -1,6 +1,6 @@
 import { Task } from "./types";
 
-export const STORAGE_KEY = "fignotes_tasks_v2"; // Increment version for schema change
+export const STORAGE_KEY = "fignotes_tasks_v3"; // Bumped for Command Center schema
 
 export class StorageService {
     /**

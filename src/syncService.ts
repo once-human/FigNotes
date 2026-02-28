@@ -1,157 +1,129 @@
-import { Task, FlowMetrics, UserBreakdown, SyncResult, HealthStatus } from "./types";
 import { StorageService } from "./storageService";
 import { CommentService } from "./commentService";
+import { Task, SyncResult, FlowMetrics, InternalStatus, Priority } from "./types";
 
 export class SyncService {
     static async sync(rawComments?: any[]): Promise<SyncResult> {
-        // If data comes from REST API, parse it. Otherwise attempt legacy CommentService (fallback).
         let liveTasks: Task[] = [];
 
         if (rawComments && Array.isArray(rawComments)) {
             liveTasks = await CommentService.parseRestComments(rawComments);
         } else {
-            console.warn("[FigNotes] No payload received from UI. Skipping raw parse.");
-            liveTasks = [];
+            console.warn("[FigNotes] No payload received for sync.");
         }
 
-        const storedTasks = await StorageService.getTasks();
+        const storedTasksMap = await StorageService.getTasks();
+        const reconciledTasks: Task[] = [];
 
-        const reconciledTasks: Record<string, Task> = {};
-        const now = new Date();
-        const nowIso = now.toISOString();
-
-        for (const live of liveTasks) {
-            if (!live || !live.commentId) continue;
-
-            const stored = storedTasks[live.commentId];
-
-            const task: Task = stored ? {
-                ...stored,
-                message: live.message ?? stored.message,
-                page: live.page ?? stored.page,
-                frame: live.frame ?? stored.frame,
-                resolved: live.resolved ?? stored.resolved,
-                resolvedBy: live.resolvedBy ?? stored.resolvedBy,
-                lastUpdatedAt: nowIso
-            } : { ...live };
-
-            const createdDate = new Date(task.createdAt || nowIso);
-            const diffTime = Math.max(0, now.getTime() - createdDate.getTime());
-            task.ageInDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            task.isAvoidance = !task.resolved && (task.effort === 3) && (task.ageInDays > 5);
-
-            reconciledTasks[task.commentId] = task;
-        }
-
-        await StorageService.saveTasks(reconciledTasks);
-
-        const taskList = Object.values(reconciledTasks).sort((a, b) => {
-            if (a.resolved !== b.resolved) return a.resolved ? 1 : -1;
-            if (a.effort !== b.effort) return b.effort - a.effort;
-            if (a.ageInDays !== b.ageInDays) return b.ageInDays - a.ageInDays;
-            return a.commentId.localeCompare(b.commentId);
+        // Reconciliation logic
+        liveTasks.forEach(live => {
+            const stored = storedTasksMap[live.commentId];
+            if (stored) {
+                // Merge Figma-native with plugin-managed
+                reconciledTasks.push({
+                    ...live,
+                    internalStatus: stored.internalStatus,
+                    timeEstimateMinutes: stored.timeEstimateMinutes,
+                    assignee: stored.assignee,
+                    priority: stored.priority,
+                    lastUpdatedAt: new Date().toISOString()
+                });
+            } else {
+                reconciledTasks.push(live);
+            }
         });
 
-        const metrics = this.calculateMetrics(taskList);
-        const weeklySummary = this.generateWeeklySummary(taskList, metrics);
-        const allResolvedByUser = this.getGlobalUserBreakdown(taskList);
+        const fullTasksMap: Record<string, Task> = {};
+        reconciledTasks.forEach(t => fullTasksMap[t.commentId] = t);
+        await StorageService.saveTasks(fullTasksMap);
 
-        return {
-            tasks: taskList,
-            metrics,
-            weeklySummary,
-            allResolvedByUser
-        };
+        return this.calculateResult(reconciledTasks);
     }
 
-    /**
-     * Non-destructive state calculation for local UI updates (e.g. changing effort)
-     */
     static async getState(): Promise<SyncResult> {
         const storedTasksMap = await StorageService.getTasks();
         const storedTasks = Object.values(storedTasksMap);
+        return this.calculateResult(storedTasks);
+    }
 
-        const taskList = storedTasks.sort((a, b) => {
-            if (a.resolved !== b.resolved) return a.resolved ? 1 : -1;
-            if (a.effort !== b.effort) return b.effort - a.effort;
-            if (a.ageInDays !== b.ageInDays) return b.ageInDays - a.ageInDays;
-            return a.commentId.localeCompare(b.commentId);
+    private static calculateResult(tasks: Task[]): SyncResult {
+        // Sort: Priority (Critical first) > Status (Done last) > Age
+        const sortedTasks = [...tasks].sort((a, b) => {
+            const priorityWeight = { "Critical": 0, "High": 1, "Medium": 2, "Low": 3 };
+            const statusWeight = { "Critical": 0, "Blocked": 1, "In Progress": 2, "Needs Review": 3, "Approved": 4, "Done": 5 };
+
+            if (priorityWeight[a.priority] !== priorityWeight[b.priority]) {
+                return (priorityWeight[a.priority] as number) - (priorityWeight[b.priority] as number);
+            }
+            if (statusWeight[a.internalStatus] !== statusWeight[b.internalStatus]) {
+                return (statusWeight[a.internalStatus] as number) - (statusWeight[b.internalStatus] as number);
+            }
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
-        const metrics = this.calculateMetrics(taskList);
-        const weeklySummary = this.generateWeeklySummary(taskList, metrics);
-        const allResolvedByUser = this.getGlobalUserBreakdown(taskList);
+        // Group by Page/Frame for metrics
+        const pages: Record<string, { name: string, frames: Record<string, Task[]> }> = {};
+        tasks.forEach(t => {
+            const pageId = t.pageId || "global";
+            if (!pages[pageId]) pages[pageId] = { name: t.page, frames: {} };
+
+            const frameId = t.frameId || "canvas";
+            if (!pages[pageId].frames[frameId]) pages[pageId].frames[frameId] = [];
+            pages[pageId].frames[frameId].push(t);
+        });
+
+        const metrics: FlowMetrics[] = [];
+        let totalFileTime = 0;
+        let currentUserTime = 0;
+        const currentUserId = null; // We'll need to pass this or handle it in UI
+
+        Object.entries(pages).forEach(([pId, p]) => {
+            Object.entries(p.frames).forEach(([fId, fTasks]) => {
+                const total = fTasks.length;
+                const unresolved = fTasks.filter(t => t.internalStatus !== "Done").length;
+                const time = fTasks.reduce((acc, t) => acc + t.timeEstimateMinutes, 0);
+
+                totalFileTime += time;
+
+                metrics.push({
+                    flowId: fId,
+                    flowName: `${p.name} / ${fTasks[0].frame}`,
+                    totalTasks: total,
+                    unresolvedTasks: unresolved,
+                    totalTimeEstimate: time,
+                    healthScore: total > 0 ? Math.round(((total - unresolved) / total) * 100) : 100
+                });
+            });
+        });
 
         return {
-            tasks: taskList,
+            tasks: sortedTasks,
             metrics,
-            weeklySummary,
-            allResolvedByUser
+            fileMetrics: {
+                totalTime: totalFileTime,
+                userTime: currentUserTime
+            },
+            weeklySummary: `Total ${totalFileTime}min of work remaining.`
         };
     }
 
-    private static calculateMetrics(tasks: Task[]): FlowMetrics[] {
-        const flowGroups = new Map<string, Task[]>();
+    static getFocusTask(tasks: Task[], currentUserId: string | null): Task | null {
+        const actionable = tasks.filter(t => t.internalStatus !== "Done" && !t.resolved);
+        if (actionable.length === 0) return null;
 
-        tasks.forEach(task => {
-            const pageName = task.page || "Unassigned";
-            const group = flowGroups.get(pageName) || [];
-            group.push(task);
-            flowGroups.set(pageName, group);
-        });
+        return actionable.sort((a, b) => {
+            const aMine = a.assignee === currentUserId;
+            const bMine = b.assignee === currentUserId;
+            if (aMine !== bMine) return aMine ? -1 : 1;
 
-        const result: FlowMetrics[] = [];
+            if (a.priority === "Critical" && b.priority !== "Critical") return -1;
+            if (b.priority === "Critical" && a.priority !== "Critical") return 1;
 
-        flowGroups.forEach((flowTasks, flowName) => {
-            const totalTasks = flowTasks.length;
-            const resolvedTasks = flowTasks.filter(t => t.resolved).length;
-            const totalEffort = flowTasks.reduce((sum, t) => sum + (t.effort || 1), 0);
-            const completedEffort = flowTasks.reduce((sum, t) => sum + (t.resolved ? (t.effort || 1) : 0), 0);
-            const weightedCompletion = totalEffort > 0 ? (completedEffort / totalEffort) * 100 : 0;
+            const aTime = new Date(a.createdAt).getTime();
+            const bTime = new Date(b.createdAt).getTime();
+            if (aTime !== bTime) return aTime - bTime;
 
-            let health: HealthStatus = "Healthy";
-            if (weightedCompletion < 40) health = "Critical";
-            else if (weightedCompletion <= 75) health = "At Risk";
-
-            const userStats = new Map<string, number>();
-            flowTasks.forEach(t => {
-                if (t.resolved && t.resolvedBy) {
-                    userStats.set(t.resolvedBy, (userStats.get(t.resolvedBy) || 0) + 1);
-                }
-            });
-
-            result.push({
-                flowName,
-                totalTasks,
-                resolvedTasks,
-                totalEffort,
-                completedEffort,
-                weightedCompletion,
-                health,
-                userBreakdown: Array.from(userStats.entries()).map(([user, count]) => ({ user, count }))
-            });
-        });
-
-        return result.sort((a, b) => a.flowName.localeCompare(b.flowName));
-    }
-
-    private static generateWeeklySummary(tasks: Task[], metrics: FlowMetrics[]): string {
-        const resolvedCount = tasks.filter(t => t.resolved).length;
-        const avgCompletion = metrics.length > 0
-            ? metrics.reduce((sum, m) => sum + m.weightedCompletion, 0) / metrics.length
-            : 0;
-        return `Project Status: ${resolvedCount} tasks resolved. Average completion: ${Math.round(avgCompletion)}%.`;
-    }
-
-    private static getGlobalUserBreakdown(tasks: Task[]): UserBreakdown[] {
-        const userMap = new Map<string, number>();
-        tasks.forEach(t => {
-            if (t.resolved && t.resolvedBy) {
-                userMap.set(t.resolvedBy, (userMap.get(t.resolvedBy) || 0) + 1);
-            }
-        });
-        return Array.from(userMap.entries())
-            .map(([user, count]) => ({ user, count }))
-            .sort((a, b) => b.count - a.count);
+            return b.timeEstimateMinutes - a.timeEstimateMinutes;
+        })[0];
     }
 }
