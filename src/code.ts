@@ -2,7 +2,7 @@ import { SyncService } from "./syncService";
 import { StorageService } from "./storageService";
 import { PluginMessage, Task } from "./types";
 
-figma.showUI(__html__, { width: 440, height: 700, themeColors: true });
+figma.showUI(__html__, { width: 440, height: 740, themeColors: true });
 
 async function broadcastState(rawComments?: any[]) {
     try {
@@ -31,6 +31,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 const task = tasks[id];
                 if (task) {
                     (task as any)[key] = value;
+                    task.lastUpdatedAt = new Date().toISOString();
                     await StorageService.updateTask(task);
                     await broadcastState();
                 }
@@ -41,9 +42,11 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 if (!msg.payload || !msg.payload.ids) throw new Error("Invalid bulk update payload");
                 const { ids, updates } = msg.payload;
                 const allTasks = await StorageService.getTasks();
+                const now = new Date().toISOString();
                 for (const taskId of ids) {
                     if (allTasks[taskId]) {
                         Object.assign(allTasks[taskId], updates);
+                        allTasks[taskId].lastUpdatedAt = now;
                     }
                 }
                 await StorageService.saveTasks(allTasks);
@@ -57,6 +60,8 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 const focusTask = SyncService.getFocusTask(state.tasks, currentUserHandle);
                 if (focusTask) {
                     figma.ui.postMessage({ type: "focus-task-found", payload: focusTask });
+                    // Trigger navigation immediately
+                    await navigateToTask(focusTask);
                 } else {
                     figma.notify("No pending tasks found.");
                 }
@@ -78,19 +83,17 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
 
             case "locate-node": {
                 if (!msg.payload) return;
-                const targetId = msg.payload.toString().replace('-', ':');
-                const node = await figma.getNodeByIdAsync(targetId);
-                if (node) {
-                    let page = node.parent;
-                    while (page && page.type !== "PAGE") page = page.parent;
-                    if (page) await figma.setCurrentPageAsync(page as PageNode);
-
-                    figma.viewport.scrollAndZoomIntoView([node]);
-                    if (node.type !== "PAGE" && node.type !== "DOCUMENT") {
+                const tasks = await StorageService.getTasks();
+                const task = tasks[msg.payload];
+                if (task) {
+                    await navigateToTask(task);
+                } else {
+                    // Fallback if task metadata not found but we have an ID
+                    const node = await figma.getNodeByIdAsync(msg.payload.replace('-', ':'));
+                    if (node) {
+                        figma.viewport.scrollAndZoomIntoView([node]);
                         figma.currentPage.selection = [node as SceneNode];
                     }
-                } else {
-                    figma.notify("Node not found on canvas.");
                 }
                 break;
             }
@@ -106,3 +109,39 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
         figma.notify(err.message, { error: true });
     }
 };
+
+async function navigateToTask(task: Task) {
+    try {
+        // Fallback Chain: Node -> Frame -> Page
+        let targetNode: BaseNode | null = null;
+
+        if (task.nodeId) {
+            targetNode = await figma.getNodeByIdAsync(task.nodeId);
+        }
+
+        if (!targetNode && task.frameId) {
+            targetNode = await figma.getNodeByIdAsync(task.frameId);
+        }
+
+        if (!targetNode && task.pageId) {
+            targetNode = await figma.getNodeByIdAsync(task.pageId);
+        }
+
+        if (targetNode) {
+            // Ensure we are on the right page
+            let page = targetNode.parent;
+            while (page && page.type !== "PAGE") page = page.parent;
+            if (page) await figma.setCurrentPageAsync(page as PageNode);
+
+            figma.viewport.scrollAndZoomIntoView([targetNode as SceneNode]);
+
+            if (targetNode.type !== "PAGE" && targetNode.type !== "DOCUMENT") {
+                figma.currentPage.selection = [targetNode as SceneNode];
+            }
+        } else {
+            figma.notify("Could not locate node, frame, or page on canvas.", { timeout: 2000 });
+        }
+    } catch (err) {
+        console.warn("[FigNotes] Navigation fallback failed", err);
+    }
+}

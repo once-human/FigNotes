@@ -13,6 +13,7 @@ export class SyncService {
             if (stored) {
                 reconciledTasks.push({
                     ...live,
+                    internalStatus: stored.internalStatus || "Pending",
                     timeEstimateMinutes: typeof stored.timeEstimateMinutes === 'number' ? stored.timeEstimateMinutes : live.timeEstimateMinutes,
                     assignee: stored.assignee || live.assignee
                 });
@@ -35,9 +36,15 @@ export class SyncService {
     }
 
     private static calculateResult(tasks: Task[], currentUserHandle: string | null): SyncResult {
-        // Sort: Unresolved first, then by date
+        // Sort: Unresolved (Figma) first, then internal status priority (Pending > In Progress > Done), then date
         const sortedTasks = [...tasks].sort((a, b) => {
             if (a.resolved !== b.resolved) return a.resolved ? 1 : -1;
+
+            const statusWeight = { "Pending": 0, "In Progress": 1, "Done": 2 };
+            if (statusWeight[a.internalStatus] !== statusWeight[b.internalStatus]) {
+                return statusWeight[a.internalStatus] - statusWeight[b.internalStatus];
+            }
+
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
@@ -52,38 +59,40 @@ export class SyncService {
 
         const metrics: FlowMetrics[] = [];
         let totalUnresolved = 0;
+        let personalPending = 0;
         let unresolvedTimeEstimate = 0;
-        let totalTimeEstimate = 0;
+        let doneInternally = 0;
 
         Object.entries(pages).forEach(([pId, p]) => {
             Object.entries(p.frames).forEach(([fId, fTasks]) => {
-                const unresolvedTasks = fTasks.filter(t => !t.resolved);
-                const unresolvedCount = unresolvedTasks.length;
-                const frameTimeUnresolved = unresolvedTasks.reduce((acc, t) => acc + t.timeEstimateMinutes, 0);
-                const frameTimeTotal = fTasks.reduce((acc, t) => acc + t.timeEstimateMinutes, 0);
+                const fUnresolved = fTasks.filter(t => !t.resolved);
+                const fPending = fTasks.filter(t => !t.resolved && t.internalStatus !== "Done");
+                const fTimeRemaining = fPending.reduce((acc, t) => acc + t.timeEstimateMinutes, 0);
 
-                totalUnresolved += unresolvedCount;
-                unresolvedTimeEstimate += frameTimeUnresolved;
-                totalTimeEstimate += frameTimeTotal;
+                totalUnresolved += fUnresolved.length;
+                personalPending += fPending.filter(t => t.assignee === currentUserHandle).length;
+                unresolvedTimeEstimate += fTimeRemaining;
+                doneInternally += fTasks.filter(t => t.internalStatus === "Done").length;
 
                 metrics.push({
                     flowId: fId,
                     flowName: `${p.name} / ${fTasks[0].frame}`,
                     totalTasks: fTasks.length,
-                    unresolvedTasks: unresolvedCount,
-                    totalTimeEstimate: frameTimeUnresolved
+                    unresolvedTasks: fUnresolved.length,
+                    pendingTasks: fPending.length,
+                    totalTimeEstimate: fTimeRemaining
                 });
             });
         });
 
-        const totalTasks = tasks.length;
-        const completionPercentage = totalTasks > 0 ? Math.round(((totalTasks - totalUnresolved) / totalTasks) * 100) : 100;
+        const completionPercentage = totalUnresolved > 0 ? Math.round((doneInternally / totalUnresolved) * 100) : 100;
 
         return {
             tasks: sortedTasks,
-            metrics: metrics.sort((a, b) => b.unresolvedTasks - a.unresolvedTasks),
+            metrics: metrics.sort((a, b) => b.pendingTasks - a.pendingTasks),
             fileMetrics: {
                 totalUnresolved,
+                personalPending,
                 unresolvedTimeEstimate,
                 completionPercentage,
                 currentUser: currentUserHandle || undefined
@@ -92,16 +101,20 @@ export class SyncService {
     }
 
     static getFocusTask(tasks: Task[], currentUserId: string | null): Task | null {
-        const actionable = tasks.filter(t => !t.resolved);
+        const actionable = tasks.filter(t => !t.resolved && t.internalStatus !== "Done");
         if (actionable.length === 0) return null;
 
         return actionable.sort((a, b) => {
-            // Priority 1: Assigned to me
+            // 1. Assigned to me
             const aMine = a.assignee === currentUserId;
             const bMine = b.assignee === currentUserId;
             if (aMine !== bMine) return aMine ? -1 : 1;
 
-            // Priority 2: Oldest first
+            // 2. Status priority
+            if (a.internalStatus === "In Progress" && b.internalStatus !== "In Progress") return -1;
+            if (b.internalStatus === "In Progress" && a.internalStatus !== "In Progress") return 1;
+
+            // 3. Oldest first
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         })[0];
     }

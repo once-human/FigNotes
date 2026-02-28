@@ -1,3 +1,5 @@
+export type InternalStatus = "Pending" | "In Progress" | "Done";
+
 export interface Task {
     commentId: string;
     nodeId: string | null;
@@ -6,11 +8,14 @@ export interface Task {
     author: string;
     createdAt: string;
     resolved: boolean;
+    internalStatus: InternalStatus;
     timeEstimateMinutes: number;
     assignee: string | null;
     message: string;
     page: string;
     frame: string;
+    lastUpdatedAt: string;
+    ageInDays: number;
 }
 
 export interface FlowMetrics {
@@ -18,6 +23,7 @@ export interface FlowMetrics {
     flowName: string;
     totalTasks: number;
     unresolvedTasks: number;
+    pendingTasks: number;
     totalTimeEstimate: number;
 }
 
@@ -26,6 +32,7 @@ export interface SyncResult {
     metrics: FlowMetrics[];
     fileMetrics: {
         totalUnresolved: number;
+        personalPending: number;
         unresolvedTimeEstimate: number;
         completionPercentage: number;
         currentUser?: string;

@@ -4,18 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <title>FigNotes</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #FFFFFF;
             --text-main: #111111;
             --text-muted: #666666;
             --border: #E6E6E6;
-            --accent: #18A0FB;
-            /* Figma Blue */
-            --accent-bg: #E1F5FE;
+            --accent: #339933;
+            /* Progress Green */
+            --accent-soft: #EEF7EE;
+            --accent-muted: #C8E6C8;
             --danger: #F24822;
-            --radius: 6px;
+            --radius: 8px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         body {
@@ -28,216 +30,310 @@
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
+            letter-spacing: -0.01em;
         }
 
         /* --- Header & Summary --- */
         .header {
-            padding: 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            padding: 16px 16px 8px;
+            background: white;
+            z-index: 10;
         }
 
-        .summary-bar {
+        .summary-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 12px;
         }
 
-        .metrics-text {
+        .metrics-label {
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .metrics-sub {
+            font-size: 11px;
             color: var(--text-muted);
+            margin-top: 2px;
         }
 
-        .settings-icon {
+        .progress-container {
+            height: 6px;
+            background: #F0F0F0;
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 100px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* --- Tabs & Filters --- */
+        .nav {
+            display: flex;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border);
+            gap: 20px;
+        }
+
+        .tab {
+            padding: 12px 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
             cursor: pointer;
-            width: 20px;
-            height: 20px;
-            opacity: 0.5;
-            transition: opacity 0.2s;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
         }
 
-        .settings-icon:hover {
-            opacity: 1;
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
         }
 
-        /* --- Filter Bar --- */
         .filters {
+            padding: 12px 16px;
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 0 16px 12px;
+            background: #FAFAFA;
             border-bottom: 1px solid var(--border);
         }
 
         .filter-chip {
-            padding: 4px 10px;
+            padding: 5px 12px;
             font-size: 11px;
             font-weight: 600;
             border-radius: 100px;
             cursor: pointer;
             border: 1px solid var(--border);
             color: var(--text-muted);
-            background: transparent;
-            transition: all 0.15s;
+            background: white;
+            transition: all 0.2s;
         }
 
         .filter-chip.active {
-            background: var(--text-main);
+            background: var(--accent);
             color: white;
-            border-color: var(--text-main);
+            border-color: var(--accent);
         }
 
-        .toggle-label {
+        .settings-btn {
             margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-muted);
             cursor: pointer;
+            opacity: 0.6;
         }
 
-        /* --- Viewport --- */
+        .settings-btn:hover {
+            opacity: 1;
+        }
+
+        /* --- Scrollable Content --- */
         .viewport {
             flex: 1;
             overflow-y: auto;
-            padding: 8px 0 100px;
+            padding-bottom: 100px;
+            /* Space for footer */
         }
 
-        /* --- Grouping --- */
-        .page-group {
-            margin-bottom: 24px;
-        }
-
-        .page-title {
-            padding: 8px 16px;
+        /* --- Hierarchy --- */
+        .group-header {
+            padding: 12px 16px;
+            background: #F5F5F5;
             font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.05em;
             color: var(--text-muted);
-            background: #FAFAFA;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .frame-group {
-            padding: 12px 16px 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid var(--border);
         }
 
-        .frame-name {
+        .frame-header {
+            padding: 10px 16px;
             font-size: 12px;
             font-weight: 700;
             color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
         }
 
         .frame-meta {
             font-size: 11px;
+            font-weight: 500;
             color: var(--text-muted);
         }
 
-        /* --- Task Card --- */
+        /* --- Task Cards --- */
         .task-card {
-            margin: 4px 16px 12px;
-            padding: 12px;
+            margin: 8px 16px 16px;
+            padding: 16px;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             background: white;
-            cursor: pointer;
-            transition: border-color 0.15s, box-shadow 0.15s;
+            position: relative;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
         }
 
         .task-card:hover {
-            border-color: #B3B3B3;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-color: var(--accent-muted);
+            box-shadow: 0 4px 12px rgba(51, 153, 51, 0.08);
         }
 
-        .task-card.resolved {
-            opacity: 0.5;
-            background: #FAFAFA;
+        .task-card.in-progress {
+            border-left: 4px solid var(--accent);
+            background: var(--accent-soft);
         }
 
-        .task-card.active {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px var(--accent-bg);
+        .task-card.done {
+            opacity: 0.6;
+            background: #F9F9F9;
         }
 
-        .task-author {
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .author-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .author-avatar {
+            width: 24px;
+            height: 24px;
+            background: #EEE;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 10px;
             font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .author-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .task-age {
+            font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 4px;
         }
 
         .task-message {
             font-size: 13px;
             line-height: 1.5;
             color: var(--text-main);
-            margin-bottom: 10px;
+            margin-bottom: 16px;
             word-break: break-word;
         }
 
-        .task-footer {
+        /* --- Card Actions --- */
+        .card-actions {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        /* --- Time Estimate UI --- */
-        .time-selector {
+        .time-row {
             display: flex;
-            gap: 4px;
+            align-items: center;
+            gap: 6px;
         }
 
         .time-btn {
-            padding: 3px 6px;
-            font-size: 10px;
-            font-weight: 600;
+            flex: 1;
+            padding: 6px 0;
+            font-size: 11px;
+            font-weight: 700;
             border: 1px solid var(--border);
             background: white;
-            border-radius: 4px;
+            border-radius: 6px;
             color: var(--text-muted);
             cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
         }
 
         .time-btn:hover {
-            border-color: #B3B3B3;
+            border-color: #999;
         }
 
         .time-btn.active {
-            background: var(--accent-bg);
-            color: var(--accent);
+            background: var(--accent);
+            color: white;
             border-color: var(--accent);
         }
 
-        .time-input {
-            width: 32px;
-            padding: 2px 4px;
-            font-size: 10px;
+        .time-input-small {
+            width: 40px;
+            padding: 5px;
+            font-size: 11px;
             border: 1px solid var(--border);
-            border-radius: 4px;
+            border-radius: 6px;
             outline: none;
+            text-align: center;
         }
 
-        .assignee-select {
-            margin-left: auto;
-            padding: 2px 4px;
-            font-size: 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            background: white;
-            color: var(--text-muted);
-            max-width: 80px;
+        .status-row {
+            display: flex;
+            gap: 8px;
         }
 
-        /* --- Global Footer --- */
+        .status-btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-pending {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .btn-work {
+            background: #E1F5FE;
+            color: #0288D1;
+        }
+
+        .btn-done {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .status-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* --- Footer --- */
         .footer {
             position: fixed;
             bottom: 0;
@@ -249,17 +345,18 @@
             display: flex;
             gap: 12px;
             z-index: 100;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
         }
 
-        .btn-primary {
+        .btn-main {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             background: var(--text-main);
             color: white;
             border: none;
             border-radius: var(--radius);
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -267,131 +364,186 @@
             gap: 8px;
         }
 
-        .btn-secondary {
-            padding: 10px 16px;
+        .btn-ghost {
+            padding: 12px 20px;
             background: white;
             color: var(--text-main);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
         }
 
-        .btn-primary:hover {
-            opacity: 0.9;
+        .btn-main:hover {
+            opacity: 0.95;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .btn-secondary:hover {
-            background: #F5F5F5;
+        .btn-ghost:hover {
+            background: #F9F9F9;
         }
 
-        /* --- Settings View --- */
-        .settings-view {
-            padding: 24px;
+        /* --- Settings --- */
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 200;
+            padding: 32px 24px;
             display: none;
         }
 
-        .settings-view.active {
+        .settings-overlay.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
             display: block;
         }
 
         input[type="text"],
         input[type="password"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             font-size: 13px;
-            margin-bottom: 16px;
             box-sizing: border-box;
             outline: none;
         }
 
         input:focus {
             border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-soft);
         }
 
-        .config-help {
-            margin-top: 24px;
+        .help-card {
+            background: #F8F9FA;
             padding: 16px;
-            background: #F9F9F9;
             border-radius: 8px;
             font-size: 12px;
-            color: var(--text-muted);
             line-height: 1.6;
+            color: #666;
+            margin-top: 32px;
         }
 
-        .config-help a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
+        /* --- Animations --- */
+        @keyframes highlight {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(51, 153, 51, 0.4);
+            }
+
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 10px rgba(51, 153, 51, 0);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .highlight-anim {
+            animation: highlight 0.6s ease-out;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Main View -->
-    <div id="mainView">
-        <div class="header">
-            <div class="summary-bar">
-                <div id="metricsHeader" class="metrics-text">Loading insights...</div>
-                <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
+    <!-- Header & Summary -->
+    <div class="header">
+        <div class="summary-row">
+            <div>
+                <div class="metrics-label" id="summaryText">30 unresolved comments</div>
+                <div class="metrics-sub" id="timeRemaining">7h 30m estimated remaining</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="metrics-label" id="completionText">9% complete</div>
+                <div class="metrics-sub" id="personalText">12 personal pending</div>
             </div>
         </div>
-
-        <div class="filters">
-            <div class="filter-chip active" id="filterAll" onclick="setTabFilter('all')">All</div>
-            <div class="filter-chip" id="filterMe" onclick="setTabFilter('me')">Assigned to Me</div>
-            <div class="filter-chip" id="filterUnassigned" onclick="setTabFilter('unassigned')">Unassigned</div>
-            <label class="toggle-label">
-                <input type="checkbox" id="showResolvedToggle" onchange="render()">
-                Show Resolved
-            </label>
-        </div>
-
-        <div class="viewport" id="workboardContent">
-            <!-- Rendered dynamically -->
-        </div>
-
-        <div class="footer">
-            <button class="btn-secondary" onclick="triggerSync()">Sync</button>
-            <button class="btn-primary" onclick="startWorking()">Start Working</button>
+        <div class="progress-container">
+            <div class="progress-fill" id="progressBar" style="width: 9%;"></div>
         </div>
     </div>
 
-    <!-- Settings View -->
-    <div id="settingsView" class="settings-view">
-        <h2 style="font-size:18px; margin-bottom:8px;">Configuration</h2>
-        <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">Setup Figma access tokens for
-            synchronization.</p>
+    <!-- Navigation Tabs -->
+    <div class="nav">
+        <div class="tab active" id="tabPending" onclick="switchTab('pending')">Pending</div>
+        <div class="tab" id="tabDone" onclick="switchTab('done')">Done</div>
+        <div class="tab" id="tabResolved" onclick="switchTab('resolved')">Resolved</div>
+    </div>
 
-        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Personal
-            Access Token</label>
-        <input type="password" id="patInput" placeholder="figp_...">
+    <!-- Filters -->
+    <div class="filters">
+        <div class="filter-chip active" id="filterAll" onclick="setFilter('all')">All</div>
+        <div class="filter-chip" id="filterMe" onclick="setFilter('me')">Assigned to Me</div>
+        <div class="settings-btn" onclick="toggleSettings(true)">⚙️</div>
+    </div>
 
-        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Figma File
-            URL</label>
-        <input type="text" id="urlInput" placeholder="https://www.figma.com/design/...">
+    <!-- Scrollable Content -->
+    <div class="viewport" id="content">
+        <!-- Rendered dynamically -->
+    </div>
 
-        <button class="btn-primary" onclick="saveSettings()">Save Configuration</button>
-        <button class="btn-secondary" onclick="toggleSettings()" style="width:100%; margin-top:8px;">Back to
-            Workboard</button>
+    <!-- Footer -->
+    <div class="footer">
+        <button class="btn-ghost" onclick="triggerSync()">Sync</button>
+        <button class="btn-main" onclick="startWorking()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M11.5 7L5.5 10.5V3.5L11.5 7Z" fill="white" />
+            </svg>
+            Start Working
+        </button>
+    </div>
 
-        <div class="config-help">
-            <strong>How to configure:</strong><br>
-            • Figma PAT: Generate in <a href="https://www.figma.com/settings/developers" target="_blank">Figma
-                Settings</a>.<br>
-            • File URL: Copy from browser address bar or Share -> Copy Link.
+    <!-- Settings Overlay -->
+    <div id="settingsView" class="settings-overlay">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+            <h2 style="margin:0; font-size:20px; font-weight:800;">Settings</h2>
+            <div style="cursor:pointer; font-size:20px; font-weight:700;" onclick="toggleSettings(false)">×</div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-label">Figma Access Token</span>
+            <input type="password" id="patInput" placeholder="figp_...">
+        </div>
+
+        <div class="input-group">
+            <span class="input-label">Figma File URL</span>
+            <input type="text" id="urlInput" placeholder="https://www.figma.com/design/...">
+        </div>
+
+        <button class="btn-main" style="width:100%;" onclick="saveSettings()">Save & Sync</button>
+
+        <div class="help-card">
+            <strong>Where to find keys:</strong><br>
+            • <b>Figma PAT:</b> Settings -> Personal Access Tokens.<br>
+            • <b>File URL:</b> Copy from browser bar or Share -> Copy Link.
         </div>
     </div>
 
     <script>
         let latestData = null;
         let config = { pat: '', fileUrl: '' };
-        let currentFilter = 'all'; // all, me, unassigned
-        let activeTaskId = null;
+        let activeTab = 'pending'; // pending, done, resolved
+        let filterMode = 'all'; // all, me
+        let highlightedTaskId = null;
 
         // --- Communication ---
         window.onmessage = (event) => {
@@ -406,25 +558,17 @@
                 latestData = payload;
                 render();
             } else if (type === 'focus-task-found') {
-                activeTaskId = payload.commentId;
+                highlightedTaskId = payload.commentId;
                 render();
+                scrollToTask(payload.commentId);
             }
         };
 
-        // Initialize
+        // Initialize Settings
         parent.postMessage({ pluginMessage: { type: 'init' } }, '*');
 
-        // --- Core Functions ---
-        function toggleSettings(forceActive = false) {
-            const sv = document.getElementById('settingsView');
-            const mv = document.getElementById('mainView');
-            if (forceActive || sv.style.display === 'none') {
-                sv.style.display = 'block';
-                mv.style.display = 'none';
-            } else {
-                sv.style.display = 'none';
-                mv.style.display = 'block';
-            }
+        function toggleSettings(show) {
+            document.getElementById('settingsView').classList.toggle('active', show);
         }
 
         function saveSettings() {
@@ -435,42 +579,60 @@
             triggerSync();
         }
 
-        async function triggerSync() {
+        function triggerSync() {
             if (!config.pat || !config.fileUrl) return;
             const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (!match) return alert("Invalid Figma URL.");
+            if (!match) return;
 
-            document.getElementById('workboardContent').innerHTML = '<div style="padding:40px; text-align:center; font-size:13px; color:var(--text-muted);">Syncing comments...</div>';
+            document.getElementById('content').innerHTML = '<div style="padding:40px; text-align:center; font-size:13px; color:var(--text-muted);">Syncing...</div>';
 
-            try {
-                const resp = await fetch(`https://api.figma.com/v1/files/${match}/comments`, {
-                    headers: { 'X-Figma-Token': config.pat }
-                });
-                const data = await resp.json();
-                parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*');
-            } catch (e) {
-                alert("Sync failed. Check PAT/URL.");
-            }
+            fetch(`https://api.figma.com/v1/files/${match}/comments`, {
+                headers: { 'X-Figma-Token': config.pat }
+            })
+                .then(r => r.json())
+                .then(data => {
+                    parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*');
+                })
+                .catch(e => alert("Sync failed. Check settings."));
         }
 
-        function setTabFilter(f) {
-            currentFilter = f;
+        function switchTab(tab) {
+            activeTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            render();
+        }
+
+        function setFilter(f) {
+            filterMode = f;
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1)).classList.add('active');
             render();
         }
 
-        function updateTask(id, key, value) {
-            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key, value } } }, '*');
+        function updateStatus(id, status) {
+            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'internalStatus', value: status } } }, '*');
+        }
+
+        function updateTime(id, mins) {
+            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'timeEstimateMinutes', value: mins } } }, '*');
         }
 
         function startWorking() {
             parent.postMessage({ pluginMessage: { type: 'focus-mode' } }, '*');
         }
 
-        function locateNode(id) {
-            activeTaskId = id;
-            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*');
+        function locateNode(commentId) {
+            highlightedTaskId = commentId;
+            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: commentId } }, '*');
+            render();
+        }
+
+        function scrollToTask(id) {
+            setTimeout(() => {
+                const el = document.getElementById('task-' + id);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
         }
 
         // --- Rendering ---
@@ -478,79 +640,103 @@
             if (!latestData) return;
 
             const m = latestData.fileMetrics;
-            const timeStr = m.unresolvedTimeEstimate >= 60
-                ? `${Math.floor(m.unresolvedTimeEstimate / 60)}h ${m.unresolvedTimeEstimate % 60}m`
-                : `${m.unresolvedTimeEstimate}m`;
+            document.getElementById('summaryText').innerText = `${m.totalUnresolved} unresolved comments`;
+            document.getElementById('timeRemaining').innerText = m.unresolvedTimeEstimate >= 60
+                ? `${Math.floor(m.unresolvedTimeEstimate / 60)}h ${m.unresolvedTimeEstimate % 60}m estimated remaining`
+                : `${m.unresolvedTimeEstimate}m estimated remaining`;
+            document.getElementById('completionText').innerText = `${m.completionPercentage}% complete`;
+            document.getElementById('personalText').innerText = `${m.personalPending} personal pending`;
+            document.getElementById('progressBar').style.width = m.completionPercentage + '%';
 
-            document.getElementById('metricsHeader').innerText =
-                `${m.totalUnresolved} unresolved • ${timeStr} remaining • ${m.completionPercentage}% complete`;
+            const container = document.getElementById('content');
 
-            const showResolved = document.getElementById('showResolvedToggle').checked;
-            const container = document.getElementById('workboardContent');
+            // Filter logic
+            let tasks = latestData.tasks.filter(t => {
+                // Tab filter
+                if (activeTab === 'resolved') return t.resolved;
+                if (t.resolved) return false; // Hide resolved in Pending/Done tabs
 
-            // Filtering
-            let filteredTasks = latestData.tasks.filter(t => {
-                if (!showResolved && t.resolved) return false;
-                if (currentFilter === 'me') return t.assignee === m.currentUser;
-                if (currentFilter === 'unassigned') return !t.assignee;
+                if (activeTab === 'pending') return t.internalStatus !== 'Done';
+                if (activeTab === 'done') return t.internalStatus === 'Done';
                 return true;
             });
 
-            if (filteredTasks.length === 0) {
-                container.innerHTML = '<div style="padding:60px; text-align:center; font-size:13px; color:var(--text-muted);">All tasks complete!</div>';
+            if (filterMode === 'me') {
+                tasks = tasks.filter(t => t.assignee === m.currentUser);
+            }
+
+            if (tasks.length === 0) {
+                container.innerHTML = `<div style="padding:80px 40px; text-align:center; font-size:14px; color:var(--text-muted);">
+                    ${activeTab === 'pending' ? 'Zero pending tasks! Nice work.' : 'Nothing to show here.'}
+                </div>`;
                 return;
             }
 
-            // Grouping by Page -> Frame
+            // Grouping: Page -> Frame
             const pages = {};
-            filteredTasks.forEach(t => {
+            tasks.forEach(t => {
                 if (!pages[t.page]) pages[t.page] = {};
                 if (!pages[t.page][t.frame]) pages[t.page][t.frame] = [];
                 pages[t.page][t.frame].push(t);
             });
 
             container.innerHTML = Object.entries(pages).map(([pageName, frames]) => `
-                <div class="page-group">
-                    <div class="page-title">${pageName}</div>
-                    ${Object.entries(frames).map(([frameName, tasks]) => {
-                const unresolved = tasks.filter(tx => !tx.resolved);
-                const time = unresolved.reduce((acc, tx) => acc + tx.timeEstimateMinutes, 0);
-                return `
-                            <div class="frame-group">
-                                <div class="frame-name">${frameName}</div>
-                                <div class="frame-meta">${unresolved.length} left • ${time}m</div>
-                            </div>
-                            ${tasks.map(t => renderTaskCard(t)).join('')}
-                        `;
-            }).join('')}
+                <div class="group-header">
+                    <span>${pageName}</span>
                 </div>
+                ${Object.entries(frames).map(([frameName, fTasks]) => {
+                const unresolved = fTasks.filter(tx => !tx.resolved);
+                const pending = unresolved.filter(tx => tx.internalStatus !== 'Done');
+                const time = pending.reduce((acc, tx) => acc + tx.timeEstimateMinutes, 0);
+                return `
+                        <div class="frame-header">
+                            <span>${frameName}</span>
+                            <span class="frame-meta">${pending.length} pending • ${time}m</span>
+                        </div>
+                        ${fTasks.map(t => renderTaskCard(t)).join('')}
+                    `;
+            }).join('')}
             `).join('');
         }
 
         function renderTaskCard(t) {
+            const initials = t.author.split(' ').map(n => n[0]).join('').slice(0, 2);
             const presets = [5, 15, 30, 60, 120];
-            const isActive = activeTaskId === t.commentId || activeTaskId === t.nodeId;
+            const isHighlighted = highlightedTaskId === t.commentId;
+            const statusClass = t.internalStatus === 'In Progress' ? 'in-progress' : (t.internalStatus === 'Done' ? 'done' : '');
 
             return `
-                <div class="task-card ${t.resolved ? 'resolved' : ''} ${isActive ? 'active' : ''}" onclick="locateNode('${t.nodeId}'); activeTaskId='${t.commentId}'; render();">
-                    <div class="task-author">${t.author.toUpperCase()}</div>
-                    <div class="task-message">${t.message}</div>
-                    <div class="task-footer">
-                        <div class="time-selector">
-                            ${presets.map(p => `
-                                <div class="time-btn ${t.timeEstimateMinutes === p ? 'active' : ''}" 
-                                     onclick="event.stopPropagation(); updateTask('${t.commentId}', 'timeEstimateMinutes', ${p})">${p}m</div>
-                            `).join('')}
-                            <input type="number" class="time-input" value="${t.timeEstimateMinutes}" 
-                                   onclick="event.stopPropagation()" 
-                                   onchange="updateTask('${t.commentId}', 'timeEstimateMinutes', parseInt(this.value))">
+                <div id="task-${t.commentId}" class="task-card ${statusClass} ${isHighlighted ? 'highlight-anim' : ''}" onclick="locateNode('${t.commentId}')">
+                    <div class="task-header">
+                        <div class="author-box">
+                            <div class="author-avatar">${initials}</div>
+                            <div class="author-name">${t.author}</div>
                         </div>
-                        <select class="assignee-select" onclick="event.stopPropagation()" onchange="updateTask('${t.commentId}', 'assignee', this.value)">
-                            <option value="">Assign...</option>
-                            <option value="${latestData.fileMetrics.currentUser}" ${t.assignee === latestData.fileMetrics.currentUser ? 'selected' : ''}>Me</option>
-                            ${t.assignee && t.assignee !== latestData.fileMetrics.currentUser ? `<option value="${t.assignee}" selected>${t.assignee}</option>` : ''}
-                        </select>
+                        <div class="task-age">${t.ageInDays === 0 ? 'Today' : t.ageInDays + 'd ago'}</div>
                     </div>
+                    
+                    <div class="task-message">${t.message}</div>
+                    
+                    <div class="card-actions">
+                        <div class="time-row" onclick="event.stopPropagation()">
+                            ${presets.map(p => `
+                                <div class="time-btn ${t.timeEstimateMinutes === p ? 'active' : ''}" onclick="updateTime('${t.commentId}', ${p})">${p}m</div>
+                            `).join('')}
+                            <input type="number" class="time-input-small" value="${t.timeEstimateMinutes}" onchange="updateTime('${t.commentId}', parseInt(this.value))">
+                        </div>
+                        
+                        <div class="status-row" onclick="event.stopPropagation()">
+                            <button class="status-btn btn-pending" onclick="updateStatus('${t.commentId}', 'Pending')">Reset</button>
+                            <button class="status-btn btn-work" onclick="updateStatus('${t.commentId}', 'In Progress')">Work</button>
+                            <button class="status-btn btn-done" onclick="updateStatus('${t.commentId}', 'Done')">
+                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                Done
+                            </button>
+                        </div>
+                    </div>
+
+                    ${t.assignee === latestData.fileMetrics.currentUser ?
+                    `<div style="position:absolute; top:12px; right:12px; width:8px; height:8px; background:var(--accent); border-radius:50%; border:2px solid white;" title="Assigned to me"></div>` : ''}
                 </div>
             `;
         }
