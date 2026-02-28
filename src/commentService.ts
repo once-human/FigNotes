@@ -3,28 +3,24 @@ import { Task } from "./types";
 export class CommentService {
     static async fetchAllComments(): Promise<Task[]> {
         try {
-            const getDeepKeys = (obj: any) => {
-                let keys = new Set<string>();
-                while (obj) {
-                    Object.getOwnPropertyNames(obj).forEach(k => keys.add(k));
-                    obj = Object.getPrototypeOf(obj);
-                }
-                return Array.from(keys);
-            };
-
-            const allKeys = getDeepKeys(figma);
-            const commentKeys = allKeys.filter(k => k.toLowerCase().includes('comment') || k.toLowerCase().includes('thread'));
-
-            console.log("[FigNotes] figma.getCommentThreadsAsync type:", typeof (figma as any).getCommentThreadsAsync);
-            console.log("[FigNotes] figma.comments type:", typeof (figma as any).comments);
-            console.log("[FigNotes] Proto keys containing 'comment/thread':", commentKeys);
+            console.log("[FigNotes] figma.apiVersion:", (figma as any).apiVersion);
+            console.log("[FigNotes] figma.currentUser:", (figma as any).currentUser?.name || "Anonymous/Null");
 
             let threadsMethod = (figma as any).getCommentThreadsAsync ||
                 ((figma as any).comments && (figma as any).comments.getThreadsAsync);
 
             if (!threadsMethod) {
-                console.warn("[FigNotes] All 'get' methods found:", allKeys.filter(k => k.startsWith('get')));
-                throw new Error("Figma Comment API not found. Please ensure you are logged in and using a version of Figma that supports comments.");
+                const getDeepKeys = (obj: any) => {
+                    let keys = new Set<string>();
+                    while (obj) {
+                        Object.getOwnPropertyNames(obj).forEach(k => keys.add(k));
+                        obj = Object.getPrototypeOf(obj);
+                    }
+                    return Array.from(keys);
+                };
+                const allKeys = getDeepKeys(figma);
+                console.warn("[FigNotes] Scanned for 'get' methods:", allKeys.filter(k => k.startsWith('get')));
+                throw new Error("Figma Comment API not found. Please ensure your Figma version is up to date.");
             }
 
             const allThreads = await threadsMethod.call(threadsMethod === (figma as any).getCommentThreadsAsync ? figma : (figma as any).comments);
