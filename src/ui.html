@@ -12,29 +12,24 @@
             --text-muted: #888888;
             --border: #F0F0F0;
             --radius-main: 12px;
-            --radius-btn: 10px;
 
-            /* Blue Theme (Professional) */
+            /* Blue Theme */
             --accent-blue: #0070F6;
             --accent-blue-soft: #EEF6FF;
             --accent-blue-outline: #CCE4FF;
 
-            /* Pink Theme (Cute Thoughtful) */
+            /* Pink Theme */
             --accent-pink: #FC97CF;
             --accent-pink-soft: #FFF5F9;
             --accent-pink-outline: #FFD6EA;
             --bg-pink: #FFFBFC;
-            /* Warmer white */
         }
 
-        /* --- Theme Modes --- */
         body.theme-blue {
             --accent: var(--accent-blue);
             --accent-soft: var(--accent-blue-soft);
             --accent-outline: var(--accent-blue-outline);
             --transition-type: ease-in-out;
-            --spring: none;
-            --card-hover-translate: translateY(-1px);
             --card-shadow: 0 2px 8px rgba(0, 112, 246, 0.08);
             --radius: var(--radius-main);
         }
@@ -45,13 +40,8 @@
             --accent-outline: var(--accent-pink-outline);
             --bg: var(--bg-pink);
             --transition-type: cubic-bezier(0.34, 1.56, 0.64, 1);
-            /* Spring-like */
-            --spring: scale(1.05);
-            /* Soft overshoot */
-            --card-hover-translate: translateY(-2px);
             --card-shadow: 0 4px 12px rgba(252, 151, 207, 0.15);
             --radius: 16px;
-            /* Rounder */
         }
 
         body {
@@ -68,13 +58,12 @@
             transition: background 0.4s ease;
         }
 
-        /* --- Header & Tab Restructure --- */
+        /* --- Header & Navigation --- */
         .page-header {
             background: white;
             padding-top: 12px;
             z-index: 1000;
             border-bottom: 2px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
         }
 
         .top-nav {
@@ -119,7 +108,6 @@
             background: var(--accent-soft);
         }
 
-        /* Primary Tabs: All, Assigned, Discussion */
         .primary-tabs {
             display: flex;
             padding: 0 16px;
@@ -144,7 +132,6 @@
             opacity: 1;
         }
 
-        /* Secondary Toggles: Pending, Resolved */
         .secondary-toggle {
             display: flex;
             padding: 12px 16px;
@@ -172,7 +159,7 @@
             border-color: var(--accent);
         }
 
-        /* --- Progress Bar --- */
+        /* --- Progress & Filters --- */
         .progress-box {
             padding: 12px 16px;
             background: white;
@@ -197,11 +184,9 @@
         .progress-fill {
             height: 100%;
             background: var(--accent);
-            border-radius: 100px;
-            transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: width 0.6s var(--transition-type);
         }
 
-        /* --- Effort Filters --- */
         .effort-filters {
             display: flex;
             padding: 12px 16px;
@@ -230,13 +215,13 @@
             border-color: var(--accent-outline);
         }
 
-        /* --- Content & Lists --- */
+        /* --- Content --- */
         .viewport {
             flex: 1;
             overflow-y: auto;
             padding-bottom: 120px;
-            scrollbar-width: thin;
             background: inherit;
+            scroll-behavior: smooth;
         }
 
         .pinned-section {
@@ -256,7 +241,6 @@
             display: block;
         }
 
-        /* --- Task Cards --- */
         .task-card {
             margin: 8px 16px 16px;
             padding: 16px;
@@ -271,7 +255,7 @@
         .task-card:hover {
             border-color: var(--accent-outline);
             box-shadow: var(--card-shadow);
-            transform: var(--card-hover-translate);
+            transform: translateY(-2px);
         }
 
         .task-card.resolved {
@@ -307,7 +291,6 @@
             word-break: break-word;
         }
 
-        /* --- Actions --- */
         .card-efforts {
             display: flex;
             gap: 6px;
@@ -347,7 +330,6 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .btn-resolve {
@@ -359,48 +341,6 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-        }
-
-        .btn-resolve:hover {
-            border-color: #A5D6A7;
-            color: #2E7D32;
-        }
-
-        /* --- Click Animations --- */
-        @keyframes pulse-blue {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.02);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        @keyframes pulse-pink {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .click-blue {
-            animation: pulse-blue 0.2s ease-in-out;
-        }
-
-        .click-pink {
-            animation: pulse-pink 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* --- Footer --- */
@@ -432,16 +372,7 @@
             gap: 8px;
         }
 
-        .btn-sync:hover {
-            filter: brightness(1.05);
-        }
-
-        .theme-pink .btn-sync:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(252, 151, 207, 0.3);
-        }
-
-        /* --- Cats (Animated SVG) --- */
+        /* --- THE CAT --- */
         #cat-container {
             position: fixed;
             bottom: 80px;
@@ -449,7 +380,7 @@
             height: 60px;
             pointer-events: none;
             z-index: 500;
-            overflow: hidden;
+            overflow: visible;
             display: none;
         }
 
@@ -459,70 +390,92 @@
 
         .cat {
             position: absolute;
-            bottom: 0;
-            width: 60px;
-            height: 40px;
-            transition: left 8s linear;
+            width: 80px;
+            height: 60px;
+            cursor: pointer;
+            pointer-events: auto;
+            user-select: none;
+            will-change: transform, left;
+            transition: left 0.1s linear;
+            /* Smooth movement update */
         }
 
         .cat-svg {
             width: 100%;
             height: 100%;
+            display: block;
+            overflow: visible;
         }
 
-        /* Animation Keyframes for Specific SVG Groups */
-        @keyframes cat-walk {
+        /* Group Animations */
+        .cat-legs {
+            transform-origin: top;
+        }
+
+        .cat-legs-walking {
+            animation: leg-wiggle 0.4s infinite alternate ease-in-out;
+        }
+
+        .cat-tail {
+            transform-origin: left bottom;
+            animation: tail-flick 2s infinite ease-in-out;
+        }
+
+        .cat-head {
+            transform-origin: center center;
+            transition: transform 0.1s ease;
+        }
+
+        /* Jump Animation */
+        @keyframes jump {
 
             0%,
             100% {
-                transform: translateY(0);
+                transform: translateY(0) scale(1, 1);
             }
 
-            50% {
-                transform: translateY(-3px);
-            }
-        }
-
-        @keyframes leg-move {
-
-            0%,
-            100% {
-                transform: rotate(-10deg);
+            40% {
+                transform: translateY(-40px) scale(0.9, 1.1);
             }
 
-            50% {
-                transform: rotate(10deg);
+            60% {
+                transform: translateY(-40px) scale(0.9, 1.1);
+            }
+
+            80% {
+                transform: translateY(0) scale(1.1, 0.9);
             }
         }
 
-        @keyframes tail-flick {
+        .cat-jumping {
+            animation: jump 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-            0%,
-            100% {
-                transform: rotate(0deg);
+        @keyframes leg-wiggle {
+            0% {
+                transform: rotate(-15deg);
             }
 
-            50% {
+            100% {
                 transform: rotate(15deg);
             }
         }
 
-        .cat-body {
-            animation: cat-walk 0.6s infinite ease-in-out;
-            transform-origin: center;
+        @keyframes tail-flick {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(20deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
         }
 
-        .cat-legs {
-            animation: leg-move 0.6s infinite ease-in-out;
-            transform-origin: top;
-        }
-
-        .cat-tail {
-            animation: tail-flick 2s infinite ease-in-out;
-            transform-origin: left center;
-        }
-
-        /* --- Settings Overlay --- */
+        /* Settings */
         .settings-overlay {
             position: fixed;
             top: 0;
@@ -533,23 +486,9 @@
             z-index: 3000;
             padding: 32px 24px;
             display: none;
-            transition: all 0.3s ease;
         }
 
         .settings-overlay.active {
-            display: block;
-        }
-
-        .input-group {
-            margin-bottom: 24px;
-        }
-
-        .input-label {
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 8px;
             display: block;
         }
 
@@ -561,25 +500,18 @@
             font-size: 14px;
             box-sizing: border-box;
             outline: none;
-            transition: border 0.2s;
-        }
-
-        input:focus {
-            border-color: var(--accent);
-            background: var(--accent-soft);
         }
     </style>
 </head>
 
 <body class="theme-blue">
 
-    <!-- Header -->
     <div class="page-header">
         <div class="top-nav">
             <div class="app-title">FigNotes</div>
             <div class="header-actions">
-                <div class="icon-btn" id="catToggle" onclick="toggleTheme()" title="Toggle Thoughtful Mode">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                <div class="icon-btn" id="catToggle" onclick="toggleTheme()" title="Thoughtful Mode">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path
                             d="M12 5c.67 0 1.35.09 2 .26 1.78-2 2.61-2.07 3-.16.14.63.14 1.25.07 1.87a6 6 0 0 1 3.51 5.95c0 4.29-3.5 11.08-8.58 11.08-5.08 0-8.58-6.79-8.58-11.08A6 6 0 0 1 7 7.02c-.07-.62-.07-1.24.07-1.87.39-1.91 1.22-1.84 3-.16.65-.17 1.33-.26 2-.26z" />
@@ -597,28 +529,21 @@
                 </div>
             </div>
         </div>
-
         <div class="primary-tabs">
             <div class="p-tab active" id="pTabAll" onclick="switchPrimaryTab('all')">All</div>
             <div class="p-tab" id="pTabAssigned" onclick="switchPrimaryTab('assigned')">Assigned</div>
             <div class="p-tab" id="pTabDiscussion" onclick="switchPrimaryTab('discussion')">Discussion</div>
         </div>
-
         <div class="secondary-toggle">
             <div class="s-toggle active" id="sTogglePending" onclick="switchSecondaryTab('pending')">Pending</div>
             <div class="s-toggle" id="sToggleResolved" onclick="switchSecondaryTab('resolved')">Resolved</div>
         </div>
-
         <div class="progress-box">
-            <div class="progress-stats">
-                <span id="statText">0 comments</span>
-                <span id="statPercent">0%</span>
-            </div>
+            <div class="progress-stats"><span id="statText">0 pending</span><span id="statPercent">0%</span></div>
             <div class="progress-bar-bg">
                 <div id="progressBar" class="progress-fill" style="width: 0%;"></div>
             </div>
         </div>
-
         <div class="effort-filters">
             <div class="effort-chip" id="fS" onclick="toggleEffortFilter('Small')">Small</div>
             <div class="effort-chip" id="fM" onclick="toggleEffortFilter('Medium')">Medium</div>
@@ -626,165 +551,125 @@
         </div>
     </div>
 
-    <!-- Main List -->
-    <div class="viewport" id="content">
-        <!-- Rendered dynamically -->
-    </div>
+    <div class="viewport" id="content"></div>
 
-    <!-- Cats Layer -->
     <div id="cat-container">
-        <!-- Cats injected here -->
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-        <button class="btn-sync" onclick="triggerSync()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M23 4v6h-6" />
-                <path d="M1 20v-6h6" />
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+        <div id="the-cat" class="cat" onclick="catJump()">
+            <svg class="cat-svg" viewBox="0 0 600 400">
+                <g class="cat-legs">
+                    <path d="M225,260v78" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                    <path d="M340,260v78" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                </g>
+                <g class="cat-body">
+                    <path class="cat-tail" d="M208,240s-35.8-1.5-46-42c-5.5-25.3-9.2-40.5-32-48"
+                        style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                    <rect x="190" y="201" width="200" height="118" rx="58.9" style="fill:#eba13d" />
+                    <g class="cat-head" id="cat-head">
+                        <path d="M330,121c5,16-1,34-14,38s-29-5-34-22c-8-25,1-49,10-52,8-2,30,11,38,36z"
+                            style="fill:#eba13d" />
+                        <path d="M372,121c-5,16,1,34,14,38s29-5,34-22c8-25-1-49-10-52-8-2-30,11-38,36z"
+                            style="fill:#eba13d" />
+                        <path d="M430,164c0,43-35,67-78,67s-78-23-78-66,41-75,78-75,78,32,78,74z"
+                            style="fill:#eba13d" />
+                        <circle cx="320" cy="156" r="10" style="fill:#33281b" />
+                        <circle cx="382" cy="156" r="10" style="fill:#33281b" />
+                        <path d="M373,200c0,2-4,6-9,6s-9-4-9-6,4-4,9-4,9,2,9,4z" style="fill:#33281b" />
+                    </g>
+                </g>
             </svg>
-            Sync
-        </button>
+        </div>
     </div>
 
-    <!-- Settings -->
+    <div class="footer"><button class="btn-sync" onclick="triggerSync()">Sync Workboard</button></div>
+
     <div id="settingsView" class="settings-overlay">
-        <h2 style="font-weight: 800; margin-bottom: 32px;">Configuration</h2>
-        <div class="input-group">
-            <span class="input-label">Figma Access Token</span>
-            <input type="password" id="patInput" placeholder="figp_...">
-        </div>
-        <div class="input-group">
-            <span class="input-label">Figma File URL</span>
-            <input type="text" id="urlInput" placeholder="https://www.figma.com/design/...">
-        </div>
-        <button class="btn-sync" onclick="saveSettings()">Apply Changes</button>
+        <h2 style="font-weight: 800; margin-bottom: 32px;">Settings</h2>
+        <div class="input-group"><span class="input-label">Figma Access Token</span><input type="password"
+                id="patInput"></div>
+        <div class="input-group"><span class="input-label">Figma File URL</span><input type="text" id="urlInput"></div>
+        <button class="btn-sync" onclick="saveSettings()">Save & Sync</button>
         <div style="text-align:center; margin-top:24px; cursor:pointer; font-size:12px; color:var(--accent); font-weight:700;"
-            onclick="toggleSettings(false)">Back</div>
+            onclick="toggleSettings(false)">Close</div>
     </div>
 
     <script>
         let latestData = null;
         let config = { pat: '', fileUrl: '' };
         let currentTheme = 'blue';
-        let pTab = 'all'; // all, assigned, discussion
-        let sToggle = 'pending'; // pending, resolved
+        let pTab = 'all';
+        let sToggle = 'pending';
         let effortFilters = new Set();
-        let cats = [];
 
-        // SVG Template for Cat
-        const catSvgTemplate = `
-        <svg class="cat-svg" viewBox="0 0 600 400">
-            <g class="cat-legs"><path d="M225,260v78" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px"/><path d="M340,260v78" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px"/></g>
-            <g class="cat-body">
-                <path class="cat-tail" d="M208,240s-35.8-1.5-46-42c-5.5-25.3-9.2-40.5-32-48" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px"/>
-                <rect x="190" y="201" width="200" height="118" rx="58.9" style="fill:#eba13d"/>
-                <g class="cat-head">
-                    <path d="M330,121c5,16-1,34-14,38s-29-5-34-22c-8-25,1-49,10-52,8-2,30,11,38,36z" style="fill:#eba13d"/>
-                    <path d="M372,121c-5,16,1,34,14,38s29-5,34-22c8-25-1-49-10-52-8-2-30,11-38,36z" style="fill:#eba13d"/>
-                    <path d="M430,164c0,43-35,67-78,67s-78-23-78-66,41-75,78-75,78,32,78,74z" style="fill:#eba13d"/>
-                    <circle cx="320" cy="156" r="10" style="fill:#33281b"/><circle cx="382" cy="156" r="10" style="fill:#33281b"/>
-                    <path d="M373,176c0,2-4,6-9,6s-9-4-9-6,4-4,9-4,9,2,9,4z" style="fill:#33281b"/>
-                </g>
-            </g>
-        </svg>`;
+        // --- Cat Engine ---
+        let cat = { x: 20, targetX: 20, dir: 1, jumping: false, state: 'idle' };
+        let mouseX = 0;
 
-        // --- Communication ---
-        window.onmessage = (e) => {
-            const { type, payload } = e.data.pluginMessage;
-            if (type === 'settings-loaded') {
-                config = payload;
-                document.getElementById('patInput').value = config.pat || '';
-                document.getElementById('urlInput').value = config.fileUrl || '';
-                if (config.pat && config.fileUrl) triggerSync();
-                else toggleSettings(true);
-            } else if (type === 'sync-complete') {
-                latestData = payload;
-                if (payload.theme) applyTheme(payload.theme);
-                render();
-            }
-        };
-
-        parent.postMessage({ pluginMessage: { type: 'init' } }, '*');
-
-        // --- Theme & Cats ---
-        function toggleTheme() {
-            const nt = currentTheme === 'blue' ? 'pink' : 'blue';
-            applyTheme(nt);
-            parent.postMessage({ pluginMessage: { type: 'set-theme', payload: nt } }, '*');
-        }
+        window.addEventListener('mousemove', (e) => { mouseX = e.clientX; });
 
         function applyTheme(theme) {
             currentTheme = theme;
             document.body.className = 'theme-' + theme;
             document.getElementById('catToggle').classList.toggle('active', theme === 'pink');
-
-            if (theme === 'pink') spawnCats();
-            else despawnCats();
+            if (theme === 'pink') {
+                cat.x = -80; cat.targetX = 60; // Walk in
+            } else {
+                cat.targetX = window.innerWidth + 80; // Walk out
+            }
         }
 
-        function spawnCats() {
-            const container = document.getElementById('cat-container');
-            container.innerHTML = '';
-            cats = [
-                { id: 'cat1', x: 20, targetX: 20, dir: 1 },
-                { id: 'cat2', x: 200, targetX: 200, dir: -1 }
-            ];
-            cats.forEach(c => {
-                const el = document.createElement('div');
-                el.id = c.id; el.className = 'cat';
-                el.innerHTML = catSvgTemplate;
-                container.appendChild(el);
-            });
-            requestAnimationFrame(animateCats);
+        function catJump() {
+            if (cat.jumping) return;
+            cat.jumping = true;
+            const el = document.getElementById('the-cat');
+            el.classList.add('cat-jumping');
+            setTimeout(() => {
+                el.classList.remove('cat-jumping');
+                cat.jumping = false;
+            }, 600);
         }
 
-        function despawnCats() {
-            cats.forEach(c => {
-                const el = document.getElementById(c.id);
-                if (el) el.style.left = '-100px'; // Walk off screen
-            });
-            setTimeout(() => { document.getElementById('cat-container').innerHTML = ''; }, 2000);
-        }
+        function animate() {
+            if (currentTheme !== 'pink' && cat.x > window.innerWidth + 20) {
+                requestAnimationFrame(animate);
+                return;
+            }
 
-        function animateCats() {
-            if (currentTheme !== 'pink') return;
-            cats.forEach(c => {
-                const el = document.getElementById(c.id);
-                if (!el) return;
+            const el = document.getElementById('the-cat');
+            const head = document.getElementById('cat-head');
+            const legs = el.querySelector('.cat-legs');
 
-                // Simple AI: Move towards target
-                if (Math.abs(c.x - c.targetX) < 1) {
-                    if (Math.random() < 0.01) { // New target
-                        c.targetX = Math.random() * (window.innerWidth - 60);
-                        c.dir = c.targetX > c.x ? 1 : -1;
-                    }
-                } else {
-                    c.x += c.dir * 0.5;
-                    el.style.left = c.x + 'px';
-                    el.style.transform = `scaleX(${c.dir})`; // Flip based on direction
+            // 1. Move Cat towards target
+            let dx = cat.targetX - cat.x;
+            if (Math.abs(dx) > 1) {
+                cat.x += Math.sign(dx) * 2;
+                cat.state = 'walking';
+                legs.classList.add('cat-legs-walking');
+                cat.dir = Math.sign(dx);
+            } else {
+                cat.state = 'idle';
+                legs.classList.remove('cat-legs-walking');
+                if (currentTheme === 'pink' && Math.random() < 0.005) {
+                    cat.targetX = Math.random() * (window.innerWidth - 80);
                 }
-            });
-            requestAnimationFrame(animateCats);
+            }
+
+            // 2. Mouse Tracking (Head)
+            const catScreenX = cat.x + 40;
+            let lookX = (mouseX - catScreenX) / 10;
+            lookX = Math.max(-15, Math.min(15, lookX));
+            head.style.transform = `translateX(${lookX}px)`;
+
+            // 3. Update DOM
+            el.style.left = cat.x + 'px';
+            el.style.transform = `scaleX(${cat.dir})`;
+
+            requestAnimationFrame(animate);
         }
+        requestAnimationFrame(animate);
 
         // --- View Logic ---
-        function switchPrimaryTab(tab) {
-            pTab = tab;
-            document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('pTab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-            render();
-        }
-
-        function switchSecondaryTab(toggle) {
-            sToggle = toggle;
-            document.querySelectorAll('.s-toggle').forEach(t => t.classList.remove('active'));
-            document.getElementById('sToggle' + toggle.charAt(0).toUpperCase() + toggle.slice(1)).classList.add('active');
-            render();
-        }
-
+        function switchPrimaryTab(tab) { pTab = tab; render(); }
+        function switchSecondaryTab(toggle) { sToggle = toggle; render(); }
         function toggleEffortFilter(eff) {
             if (effortFilters.has(eff)) effortFilters.delete(eff);
             else effortFilters.add(eff);
@@ -792,73 +677,32 @@
             render();
         }
 
-        function toggleSettings(show) { document.getElementById('settingsView').classList.toggle('active', show); }
-
-        function saveSettings() {
-            config.pat = document.getElementById('patInput').value;
-            config.fileUrl = document.getElementById('urlInput').value;
-            parent.postMessage({ pluginMessage: { type: 'save-settings', payload: config } }, '*');
-            toggleSettings(false);
-            triggerSync();
+        function toggleTheme() {
+            const nt = currentTheme === 'blue' ? 'pink' : 'blue';
+            applyTheme(nt);
+            parent.postMessage({ pluginMessage: { type: 'set-theme', payload: nt } }, '*');
         }
 
-        function triggerSync() {
-            if (!config.pat || !config.fileUrl) return;
-            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (!fileKey) return;
-            fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, { headers: { 'X-Figma-Token': config.pat } })
-                .then(r => r.json())
-                .then(data => parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*'))
-                .catch(() => alert("Sync Failed. Check credentials."));
-        }
-
-        async function toggleResolve(commentId, isResolved) {
-            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            const type = isResolved ? 'unresolve-comment' : 'resolve-comment';
-            parent.postMessage({ pluginMessage: { type, payload: commentId } }, '*');
-
-            fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${commentId}`, {
-                method: 'POST',
-                headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resolved: !isResolved })
-            }).catch(e => console.error(e));
-        }
-
-        function setWorking(id) { parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*'); }
-        function updateEffort(id, old, next) {
-            const v = old === next ? null : next;
-            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: v } } }, '*');
-        }
-        function locate(id, el) {
-            el.classList.add(currentTheme === 'blue' ? 'click-blue' : 'click-pink');
-            setTimeout(() => el.classList.remove('click-blue', 'click-pink'), 400);
-            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*');
-        }
-
-        // --- Rendering ---
         function render() {
             if (!latestData) return;
             const container = document.getElementById('content');
             const currentUser = latestData.currentUser;
 
-            // 1. Filter by Primary Tab
             let allGrouped = latestData.tasks.filter(t => {
                 if (pTab === 'assigned') return t.assignee === currentUser;
                 if (pTab === 'discussion') return t.mentions.includes(currentUser) && t.mentions.length > 1;
                 return true;
             });
 
-            // Calculate Progress Bar for this group
             const total = allGrouped.length;
-            const resolvedCount = allGrouped.filter(t => t.resolved).length;
-            const pendingCount = total - resolvedCount;
-            const percent = total > 0 ? Math.round((resolvedCount / total) * 100) : 0;
+            const rCount = allGrouped.filter(t => t.resolved).length;
+            const pCount = total - rCount;
+            const percent = total > 0 ? (rCount / total * 100) : 0;
 
-            document.getElementById('statText').innerText = `${pendingCount} pending / ${total} total`;
-            document.getElementById('statPercent').innerText = `${percent}%`;
+            document.getElementById('statText').innerText = `${pCount} pending / ${total} total`;
+            document.getElementById('statPercent').innerText = `${Math.round(percent)}%`;
             document.getElementById('progressBar').style.width = `${percent}%`;
 
-            // 2. Filter by Secondary Toggle & Effort
             let tasks = allGrouped.filter(t => {
                 if (sToggle === 'pending' && t.resolved) return false;
                 if (sToggle === 'resolved' && !t.resolved) return false;
@@ -866,46 +710,57 @@
                 return true;
             });
 
-            const workingTask = tasks.find(t => t.isCurrentlyWorking);
-            const listTasks = tasks.filter(t => !t.isCurrentlyWorking);
-
-            let html = '';
-            if (workingTask && sToggle === 'pending') {
-                html += `<div class="pinned-section"><span class="label">Currently Working On</span>${renderCard(workingTask)}</div>`;
-            }
-
-            if (listTasks.length === 0) {
-                html += `<div style="padding:100px 40px; text-align:center; font-size:13px; color:var(--text-muted);">Inbox zero.</div>`;
-            } else {
-                html += listTasks.map(t => renderCard(t)).join('');
-            }
-            container.innerHTML = html;
+            container.innerHTML = tasks.map(t => renderCard(t)).join('');
         }
 
         function renderCard(t) {
-            return `
-                <div class="task-card ${t.resolved ? 'resolved' : ''}" onclick="locate('${t.commentId}', this)">
-                    <div class="card-header"><span class="author">${t.author}</span><span class="meta">${t.page} / ${t.frame}</span></div>
-                    <div class="message">${t.message}</div>
-                    ${!t.resolved ? `
-                        <div class="card-efforts" onclick="event.stopPropagation()">
-                            <div class="effort-btn ${t.effort === 'Small' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Small')">Small</div>
-                            <div class="effort-btn ${t.effort === 'Medium' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Medium')">Medium</div>
-                            <div class="effort-btn ${t.effort === 'Large' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', '${t.effort}', 'Large')">Large</div>
-                        </div>
-                        <div class="card-actions" onclick="event.stopPropagation()">
-                            <button class="btn-work" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">${t.isCurrentlyWorking ? 'Stop Focus' : 'Work on this'}</button>
-                            <button class="btn-resolve" onclick="toggleResolve('${t.commentId}', false)">Resolve</button>
-                        </div>
-                    ` : `
-                        <div class="card-actions" onclick="event.stopPropagation()">
-                            <span style="font-size:11px; font-weight:800; color:#2E7D32; margin-right:auto;">RESOLVED</span>
-                            <button class="btn-resolve" onclick="toggleResolve('${t.commentId}', true)">Unignore</button>
-                        </div>
-                    `}
-                </div>
-            `;
+            return `<div class="task-card ${t.resolved ? 'resolved' : ''}" onclick="locate('${t.commentId}')">
+                <div class="card-header"><b>${t.author}</b> <span class="meta">${t.page}/${t.frame}</span></div>
+                <div class="message">${t.message}</div>
+                ${!t.resolved ? `<div class="card-actions"><button class="btn-resolve" onclick="event.stopPropagation(); resolve('${t.commentId}')">Resolve</button></div>` : '<b style="color:green;font-size:10px">RESOLVED</b>'}
+            </div>`;
         }
+
+        function locate(id) { parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*'); }
+        async function resolve(id) {
+            parent.postMessage({ pluginMessage: { type: 'resolve-comment', payload: id } }, '*');
+            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${id}`, {
+                method: 'POST',
+                headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resolved: true })
+            });
+        }
+
+        function triggerSync() {
+            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            if (!fileKey) return;
+            fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, { headers: { 'X-Figma-Token': config.pat } })
+                .then(r => r.json())
+                .then(data => parent.postMessage({ pluginMessage: { type: 'sync', payload: data.comments } }, '*'));
+        }
+
+        function toggleSettings(s) { document.getElementById('settingsView').classList.toggle('active', s); }
+        function saveSettings() {
+            config.pat = document.getElementById('patInput').value;
+            config.fileUrl = document.getElementById('urlInput').value;
+            parent.postMessage({ pluginMessage: { type: 'save-settings', payload: config } }, '*');
+            toggleSettings(false); triggerSync();
+        }
+
+        window.onmessage = (e) => {
+            const { type, payload } = e.data.pluginMessage;
+            if (type === 'settings-loaded') {
+                config = payload;
+                document.getElementById('patInput').value = config.pat || '';
+                document.getElementById('urlInput').value = config.fileUrl || '';
+                if (config.pat && config.fileUrl) triggerSync();
+            } else if (type === 'sync-complete') {
+                latestData = payload;
+                if (payload.theme) applyTheme(payload.theme);
+                render();
+            }
+        };
     </script>
 </body>
 
