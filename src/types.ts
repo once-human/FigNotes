@@ -13,6 +13,7 @@ export interface Task {
     discussionStatus: DiscussionStatus;
     createdAt: string;
     lastUpdatedAt: string;
+    nodeId?: string | null; // For locating on canvas
 
     // Enhanced Fields
     ageInDays: number;
@@ -43,6 +44,6 @@ export interface SyncResult {
 }
 
 export interface PluginMessage {
-    type: "sync" | "update-task" | "notify" | "export" | "save-settings" | "get-settings" | "init";
+    type: "sync" | "update-task" | "notify" | "export" | "save-settings" | "get-settings" | "init" | "locate-node";
     payload?: any;
 }

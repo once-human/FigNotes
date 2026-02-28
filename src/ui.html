@@ -241,6 +241,7 @@
         let currentFilter = 'all';
         let latestData = null;
         let config = { pat: '', fileUrl: '' };
+        let nativeFileKey = null;
 
         // --- Navigation ---
         let isSettingsOpen = true; // Defaults open until settings load
@@ -263,6 +264,10 @@
             const { type, payload } = event.data.pluginMessage;
 
             if (type === 'init') {
+                if (payload && payload.fileKey) {
+                    nativeFileKey = payload.fileKey;
+                    document.getElementById('urlInput').placeholder = "Auto-detected by Figma! Leave blank.";
+                }
                 // Request settings on boot
                 parent.postMessage({ pluginMessage: { type: 'get-settings' } }, '*');
             }
@@ -271,7 +276,7 @@
                 patInput.value = config.pat || '';
                 urlInput.value = config.fileUrl || '';
 
-                if (config.pat && config.fileUrl) {
+                if (config.pat && (config.fileUrl || nativeFileKey)) {
                     toggleSettings(false);
                     triggerSync();
                 } else {
@@ -294,8 +299,8 @@
             config.pat = patInput.value.trim();
             config.fileUrl = urlInput.value.trim();
 
-            if (!config.pat || !config.fileUrl) {
-                alert("Both Token and URL are required.");
+            if (!config.pat || (!config.fileUrl && !nativeFileKey)) {
+                alert("Both Token and URL are required (unless URL was auto-detected).");
                 return;
             }
 
@@ -316,7 +321,7 @@
         syncBtn.onclick = triggerSync;
 
         async function triggerSync() {
-            if (!config.pat || !config.fileUrl) {
+            if (!config.pat || (!config.fileUrl && !nativeFileKey)) {
                 toggleSettings(true);
                 return;
             }
@@ -324,14 +329,17 @@
             setSyncingState(true);
             mainContent.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-secondary);">Fetching comments from Figma API...</div>`;
 
-            // Extract File Key from URL (e.g. https://www.figma.com/file/abc123def/...)
-            const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/);
-            if (!match) {
-                renderError("Invalid Figma URL format. Could not extract File Key.");
-                setSyncingState(false);
-                return;
+            let fileKey = nativeFileKey;
+            if (!fileKey) {
+                // Extract File Key from URL (e.g. https://www.figma.com/file/abc123def/...)
+                const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/);
+                if (!match) {
+                    renderError("Invalid Figma URL format. Could not extract File Key.");
+                    setSyncingState(false);
+                    return;
+                }
+                fileKey = match[1];
             }
-            const fileKey = match[1];
 
             try {
                 // 1. Fetch Comments via REST API
@@ -402,8 +410,9 @@
                                 <div class="task-item">
                                     <div style="flex: 1;">
                                         <div style="font-weight: 500; font-size: 13px; line-height: 1.4; ${t.resolved ? 'text-decoration: line-through; opacity: 0.5;' : ''}">${t.message}</div>
-                                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; display: flex; gap: 8px;">
+                                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; display: flex; gap: 8px; align-items: center;">
                                             <span>🏠 ${t.frame}</span>
+                                            ${t.nodeId ? `<button onclick="locateNode('${t.nodeId}')" style="background:none; border:none; cursor:pointer; font-size:14px; padding:0; color:var(--accent);" title="Locate on Canvas">⌖</button>` : ''}
                                             <span>⏳ ${t.ageInDays}d old</span>
                                         </div>
                                     </div>
@@ -431,6 +440,10 @@
 
         function updateTask(id, key, value) {
             parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key, value } } }, '*');
+        }
+
+        function locateNode(nodeId) {
+            parent.postMessage({ pluginMessage: { type: 'locate-node', payload: nodeId } }, '*');
         }
 
         function renderError(err) {

@@ -14,6 +14,7 @@ export class CommentService {
 
                 tasks.push({
                     commentId: commentObj.id,
+                    nodeId: nodeId,
                     message: commentObj.message,
                     page: page?.name || "Global / Unassigned",
                     frame: frame?.name || "Canvas",

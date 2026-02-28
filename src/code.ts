@@ -14,7 +14,7 @@ function log(...args: any[]) {
     if (IS_DEV) console.log("[FigNotes]", ...args);
 }
 
-figma.showUI(__html__, { width: 480, height: 720, themeColors: true });
+figma.showUI(__html__, { width: 480, height: 840, themeColors: true });
 
 let isSyncing = false;
 let syncTimeout: number | null = null;
@@ -60,7 +60,8 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                     log(`Updating task ${id}: ${key} = ${value}`);
                     (task as any)[key] = value;
                     await StorageService.updateTask(task);
-                    await debouncedSync();
+                    const result = await SyncService.getState();
+                    figma.ui.postMessage({ type: "sync-complete", payload: result });
                 }
                 break;
 
@@ -80,6 +81,30 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 });
                 break;
 
+            case "locate-node":
+                if (!msg.payload) return;
+                try {
+                    const nodeToFind = await figma.getNodeByIdAsync(msg.payload);
+                    if (nodeToFind) {
+                        let page = nodeToFind.parent;
+                        while (page && page.type !== "PAGE") {
+                            page = page.parent;
+                        }
+                        if (page) {
+                            await figma.setCurrentPageAsync(page as PageNode);
+                        }
+                        figma.viewport.scrollAndZoomIntoView([nodeToFind]);
+                        if (nodeToFind.type !== "PAGE" && nodeToFind.type !== "DOCUMENT") {
+                            figma.currentPage.selection = [nodeToFind as SceneNode];
+                        }
+                    } else {
+                        figma.notify("Could not locate element on canvas.");
+                    }
+                } catch (e) {
+                    figma.notify("Could not locate element on canvas.");
+                }
+                break;
+
             case "notify":
                 figma.notify(msg.payload || "Notification");
                 break;
@@ -96,4 +121,4 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
 
 // Initial launch trigger
 // We don't auto-sync here anymore because the UI needs to handle the REST fetch using settings.
-figma.ui.postMessage({ type: "init" });
+figma.ui.postMessage({ type: "init", payload: { fileKey: figma.fileKey } });

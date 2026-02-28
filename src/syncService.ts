@@ -64,6 +64,32 @@ export class SyncService {
         };
     }
 
+    /**
+     * Non-destructive state calculation for local UI updates (e.g. changing effort)
+     */
+    static async getState(): Promise<SyncResult> {
+        const storedTasksMap = await StorageService.getTasks();
+        const storedTasks = Object.values(storedTasksMap);
+
+        const taskList = storedTasks.sort((a, b) => {
+            if (a.resolved !== b.resolved) return a.resolved ? 1 : -1;
+            if (a.effort !== b.effort) return b.effort - a.effort;
+            if (a.ageInDays !== b.ageInDays) return b.ageInDays - a.ageInDays;
+            return a.commentId.localeCompare(b.commentId);
+        });
+
+        const metrics = this.calculateMetrics(taskList);
+        const weeklySummary = this.generateWeeklySummary(taskList, metrics);
+        const allResolvedByUser = this.getGlobalUserBreakdown(taskList);
+
+        return {
+            tasks: taskList,
+            metrics,
+            weeklySummary,
+            allResolvedByUser
+        };
+    }
+
     private static calculateMetrics(tasks: Task[]): FlowMetrics[] {
         const flowGroups = new Map<string, Task[]>();
 
