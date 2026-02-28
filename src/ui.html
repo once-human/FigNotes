@@ -3,428 +3,572 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>FigNotes Professional</title>
+    <title>FigNotes</title>
     <style>
         :root {
-            --bg: var(--figma-color-bg);
-            --text: var(--figma-color-text);
-            --border: var(--figma-color-border);
-            --accent: #18A0FB;
-            --success: #1BC47D;
-            --warning: #F2994A;
-            --danger: #EB5757;
-            --subtext: rgba(255, 255, 255, 0.6);
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --bg: #FAFAF9;
+            --surface: #FFFFFF;
+            --accent: #8DA399;
+            /* Sage */
+            --accent-soft: #E2E8E4;
+            --text-primary: #444442;
+            --text-secondary: #71716F;
+            --border: #EBEBE9;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            --success: #A3B18A;
+            --warning: #E9C46A;
+            --danger: #E76F51;
         }
 
-        body.light {
-            --subtext: rgba(0, 0, 0, 0.5);
-            --card-bg: rgba(0, 0, 0, 0.02);
+        /* Figma Theme Overrides (Subtle) */
+        body.figma-dark {
+            --bg: #1E1E1E;
+            --surface: #2C2C2C;
+            --text-primary: #EBEBEB;
+            --text-secondary: #B3B3B3;
+            --border: #444444;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             font-size: 13px;
-            overflow-x: hidden;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* Sticky Header */
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
             position: sticky;
             top: 0;
             background: var(--bg);
-            z-index: 10;
-            padding-bottom: 10px;
+            padding: 20px;
+            z-index: 100;
             border-bottom: 1px solid var(--border);
-        }
-
-        .title-group h1 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--accent);
-            letter-spacing: -0.02em;
-        }
-
-        .title-group p {
-            margin: 2px 0 0 0;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--subtext);
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 8px;
-        }
-
-        .tab {
-            cursor: pointer;
-            opacity: 0.5;
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-
-        .tab.active {
-            opacity: 1;
-            color: var(--accent);
-        }
-
-        .summary-block {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 20px;
-            font-style: italic;
-            border-left: 4px solid var(--accent);
-        }
-
-        .flow-card {
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 24px;
-            background: var(--card-bg);
-        }
-
-        .flow-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .sync-info {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .btn-sync {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(141, 163, 153, 0.2);
+        }
+
+        .btn-sync:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(141, 163, 153, 0.3);
+        }
+
+        .btn-sync:active {
+            transform: translateY(0);
+        }
+
+        /* Overview Section */
+        .overview {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            padding: 0 20px 16px 20px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .filter-chip:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .filter-chip.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Flow Cards */
+        .flow-container {
+            padding: 0 20px 40px 20px;
+        }
+
+        .flow-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .flow-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .flow-header:hover {
+            background: rgba(141, 163, 153, 0.02);
+        }
+
+        .flow-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .flow-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-soft);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
         }
 
         .flow-title {
-            font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
+            font-size: 14px;
         }
 
-        .health-badge {
-            font-size: 9px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 800;
-        }
-
-        .health-Healthy {
-            background: var(--success);
-            color: white;
-        }
-
-        .health-At-Risk {
-            background: var(--warning);
-            color: black;
-        }
-
-        .health-Critical {
-            background: var(--danger);
-            color: white;
-        }
-
-        .metric-row {
-            margin-bottom: 16px;
-        }
-
-        .progress-info {
+        .flow-meta {
+            text-align: right;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .flow-progress-text {
             font-size: 11px;
-            margin-bottom: 4px;
-            color: var(--subtext);
+            font-weight: 600;
+            color: var(--accent);
         }
 
-        .progress-bar {
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
+        .flow-health {
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+
+        /* Expanding Content */
+        .flow-content {
+            max-height: 0;
             overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            border-top: 0px solid var(--border);
         }
 
-        .progress-fill {
-            height: 100%;
-            transition: width 0.6s ease;
+        .flow-card.expanded .flow-content {
+            max-height: 2000px;
+            border-top-width: 1px;
+        }
+
+        .task-list {
+            padding: 8px 16px;
         }
 
         .task-item {
             padding: 12px 0;
             border-bottom: 1px solid var(--border);
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .task-item:last-child {
             border-bottom: none;
         }
 
-        .task-top {
+        .task-main {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: flex-start;
-            margin-bottom: 8px;
         }
 
-        .age-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-top: 4px;
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            margin-top: 2px;
+            cursor: pointer;
+            transition: var(--transition);
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .age-fresh {
-            background: var(--border);
+        .task-item.resolved .task-checkbox {
+            background: var(--success);
+            border-color: var(--success);
         }
 
-        .age-warn {
-            background: var(--warning);
-            box-shadow: 0 0 8px var(--warning);
-        }
-
-        .age-danger {
-            background: var(--danger);
-            box-shadow: 0 0 8px var(--danger);
-        }
-
-        .avoidance-badge {
-            background: #7B61FF;
+        .task-item.resolved .task-checkbox::after {
+            content: '✓';
             color: white;
+            font-size: 12px;
+        }
+
+        .task-body {
+            flex: 1;
+        }
+
+        .task-message {
+            font-weight: 500;
+            margin-bottom: 2px;
+            transition: var(--transition);
+        }
+
+        .task-item.resolved .task-message {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .task-loc {
+            font-size: 10px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 6px;
+        }
+
+        .badge {
             font-size: 9px;
             padding: 2px 6px;
             border-radius: 4px;
-            font-weight: 700;
-            display: inline-block;
-            margin-bottom: 4px;
+            font-weight: 600;
         }
 
-        .task-msg {
-            font-weight: 500;
-            word-break: break-word;
+        .badge-age-warn {
+            background: #FDE68A;
+            color: #92400E;
         }
 
-        .task-meta {
-            font-size: 11px;
-            color: var(--subtext);
-            margin-bottom: 8px;
+        .badge-age-danger {
+            background: #FECACA;
+            color: #991B1B;
         }
 
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+        .badge-cognitive {
+            background: #DDD6FE;
+            color: #5B21B6;
+        }
+
+        /* Controls Area */
+        .task-controls {
+            display: flex;
+            gap: 8px;
+            padding-left: 28px;
         }
 
         select {
-            background: var(--bg);
-            color: var(--text);
+            background: var(--surface);
             border: 1px solid var(--border);
-            padding: 4px;
-            border-radius: 4px;
+            color: var(--text-secondary);
             font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            outline: none;
+            transition: var(--transition);
+            cursor: pointer;
         }
 
-        .analytics-panel {
-            margin-top: 20px;
+        select:hover {
+            border-color: var(--accent);
         }
 
-        .user-bar-row {
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-soft);
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 60px 40px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .empty-illustration {
+            width: 120px;
+            height: 120px;
+            background: var(--accent-soft);
+            border-radius: 50%;
+            margin: 0 auto 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+            justify-content: center;
+            opacity: 0.5;
         }
 
-        .user-label {
-            width: 80px;
-            font-size: 11px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .user-bar-bg {
-            flex: 1;
-            height: 12px;
-            background: var(--border);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .user-bar-fill {
-            height: 100%;
-            background: var(--accent);
-        }
-
-        .user-count {
-            width: 20px;
-            font-size: 11px;
-            text-align: right;
-        }
-
-        .export-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--accent);
+        .empty-illustration svg {
+            width: 60px;
+            height: 60px;
             color: var(--accent);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
         }
 
-        #discussion-view {
-            display: none;
+        /* Transitions */
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 
 <body id="body">
     <div class="header">
-        <div class="title-group">
-            <h1>FigNotes PRO</h1>
-            <p id="lastSync">Live Dashboard</p>
+        <div class="brand">
+            <h1>FigNotes</h1>
+            <div id="lastSync" class="sync-info">Waiting for sync...</div>
         </div>
-        <button id="syncBtn"
-            style="background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer;">Sync</button>
+        <button id="syncBtn" class="btn-sync">Sync Dashboard</button>
     </div>
 
-    <div class="nav-tabs">
-        <div class="tab active" onclick="switchTab('flow')">Flow Execution</div>
-        <div class="tab" onclick="switchTab('discussion')">Discussion Board</div>
-        <div class="tab" onclick="switchTab('analytics')">Analytics</div>
+    <div id="overview" class="overview">
+        <div class="stat-card">
+            <div class="stat-label">Total</div>
+            <div id="stat-total" class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Velocity</div>
+            <div id="stat-velocity" class="stat-value">0%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Blocked</div>
+            <div id="stat-blocked" class="stat-value">0</div>
+        </div>
     </div>
 
-    <div id="summary" class="summary-block">Loading execution summary...</div>
-
-    <div id="flow-view">
-        <div id="dashboard"></div>
+    <div class="filter-bar">
+        <div class="filter-chip active" onclick="setFilter('all')">All Tasks</div>
+        <div id="filter-unresolved" class="filter-chip" onclick="setFilter('unresolved')">Unresolved</div>
+        <div id="filter-discussion" class="filter-chip" onclick="setFilter('discussion')">Discussion</div>
+        <div id="filter-blocked" class="filter-chip" onclick="setFilter('blocked')">Blocked</div>
     </div>
 
-    <div id="discussion-view">
-        <div id="discussion-list"></div>
+    <div id="container" class="flow-container">
+        <!-- Flow cards will be injected here -->
     </div>
 
-    <div id="analytics-view" style="display: none;">
-        <h3>Resolution Analytics</h3>
-        <div id="user-analytics" class="analytics-panel"></div>
-    </div>
-
-    <div class="export-group">
-        <button class="btn-outline" onclick="exportData('markdown')">Export Markdown</button>
-        <button class="btn-outline" onclick="exportData('csv')">Export CSV</button>
+    <div id="empty-state" class="empty-state" style="display: none;">
+        <div class="empty-illustration">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L21 3z"></path>
+            </svg>
+        </div>
+        <h3>No tasks found</h3>
+        <p>Comments in this file will appear here as actionable tasks.</p>
     </div>
 
     <script>
-        let currentData = null;
-        const dashboard = document.getElementById('dashboard');
-        const summaryEl = document.getElementById('summary');
-        const discList = document.getElementById('discussion-list');
-        const userAnalytics = document.getElementById('user-analytics');
+        let rawData = null;
+        let activeFilter = 'all';
+        const container = document.getElementById('container');
+        const emptyState = document.getElementById('empty-state');
+        const syncBtn = document.getElementById('syncBtn');
 
+        // Initial sync
         window.onmessage = (event) => {
             const { type, payload } = event.data.pluginMessage;
             if (type === 'sync-complete') {
-                currentData = payload;
+                rawData = payload;
                 render();
-            } else if (type === 'export-data') {
-                downloadFile(payload.content, `fignotes_export.${payload.format}`);
+                updateStats();
+                document.getElementById('lastSync').innerText = `Last update: ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
             }
         };
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+        syncBtn.onclick = () => {
+            parent.postMessage({ pluginMessage: { type: 'sync' } }, '*');
+        };
 
-            document.getElementById('flow-view').style.display = tab === 'flow' ? 'block' : 'none';
-            document.getElementById('discussion-view').style.display = tab === 'discussion' ? 'block' : 'none';
-            document.getElementById('analytics-view').style.display = tab === 'analytics' ? 'block' : 'none';
+        function setFilter(filter) {
+            activeFilter = filter;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            render();
+        }
+
+        function updateStats() {
+            if (!rawData) return;
+            const tasks = rawData.tasks;
+            document.getElementById('stat-total').innerText = tasks.length;
+
+            const totalEffort = tasks.reduce((s, t) => s + t.effort, 0);
+            const doneEffort = tasks.reduce((s, t) => s + (t.resolved ? t.effort : 0), 0);
+            const velocity = totalEffort > 0 ? Math.round((doneEffort / totalEffort) * 100) : 0;
+            document.getElementById('stat-velocity').innerText = velocity + '%';
+
+            const blocked = tasks.filter(t => t.discussionStatus === 'blocked').length;
+            document.getElementById('stat-blocked').innerText = blocked;
         }
 
         function render() {
-            if (!currentData) return;
+            if (!rawData || !rawData.metrics.length) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
 
-            summaryEl.innerText = currentData.weeklySummary;
+            container.style.display = 'block';
+            emptyState.style.display = 'none';
 
-            // Flow Execution View
-            dashboard.innerHTML = currentData.metrics.map(flow => `
-                <div class="flow-card">
-                    <div class="flow-header">
-                        <span class="flow-title">${flow.flowName}</span>
-                        <span class="health-badge health-${flow.health.replace(' ', '-')}">${flow.health}</span>
-                    </div>
-                    <div class="metric-row">
-                        <div class="progress-info">
-                            <span>Completion</span>
-                            <span>${Math.round(flow.weightedCompletion)}%</span>
+            let html = '';
+
+            rawData.metrics.forEach(flow => {
+                const flowTasks = rawData.tasks.filter(t => t.page === flow.flowName && matchesFilter(t));
+                if (flowTasks.length === 0 && activeFilter !== 'all') return;
+
+                const isExpanded = false; // Default state for new render
+
+                html += `
+                    <div class="flow-card fade-in" id="flow-${flow.flowName.replace(/\s+/g, '-')}">
+                        <div class="flow-header" onclick="toggleFlow('${flow.flowName.replace(/\s+/g, '-')}')">
+                            <div class="flow-info">
+                                <div class="flow-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                                </div>
+                                <div class="flow-title">${flow.flowName}</div>
+                            </div>
+                            <div class="flow-meta">
+                                <div class="flow-progress-text">${Math.round(flow.weightedCompletion)}% Done</div>
+                                <div class="flow-health" style="color: ${getHealthColor(flow.health)}">${flow.health}</div>
+                            </div>
                         </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${flow.weightedCompletion}%; background: ${getHealthColor(flow.health)}"></div>
+                        <div class="flow-content">
+                            <div class="task-list">
+                                ${flowTasks.map(t => renderTask(t)).join('')}
+                            </div>
                         </div>
                     </div>
-                    <div class="task-list">
-                        ${currentData.tasks.filter(t => t.page === flow.flowName).map(t => renderTask(t)).join('')}
-                    </div>
-                </div>
-            `).join('');
+                `;
+            });
 
-            // Discussion View
-            const discTasks = currentData.tasks.filter(t => t.discussionStatus !== 'pending' || t.isAvoidance);
-            discList.innerHTML = discTasks.length ? discTasks.map(t => renderTask(t)).join('') : '<p style="text-align:center; padding: 20px; opacity: 0.5;">No active discussions or blocked items.</p>';
-
-            // Analytics View
-            const maxCount = Math.max(...currentData.allResolvedByUser.map(u => u.count), 1);
-            userAnalytics.innerHTML = currentData.allResolvedByUser.map(u => `
-                <div class="user-bar-row">
-                    <span class="user-label">${u.user}</span>
-                    <div class="user-bar-bg">
-                        <div class="user-bar-fill" style="width: ${(u.count / maxCount) * 100}%"></div>
-                    </div>
-                    <span class="user-count">${u.count}</span>
-                </div>
-            `).join('') || '<p style="opacity: 0.5;">None resolved yet.</p>';
+            container.innerHTML = html || '<div class="empty-state">No matching tasks for this filter</div>';
         }
 
         function renderTask(t) {
-            const ageColor = t.ageInDays > 7 ? 'warn' : (t.ageInDays > 3 ? 'warn' : 'fresh'); // Fixed logic: 7+ danger, 3+ warn
-            const ageClass = t.ageInDays > 7 ? 'age-danger' : (t.ageInDays > 3 ? 'age-warn' : 'age-fresh');
+            let badges = '';
+            if (t.ageInDays > 7) badges += `<span class="badge badge-age-danger">${t.ageInDays}d</span>`;
+            else if (t.ageInDays > 3) badges += `<span class="badge badge-age-warn">${t.ageInDays}d</span>`;
+            if (t.isAvoidance) badges += `<span class="badge badge-cognitive">Cognitive Load</span>`;
 
             return `
-                <div class="task-item">
-                    ${t.isAvoidance ? '<div class="avoidance-badge">HIGH COGNITIVE LOAD</div>' : ''}
-                    <div class="task-top">
-                        <div class="age-dot ${ageClass}" title="${t.ageInDays} days old"></div>
-                        <div style="flex:1">
-                            <span class="task-meta">${t.frame} • ${t.ageInDays}d old</span>
-                            <div class="task-msg">${t.message}</div>
+                <div class="task-item ${t.resolved ? 'resolved' : ''}">
+                    <div class="task-main">
+                        <div class="task-checkbox"></div>
+                        <div class="task-body">
+                            <div class="task-message">${t.message}</div>
+                            <div class="task-loc">
+                                <span>${t.frame}</span>
+                                ${badges}
+                            </div>
                         </div>
                     </div>
-                    <div class="controls">
+                    <div class="task-controls">
                         <select onchange="updateTask('${t.commentId}', 'effort', parseInt(this.value))">
-                            <option value="1" ${t.effort == 1 ? 'selected' : ''}>S (1)</option>
-                            <option value="2" ${t.effort == 2 ? 'selected' : ''}>M (2)</option>
-                            <option value="3" ${t.effort == 3 ? 'selected' : ''}>L (3)</option>
+                            <option value="1" ${t.effort == 1 ? 'selected' : ''}>Small (1)</option>
+                            <option value="2" ${t.effort == 2 ? 'selected' : ''}>Medium (2)</option>
+                            <option value="3" ${t.effort == 3 ? 'selected' : ''}>Large (3)</option>
                         </select>
                         <select onchange="updateTask('${t.commentId}', 'discussionStatus', this.value)">
                             <option value="pending" ${t.discussionStatus == 'pending' ? 'selected' : ''}>Pending</option>
-                            <option value="discussion" ${t.discussionStatus == 'discussion' ? 'selected' : ''}>Discuss</option>
+                            <option value="discussion" ${t.discussionStatus == 'discussion' ? 'selected' : ''}>Needs Discussion</option>
                             <option value="blocked" ${t.discussionStatus == 'blocked' ? 'selected' : ''}>Blocked</option>
                         </select>
                     </div>
@@ -432,32 +576,28 @@
             `;
         }
 
+        function matchesFilter(t) {
+            if (activeFilter === 'all') return true;
+            if (activeFilter === 'unresolved') return !t.resolved;
+            if (activeFilter === 'discussion') return t.discussionStatus === 'discussion';
+            if (activeFilter === 'blocked') return t.discussionStatus === 'blocked';
+            return true;
+        }
+
+        function toggleFlow(id) {
+            const card = document.getElementById(`flow-${id}`);
+            card.classList.toggle('expanded');
+        }
+
         function getHealthColor(health) {
-            if (health === 'Healthy') return '#1BC47D';
-            if (health === 'At Risk') return '#F2994A';
-            return '#EB5757';
+            if (health === 'Healthy') return '#A3B18A';
+            if (health === 'At Risk') return '#E9C46A';
+            return '#E76F51';
         }
 
         function updateTask(id, key, value) {
             parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key, value } } }, '*');
         }
-
-        function exportData(format) {
-            parent.postMessage({ pluginMessage: { type: 'export', payload: { format, data: currentData } } }, '*');
-        }
-
-        function downloadFile(content, fileName) {
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.click();
-        }
-
-        document.getElementById('syncBtn').onclick = () => {
-            parent.postMessage({ pluginMessage: { type: 'sync' } }, '*');
-        };
     </script>
 </body>
 
