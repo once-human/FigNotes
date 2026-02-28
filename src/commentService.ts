@@ -3,20 +3,28 @@ import { Task } from "./types";
 export class CommentService {
     static async fetchAllComments(): Promise<Task[]> {
         try {
+            const getDeepKeys = (obj: any) => {
+                let keys = new Set<string>();
+                while (obj) {
+                    Object.getOwnPropertyNames(obj).forEach(k => keys.add(k));
+                    obj = Object.getPrototypeOf(obj);
+                }
+                return Array.from(keys);
+            };
+
+            const allKeys = getDeepKeys(figma);
+            const commentKeys = allKeys.filter(k => k.toLowerCase().includes('comment') || k.toLowerCase().includes('thread'));
+
+            console.log("[FigNotes] figma.getCommentThreadsAsync type:", typeof (figma as any).getCommentThreadsAsync);
+            console.log("[FigNotes] figma.comments type:", typeof (figma as any).comments);
+            console.log("[FigNotes] Proto keys containing 'comment/thread':", commentKeys);
+
             let threadsMethod = (figma as any).getCommentThreadsAsync ||
                 ((figma as any).comments && (figma as any).comments.getThreadsAsync);
 
             if (!threadsMethod) {
-                const scannedKeys: string[] = [];
-                for (const key in figma) {
-                    if (key.toLowerCase().includes('comment') || key.toLowerCase().includes('thread')) {
-                        scannedKeys.push(key);
-                    }
-                }
-                console.warn("[FigNotes] Comment API not found.");
-                console.warn("[FigNotes] Scanned for keys:", scannedKeys);
-                console.warn("[FigNotes] figma.apiVersion:", (figma as any).apiVersion);
-                throw new Error("Figma Comment API not accessible in this environment.");
+                console.warn("[FigNotes] All 'get' methods found:", allKeys.filter(k => k.startsWith('get')));
+                throw new Error("Figma Comment API not found. Please ensure you are logged in and using a version of Figma that supports comments.");
             }
 
             const allThreads = await threadsMethod.call(threadsMethod === (figma as any).getCommentThreadsAsync ? figma : (figma as any).comments);
