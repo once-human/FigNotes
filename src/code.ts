@@ -47,10 +47,17 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 break;
             }
 
+            case "set-theme": {
+                if (!msg.payload) return;
+                await SyncService.setTheme(msg.payload);
+                // No need to broadcast full state for theme change usually, 
+                // but let's do it to ensure UI is in sync
+                await broadcastState();
+                break;
+            }
+
             case "resolve-comment": {
                 if (!msg.payload) return;
-                // Note: The actual REST call happens in the UI. 
-                // This handler updates local state immediately for responsiveness.
                 const tasks = await StorageService.getTasks();
                 if (tasks[msg.payload]) {
                     tasks[msg.payload].resolved = true;
@@ -98,7 +105,6 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
 
 async function navigateToTask(task: Task) {
     try {
-        // Fallback Chain: Node -> Frame -> Page -> Page Center
         let targetNode: BaseNode | null = null;
 
         if (task.nodeId) {
@@ -114,7 +120,6 @@ async function navigateToTask(task: Task) {
         }
 
         if (targetNode) {
-            // Ensure page is active
             let page = targetNode.parent;
             while (page && page.type !== "PAGE") page = page.parent;
             if (page && figma.currentPage.id !== page.id) {
@@ -124,16 +129,16 @@ async function navigateToTask(task: Task) {
             }
 
             if (targetNode.type !== "PAGE" && targetNode.type !== "DOCUMENT") {
+                // Smooth zoom/scroll using scrollAndZoomIntoView
                 figma.viewport.scrollAndZoomIntoView([targetNode as SceneNode]);
                 figma.currentPage.selection = [targetNode as SceneNode];
             } else {
-                // If we landed on a page, just center the view
                 figma.viewport.center = { x: 0, y: 0 };
             }
         } else {
-            // Absolute fallback: Center the current page
+            // Fallback to center of current page
             figma.viewport.center = { x: figma.viewport.center.x, y: figma.viewport.center.y };
-            figma.notify("Target not found. Centering view.", { timeout: 1000 });
+            figma.notify("Focusing canvas...", { timeout: 1000 });
         }
     } catch (err) {
         console.warn("[FigNotes] Navigation fallback failed", err);

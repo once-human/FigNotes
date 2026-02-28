@@ -1,6 +1,7 @@
-import { Task } from "./types";
+import { Task, ThemeMode } from "./types";
 
-export const STORAGE_KEY = "fignotes_tasks_v6";
+export const STORAGE_KEY = "fignotes_tasks_v7";
+export const THEME_KEY = "fignotes_theme";
 
 export class StorageService {
     static async getTasks(): Promise<Record<string, Task>> {
@@ -26,5 +27,18 @@ export class StorageService {
         const tasks = await this.getTasks();
         tasks[task.commentId] = task;
         await this.saveTasks(tasks);
+    }
+
+    static async getTheme(): Promise<ThemeMode> {
+        try {
+            const theme = await figma.clientStorage.getAsync(THEME_KEY);
+            return theme || "blue";
+        } catch {
+            return "blue";
+        }
+    }
+
+    static async saveTheme(theme: ThemeMode): Promise<void> {
+        await figma.clientStorage.setAsync(THEME_KEY, theme);
     }
 }

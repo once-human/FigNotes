@@ -1,11 +1,12 @@
 import { StorageService } from "./storageService";
 import { CommentService } from "./commentService";
-import { Task, SyncResult } from "./types";
+import { Task, SyncResult, ThemeMode } from "./types";
 
 export class SyncService {
     static async sync(rawComments: any[], currentUserHandle: string | null): Promise<SyncResult> {
         let liveTasks = await CommentService.parseRestComments(rawComments, currentUserHandle);
         const storedTasksMap = await StorageService.getTasks();
+        const theme = await StorageService.getTheme();
         const reconciledTasks: Task[] = [];
 
         liveTasks.forEach(live => {
@@ -15,7 +16,7 @@ export class SyncService {
                     ...live,
                     effort: stored.effort || null,
                     isCurrentlyWorking: stored.isCurrentlyWorking || false,
-                    assignee: stored.assignee || live.assignee // Allow manual override to persist
+                    assignee: stored.assignee || live.assignee
                 });
             } else {
                 reconciledTasks.push(live);
@@ -26,18 +27,27 @@ export class SyncService {
         reconciledTasks.forEach(t => fullTasksMap[t.commentId] = t);
         await StorageService.saveTasks(fullTasksMap);
 
-        return { tasks: reconciledTasks, currentUser: currentUserHandle || undefined };
+        return {
+            tasks: reconciledTasks,
+            currentUser: currentUserHandle || undefined,
+            theme: theme
+        };
     }
 
     static async getState(currentUserHandle: string | null): Promise<SyncResult> {
         const storedTasksMap = await StorageService.getTasks();
         const storedTasks = Object.values(storedTasksMap);
-        return { tasks: storedTasks, currentUser: currentUserHandle || undefined };
+        const theme = await StorageService.getTheme();
+        return {
+            tasks: storedTasks,
+            currentUser: currentUserHandle || undefined,
+            theme: theme
+        };
     }
 
     static async setWorking(taskId: string): Promise<void> {
         const tasks = await StorageService.getTasks();
-        // Clear previous working task
+        // Exclusive pin logic: only one task active at a time
         Object.values(tasks).forEach(t => t.isCurrentlyWorking = false);
 
         if (tasks[taskId]) {
@@ -50,5 +60,9 @@ export class SyncService {
         const tasks = await StorageService.getTasks();
         Object.values(tasks).forEach(t => t.isCurrentlyWorking = false);
         await StorageService.saveTasks(tasks);
+    }
+
+    static async setTheme(theme: ThemeMode): Promise<void> {
+        await StorageService.saveTheme(theme);
     }
 }

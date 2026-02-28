@@ -1,4 +1,5 @@
 export type EffortSize = "Small" | "Medium" | "Large";
+export type ThemeMode = "blue" | "pink";
 
 export interface Task {
     commentId: string;
@@ -20,9 +21,10 @@ export interface Task {
 export interface SyncResult {
     tasks: Task[];
     currentUser?: string;
+    theme?: ThemeMode;
 }
 
 export interface PluginMessage {
-    type: "sync" | "update-task" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "resolve-comment" | "set-working";
+    type: "sync" | "update-task" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "resolve-comment" | "set-working" | "set-theme";
     payload?: any;
 }

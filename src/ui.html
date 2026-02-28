@@ -7,20 +7,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Common */
             --bg: #FFFFFF;
             --text-main: #111111;
             --text-muted: #666666;
             --border: #F3F3F3;
-            --accent: #FC97CF;
-            /* Designer Pink */
-            --accent-soft: #FFF0F7;
-            --accent-muted: #FFD6EA;
             --radius: 12px;
-            --shadow: 0 2px 8px rgba(252, 151, 207, 0.1);
+            --font-main: 'Inter', -apple-system, sans-serif;
+
+            /* Blue Theme (Default) */
+            --accent-blue: #0070F6;
+            --accent-blue-soft: #EBF5FF;
+            --accent-blue-muted: #CCE3FD;
+
+            /* Pink Theme (Fun) */
+            --accent-pink: #FC97CF;
+            --accent-pink-soft: #FFF0F7;
+            --accent-pink-muted: #FFD6EA;
+        }
+
+        /* --- Theme Switching --- */
+        body.theme-blue {
+            --accent: var(--accent-blue);
+            --accent-soft: var(--accent-blue-soft);
+            --accent-muted: var(--accent-blue-muted);
+            --tab-transition: all 0.2s ease-in-out;
+            --card-bounce: none;
+            --shadow: 0 2px 8px rgba(0, 112, 246, 0.08);
+        }
+
+        body.theme-pink {
+            --accent: var(--accent-pink);
+            --accent-soft: var(--accent-pink-soft);
+            --accent-muted: var(--accent-pink-muted);
+            --tab-transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --card-bounce: scale(1.02);
+            --shadow: 0 4px 12px rgba(252, 151, 207, 0.15);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-main);
             background: var(--bg);
             color: var(--text-main);
             margin: 0;
@@ -30,57 +56,142 @@
             height: 100vh;
             overflow: hidden;
             letter-spacing: -0.01em;
+            transition: background 0.3s ease;
         }
 
-        /* --- Tabs --- */
-        .nav {
-            display: flex;
-            padding: 12px 16px 0;
-            border-bottom: 2px solid var(--border);
-            gap: 20px;
+        /* --- Header & Tabs --- */
+        .page-header {
             background: white;
             z-index: 100;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .top-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px 4px;
+            gap: 12px;
+        }
+
+        .tab-group-container {
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 16px;
+        }
+
+        .divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            margin: 0 4px;
         }
 
         .tab {
             padding: 12px 0;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
             border-bottom: 3px solid transparent;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: var(--tab-transition);
             white-space: nowrap;
+            opacity: 0.7;
         }
 
         .tab.active {
             color: var(--accent);
             border-bottom-color: var(--accent);
+            opacity: 1;
         }
 
-        /* --- Scrollable Content --- */
+        .actions-row {
+            margin-left: auto;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.6;
+        }
+
+        .icon-btn:hover {
+            opacity: 1;
+            background: var(--border);
+        }
+
+        .icon-btn.active {
+            opacity: 1;
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        /* --- Effort Filtering --- */
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 12px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .effort-chip {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 100px;
+            background: #FAFAFA;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .effort-chip.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: var(--accent-muted);
+        }
+
+        /* --- Content --- */
         .viewport {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 100px;
+            padding-bottom: 120px;
             background: white;
             scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
         }
 
-        /* --- Pinned Section --- */
         .pinned-section {
             padding: 16px;
             background: var(--accent-soft);
-            border-bottom: 1px solid var(--accent-muted);
+            border-bottom: 1px solid var(--border);
             margin-bottom: 8px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .section-label {
-            font-size: 11px;
+        .label {
+            font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--accent);
             margin-bottom: 12px;
             display: block;
@@ -93,19 +204,20 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             background: white;
-            transition: all 0.2s ease;
-            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
             position: relative;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
 
         .task-card:hover {
             border-color: var(--accent-muted);
             box-shadow: var(--shadow);
-            transform: translateY(-1px);
+            transform: var(--card-bounce);
         }
 
         .task-card.resolved {
-            opacity: 0.5;
+            opacity: 0.4;
             background: #FAFAFA;
         }
 
@@ -113,20 +225,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .author {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
             color: var(--text-main);
-            text-transform: uppercase;
+            background: #F0F0F0;
+            padding: 3px 8px;
+            border-radius: 4px;
         }
 
         .meta {
             font-size: 11px;
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .message {
@@ -137,18 +251,18 @@
             word-break: break-word;
         }
 
-        /* --- Effort UI --- */
-        .effort-row {
+        /* --- Effort Buttons --- */
+        .effort-selector {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             margin-bottom: 16px;
         }
 
         .effort-btn {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             text-align: center;
             border-radius: 8px;
             border: 1px solid var(--border);
@@ -158,18 +272,13 @@
             transition: all 0.2s;
         }
 
-        .effort-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
         .effort-btn.active {
             background: var(--accent);
             color: white;
             border-color: var(--accent);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        /* --- Actions --- */
         .card-actions {
             display: flex;
             gap: 8px;
@@ -177,33 +286,27 @@
 
         .btn-work {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             background: var(--accent-soft);
             color: var(--accent);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .btn-work:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-work.active {
-            background: var(--accent);
-            color: white;
+        .theme-pink .btn-work:active {
+            transform: scale(0.95);
         }
 
         .btn-resolve {
-            padding: 10px 16px;
+            padding: 12px 16px;
             background: white;
             color: var(--text-muted);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
@@ -212,7 +315,25 @@
         .btn-resolve:hover {
             color: #2E7D32;
             border-color: #A5D6A7;
-            background: #F1F8E9;
+        }
+
+        /* --- Pulse Animation --- */
+        @keyframes pulse-accent {
+            0% {
+                box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(var(--accent-rgb), 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0);
+            }
+        }
+
+        .card-click-anim {
+            animation: pulse-accent 0.6s ease-out;
         }
 
         /* --- Footer --- */
@@ -224,7 +345,7 @@
             padding: 16px;
             background: white;
             border-top: 1px solid var(--border);
-            z-index: 100;
+            z-index: 1000;
         }
 
         .btn-sync {
@@ -237,20 +358,67 @@
             font-size: 14px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(252, 151, 207, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .btn-sync:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(252, 151, 207, 0.4);
+        .theme-blue .btn-sync:hover {
+            filter: brightness(1.1);
         }
 
-        .btn-sync:active {
-            transform: translateY(0);
+        .theme-pink .btn-sync:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(252, 151, 207, 0.4);
         }
 
-        /* --- Settings --- */
+        /* --- Cat Animation --- */
+        #cat-companion {
+            position: fixed;
+            bottom: 60px;
+            right: -60px;
+            width: 40px;
+            height: 40px;
+            z-index: 50;
+            pointer-events: none;
+            transition: right 2s ease-in-out;
+            display: none;
+        }
+
+        body.theme-pink #cat-companion {
+            display: block;
+        }
+
+        .cat-walk {
+            animation: walk 15s infinite linear;
+        }
+
+        @keyframes walk {
+            0% {
+                right: -60px;
+                transform: scaleX(1);
+            }
+
+            45% {
+                right: 100%;
+                transform: scaleX(1);
+            }
+
+            50% {
+                right: 100%;
+                transform: scaleX(-1);
+            }
+
+            95% {
+                right: -60px;
+                transform: scaleX(-1);
+            }
+
+            100% {
+                right: -60px;
+                transform: scaleX(1);
+            }
+        }
+
+        /* --- Settings Overlay --- */
         .settings-overlay {
             position: fixed;
             top: 0;
@@ -258,13 +426,18 @@
             right: 0;
             bottom: 0;
             background: white;
-            z-index: 200;
+            z-index: 2000;
             padding: 32px 24px;
             display: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
         .settings-overlay.active {
             display: block;
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .input-group {
@@ -272,7 +445,7 @@
         }
 
         .input-label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -280,41 +453,53 @@
             display: block;
         }
 
-        input[type="text"],
-        input[type="password"] {
+        input {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             font-size: 14px;
             box-sizing: border-box;
             outline: none;
+            transition: all 0.2s;
         }
 
         input:focus {
             border-color: var(--accent);
             background: var(--accent-soft);
         }
-
-        .config-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 700;
-            cursor: pointer;
-        }
     </style>
 </head>
 
-<body>
+<body class="theme-blue">
 
-    <!-- Tabs -->
-    <div class="nav">
-        <div class="tab active" id="tabPending" onclick="switchTab('pending')">Pending</div>
-        <div class="tab" id="tabMe" onclick="switchTab('me')">Assigned to Me</div>
-        <div class="tab" id="tabDiscussion" onclick="switchTab('discussion')">Discussion</div>
-        <div class="tab" id="tabResolved" onclick="switchTab('resolved')">Resolved</div>
-        <div style="flex:1;"></div>
-        <div style="padding: 12px 0; cursor: pointer;" onclick="toggleSettings(true)">⚙️</div>
+    <!-- Header -->
+    <div class="page-header">
+        <div class="top-row">
+            <div style="font-size: 16px; font-weight: 800; letter-spacing: -0.03em;">FigNotes</div>
+            <div class="actions-row">
+                <div class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Fun Mode">✨</div>
+                <div class="icon-btn" onclick="toggleSettings(true)" title="Settings">⚙️</div>
+            </div>
+        </div>
+
+        <div class="tab-group-container">
+            <div class="tab-group">
+                <div class="tab active" id="tabPending" onclick="switchTab('pending')">Pending</div>
+                <div class="tab" id="tabResolved" onclick="switchTab('resolved')">Resolved</div>
+            </div>
+            <div class="divider"></div>
+            <div class="tab-group">
+                <div class="tab" id="tabMe" onclick="switchTab('me')">Assigned</div>
+                <div class="tab" id="tabDiscussion" onclick="switchTab('discussion')">Discussion</div>
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <div class="effort-chip" id="filterS" onclick="toggleEffortFilter('Small')">Small</div>
+            <div class="effort-chip" id="filterM" onclick="toggleEffortFilter('Medium')">Medium</div>
+            <div class="effort-chip" id="filterL" onclick="toggleEffortFilter('Large')">Large</div>
+        </div>
     </div>
 
     <!-- Scrollable Content -->
@@ -322,14 +507,30 @@
         <!-- Rendered dynamically -->
     </div>
 
+    <!-- Cat Companion (Pink Mode Only) -->
+    <div id="cat-companion">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 25C10 25 12 18 20 18C28 18 30 25 30 25" stroke="#FC97CF" stroke-width="2"
+                stroke-linecap="round" />
+            <circle cx="15" cy="22" r="1.5" fill="#FC97CF" />
+            <circle cx="25" cy="22" r="1.5" fill="#FC97CF" />
+            <path d="M12 18L10 12L16 16" fill="#FC97CF" />
+            <path d="M28 18L30 12L24 16" fill="#FC97CF" />
+            <path d="M20 28C20 28 21 32 26 32" stroke="#FC97CF" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+    </div>
+
     <!-- Footer -->
     <div class="footer">
-        <button class="btn-sync" onclick="triggerSync()">Sync</button>
+        <button class="btn-sync" onclick="triggerSync()">Sync Comments</button>
     </div>
 
     <!-- Settings Overlay -->
     <div id="settingsView" class="settings-overlay">
-        <h2 style="font-weight: 800; margin-bottom: 32px;">Configure FigNotes</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+            <h2 style="font-weight: 800; margin: 0;">Settings</h2>
+            <div style="cursor:pointer; font-size:24px;" onclick="toggleSettings(false)">×</div>
+        </div>
         <div class="input-group">
             <span class="input-label">Figma Access Token</span>
             <input type="password" id="patInput" placeholder="figp_...">
@@ -339,15 +540,14 @@
             <input type="text" id="urlInput" placeholder="https://www.figma.com/design/...">
         </div>
         <button class="btn-sync" onclick="saveSettings()">Save & Sync</button>
-        <p style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:24px;">
-            <span class="config-link" onclick="toggleSettings(false)">Back to Workboard</span>
-        </p>
     </div>
 
     <script>
         let latestData = null;
         let config = { pat: '', fileUrl: '' };
-        let activeTab = 'pending'; // pending, me, discussion, resolved
+        let activeTab = 'pending';
+        let currentTheme = 'blue';
+        let activeEffortFilters = new Set();
 
         // --- Communication ---
         window.onmessage = (event) => {
@@ -360,12 +560,39 @@
                 else toggleSettings(true);
             } else if (type === 'sync-complete') {
                 latestData = payload;
+                if (payload.theme) applyTheme(payload.theme);
                 render();
             }
         };
 
         parent.postMessage({ pluginMessage: { type: 'init' } }, '*');
 
+        // --- Theme ---
+        function toggleTheme() {
+            const newTheme = currentTheme === 'blue' ? 'pink' : 'blue';
+            applyTheme(newTheme);
+            parent.postMessage({ pluginMessage: { type: 'set-theme', payload: newTheme } }, '*');
+        }
+
+        function applyTheme(theme) {
+            currentTheme = theme;
+            document.body.className = 'theme-' + theme;
+            document.getElementById('themeToggle').classList.toggle('active', theme === 'pink');
+
+            // Trigger cat walking
+            const cat = document.getElementById('cat-companion');
+            if (theme === 'pink') {
+                cat.classList.add('cat-walk');
+            } else {
+                cat.classList.remove('cat-walk');
+            }
+
+            // Set accent RGB for pulse animation
+            const rgb = theme === 'blue' ? '0, 112, 246' : '252, 151, 207';
+            document.documentElement.style.setProperty('--accent-rgb', rgb);
+        }
+
+        // --- UI Logic ---
         function toggleSettings(show) {
             document.getElementById('settingsView').classList.toggle('active', show);
         }
@@ -380,12 +607,12 @@
 
         function triggerSync() {
             if (!config.pat || !config.fileUrl) return;
-            const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (!match) return;
+            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            if (!fileKey) return;
 
-            document.getElementById('content').innerHTML = '<div style="padding:40px; text-align:center; font-size:14px; font-weight:700; color:var(--accent);">Syncing comments...</div>';
+            document.getElementById('content').innerHTML = '<div style="padding:40px; text-align:center; font-size:12px; color:var(--accent); font-weight:700;">Refreshing workboard...</div>';
 
-            fetch(`https://api.figma.com/v1/files/${match}/comments`, {
+            fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, {
                 headers: { 'X-Figma-Token': config.pat }
             })
                 .then(r => r.json())
@@ -398,73 +625,90 @@
         function switchTab(tab) {
             activeTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            const map = { 'pending': 'tabPending', 'resolved': 'tabResolved', 'me': 'tabMe', 'discussion': 'tabDiscussion' };
+            document.getElementById(map[tab]).classList.add('active');
+
+            // Animation: content fade
+            const container = document.getElementById('content');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                render();
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 150);
+        }
+
+        function toggleEffortFilter(effort) {
+            if (activeEffortFilters.has(effort)) activeEffortFilters.delete(effort);
+            else activeEffortFilters.add(effort);
+
+            document.getElementById('filter' + effort[0]).classList.toggle('active');
             render();
         }
 
         async function resolveComment(commentId) {
             if (!config.pat || !config.fileUrl) return;
-            const match = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (!match) return;
+            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
 
-            // Optimistic update
+            // Optimistic
             parent.postMessage({ pluginMessage: { type: 'resolve-comment', payload: commentId } }, '*');
 
-            try {
-                await fetch(`https://api.figma.com/v1/files/${match}/comments/${commentId}`, {
-                    method: 'POST',
-                    headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ resolved: true })
-                });
-            } catch (e) {
-                console.error("REST resolve failed", e);
-            }
-        }
-
-        function updateEffort(id, effort) {
-            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: effort } } }, '*');
+            fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${commentId}`, {
+                method: 'POST',
+                headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resolved: true })
+            }).catch(e => console.error("REST resolve failed", e));
         }
 
         function setWorking(id) {
             parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*');
         }
 
-        function locateNode(id) {
+        function toggleEffort(id, currentEffort, targetEffort) {
+            const newValue = currentEffort === targetEffort ? null : targetEffort;
+            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: newValue } } }, '*');
+        }
+
+        function locateNode(id, el) {
+            // Pulse animation
+            el.classList.add('card-click-anim');
+            setTimeout(() => el.classList.remove('card-click-anim'), 600);
+
             parent.postMessage({ pluginMessage: { type: 'locate-node', payload: id } }, '*');
         }
 
         // --- Rendering ---
         function render() {
             if (!latestData) return;
-
             const container = document.getElementById('content');
             const currentUser = latestData.currentUser;
 
-            // Sorting & Filtering
             let tasks = latestData.tasks;
 
-            // 1. Split pinned
+            // Filter by Effort
+            if (activeEffortFilters.size > 0) {
+                tasks = tasks.filter(t => activeEffortFilters.has(t.effort));
+            }
+
             const workingTask = tasks.find(t => t.isCurrentlyWorking);
 
-            // 2. Tab Filter
-            let filteredTasks = tasks.filter(t => {
+            // Filter by Tab
+            let listTasks = tasks.filter(t => {
                 if (activeTab === 'resolved') return t.resolved;
                 if (t.resolved) return false;
 
                 if (activeTab === 'me') return t.assignee === currentUser;
                 if (activeTab === 'discussion') return t.mentions.includes(currentUser) && t.mentions.length > 1;
-                // Pending: Not assigned, not a multi-mention discussion
                 if (activeTab === 'pending') {
-                    const isMultiMention = t.mentions.includes(currentUser) && t.mentions.length > 1;
-                    return t.assignee !== currentUser && !isMultiMention;
+                    const isMulti = t.mentions.includes(currentUser) && t.mentions.length > 1;
+                    return t.assignee !== currentUser && !isMulti;
                 }
                 return true;
             });
 
-            // Prevent duplicate in pinned vs list?
-            // Actually, keep it in list but mute it? User says: "Pin comment moves to top".
-            // So we'll remove it from the filtered list if it's pinned.
-            const listTasks = filteredTasks.filter(t => !t.isCurrentlyWorking);
+            // Remove working task from list to avoid duplication if it matches tab
+            listTasks = listTasks.filter(t => !t.isCurrentlyWorking);
 
             let html = '';
 
@@ -472,24 +716,26 @@
             if (workingTask && !workingTask.resolved) {
                 html += `
                     <div class="pinned-section">
-                        <span class="section-label">Currently Working On</span>
-                        ${renderTaskCard(workingTask, true)}
+                        <span class="label">Currently Working On</span>
+                        ${renderTaskCard(workingTask)}
                     </div>
                 `;
             }
 
             if (listTasks.length === 0) {
-                html += `<div style="padding:60px 40px; text-align:center; font-size:14px; color:var(--text-muted);">Tab is empty.</div>`;
+                html += `<div style="padding:100px 40px; text-align:center; font-size:13px; color:var(--text-muted); line-height:1.6;">
+                    ${activeTab === 'pending' ? "The board is clear. <br>Sync to check for new comments." : "Nothing magic here yet."}
+                </div>`;
             } else {
-                html += listTasks.map(t => renderTaskCard(t, false)).join('');
+                html += listTasks.map(t => renderTaskCard(t)).join('');
             }
 
             container.innerHTML = html;
         }
 
-        function renderTaskCard(t, isPinned) {
+        function renderTaskCard(t) {
             return `
-                <div class="task-card ${t.resolved ? 'resolved' : ''}" onclick="locateNode('${t.commentId}')">
+                <div class="task-card ${t.resolved ? 'resolved' : ''}" onclick="locateNode('${t.commentId}', this)">
                     <div class="task-header">
                         <span class="author">${t.author}</span>
                         <span class="meta">${t.page} / ${t.frame}</span>
@@ -497,20 +743,18 @@
                     <div class="message">${t.message}</div>
                     
                     ${!t.resolved ? `
-                        <div class="effort-row" onclick="event.stopPropagation()">
-                            <div class="effort-btn ${t.effort === 'Small' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', 'Small')">Small</div>
-                            <div class="effort-btn ${t.effort === 'Medium' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', 'Medium')">Medium</div>
-                            <div class="effort-btn ${t.effort === 'Large' ? 'active' : ''}" onclick="updateEffort('${t.commentId}', 'Large')">Large</div>
+                        <div class="effort-selector" onclick="event.stopPropagation()">
+                            <div class="effort-btn ${t.effort === 'Small' ? 'active' : ''}" onclick="toggleEffort('${t.commentId}', '${t.effort}', 'Small')">Small</div>
+                            <div class="effort-btn ${t.effort === 'Medium' ? 'active' : ''}" onclick="toggleEffort('${t.commentId}', '${t.effort}', 'Medium')">Medium</div>
+                            <div class="effort-btn ${t.effort === 'Large' ? 'active' : ''}" onclick="toggleEffort('${t.commentId}', '${t.effort}', 'Large')">Large</div>
                         </div>
                         <div class="card-actions" onclick="event.stopPropagation()">
                             <button class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">
-                                ${t.isCurrentlyWorking ? 'Current Goal' : 'Work on this'}
+                                ${t.isCurrentlyWorking ? 'Focus Goal' : 'Work on this'}
                             </button>
                             <button class="btn-resolve" onclick="resolveComment('${t.commentId}')">Resolve</button>
                         </div>
-                    ` : `
-                        <div style="font-size:11px; font-weight:800; color:#2E7D32;">RESOLVED</div>
-                    `}
+                    ` : `<div style="font-size:10px; font-weight:800; color:#2E7D32; letter-spacing:0.05em;">COMPLETED</div>`}
                 </div>
             `;
         }
