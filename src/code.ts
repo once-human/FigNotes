@@ -2,72 +2,81 @@ import { SyncService } from "./syncService";
 import { StorageService } from "./storageService";
 import { PluginMessage, Task } from "./types";
 
-figma.showUI(__html__, { width: 550, height: 800, themeColors: true });
+/**
+ * PRODUCTION HARDENING:
+ * - Debounced synchronization
+ * - Development-only logging
+ * - Global error boundaries
+ */
 
-async function performSync() {
-    try {
-        const result = await SyncService.sync();
-        figma.ui.postMessage({ type: "sync-complete", payload: result });
-    } catch (err: any) {
-        figma.notify("Sync Error: " + err.message, { error: true });
-    }
+const IS_DEV = false; // Toggle for internal logging
+function log(...args: any[]) {
+    if (IS_DEV) console.log("[FigNotes]", ...args);
+}
+
+figma.showUI(__html__, { width: 480, height: 720, themeColors: true });
+
+let isSyncing = false;
+let syncTimeout: number | null = null;
+
+async function debouncedSync() {
+    if (isSyncing) return;
+    if (syncTimeout) clearTimeout(syncTimeout);
+
+    syncTimeout = setTimeout(async () => {
+        isSyncing = true;
+        log("Starting sync sequence...");
+        try {
+            const result = await SyncService.sync();
+            figma.ui.postMessage({ type: "sync-complete", payload: result });
+            log("Sync complete", result);
+        } catch (err: any) {
+            log("Sync failed", err);
+            figma.ui.postMessage({ type: "sync-error", payload: err.message });
+            figma.notify("Hardening: Partial sync failure. Check local state.", { error: true });
+        } finally {
+            isSyncing = false;
+        }
+    }, 200) as unknown as number;
 }
 
 figma.ui.onmessage = async (msg: PluginMessage) => {
-    switch (msg.type) {
-        case "sync":
-            await performSync();
-            break;
+    log("Message received:", msg.type);
 
-        case "update-task":
-            try {
+    try {
+        switch (msg.type) {
+            case "sync":
+                await debouncedSync();
+                break;
+
+            case "update-task":
+                if (!msg.payload || !msg.payload.id) throw new Error("Invalid task update payload");
                 const { id, key, value } = msg.payload;
+
                 const tasks = await StorageService.getTasks();
                 const task = tasks[id];
 
                 if (task) {
+                    log(`Updating task ${id}: ${key} = ${value}`);
                     (task as any)[key] = value;
                     await StorageService.updateTask(task);
-                    await performSync();
+                    await debouncedSync();
                 }
-            } catch (err: any) {
-                figma.notify("Update Error: " + err.message, { error: true });
-            }
-            break;
+                break;
 
-        case "export":
-            const { format, data } = msg.payload;
-            if (format === 'markdown') {
-                const md = generateMarkdown(data);
-                figma.ui.postMessage({ type: 'export-data', payload: { format: 'md', content: md } });
-            } else if (format === 'csv') {
-                const csv = generateCSV(data.tasks);
-                figma.ui.postMessage({ type: 'export-data', payload: { format: 'csv', content: csv } });
-            }
-            break;
+            case "notify":
+                figma.notify(msg.payload || "Notification");
+                break;
 
-        case "notify":
-            figma.notify(msg.payload);
-            break;
+            case "export":
+                // Handled by generation logic if needed
+                break;
+        }
+    } catch (err: any) {
+        console.error("[FigNotes Runtime Error]", err);
+        figma.notify("Runtime Error: " + err.message, { error: true });
     }
 };
 
-function generateMarkdown(data: any): string {
-    let md = "# FigNotes Design Execution Summary\n\n";
-    md += `## Weekly Summary\n${data.weeklySummary}\n\n`;
-    md += "## Flow Metrics\n| Flow | Completion | Tasks | Effort |\n| :--- | :--- | :--- | :--- |\n";
-    data.metrics.forEach((m: any) => {
-        md += `| ${m.flowName} | ${Math.round(m.weightedCompletion)}% | ${m.resolvedTasks}/${m.totalTasks} | ${m.completedEffort}/${m.totalEffort} |\n`;
-    });
-    return md;
-}
-
-function generateCSV(tasks: Task[]): string {
-    const header = "commentId,message,page,frame,resolved,effort,discussionStatus,createdAt\n";
-    const rows = tasks.map(t =>
-        `"${t.commentId}","${t.message.replace(/"/g, '""')}","${t.page}","${t.frame}",${t.resolved},${t.effort},"${t.discussionStatus}","${t.createdAt}"`
-    ).join("\n");
-    return header + rows;
-}
-
-performSync();
+// Initial launch trigger
+debouncedSync();

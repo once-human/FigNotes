@@ -3,7 +3,7 @@ import { Task } from "./types";
 export class CommentService {
     static async fetchAllComments(): Promise<Task[]> {
         try {
-            const allThreads = await figma.comments.getThreadsAsync();
+            const allThreads = await (figma as any).getCommentThreadsAsync();
             const tasks: Task[] = [];
             const now = new Date().toISOString();
 
