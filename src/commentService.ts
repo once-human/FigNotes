@@ -3,7 +3,16 @@ import { Task } from "./types";
 export class CommentService {
     static async fetchAllComments(): Promise<Task[]> {
         try {
-            const allThreads = await (figma as any).getCommentThreadsAsync();
+            let threadsMethod = (figma as any).getCommentThreadsAsync ||
+                ((figma as any).comments && (figma as any).comments.getThreadsAsync);
+
+            if (!threadsMethod) {
+                const keys = Object.keys(figma).filter(k => k.toLowerCase().includes('comment') || k.toLowerCase().includes('thread'));
+                console.warn("[FigNotes] Comment API not found. Available keys:", keys);
+                throw new Error("Figma Comment API not accessible in this environment.");
+            }
+
+            const allThreads = await threadsMethod.call(threadsMethod === (figma as any).getCommentThreadsAsync ? figma : (figma as any).comments);
             const tasks: Task[] = [];
             const now = new Date().toISOString();
 
