@@ -45,7 +45,7 @@
             --transition-type: cubic-bezier(0.68, -0.6, 0.32, 1.6);
             --card-shadow: 0 4px 12px rgba(252, 151, 207, 0.2);
             --radius: 18px;
-            --bounce: scale(1.02) rotate(-1.5deg);
+            --bounce: scale(1.02) rotate(var(--tilt, -1deg));
             --pulse-shadow: 0 0 25px rgba(252, 151, 207, 0.5);
             --work-bounce: work-pop 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
         }
@@ -306,6 +306,7 @@
             color: white;
             text-transform: uppercase;
             flex-shrink: 0;
+            transition: background-color 0.4s ease;
         }
 
         .author-info {
@@ -333,7 +334,7 @@
             word-break: break-word;
         }
 
-        /* SCALED DOWN BUTTONS (90%) */
+        /* SCALED DOWN BUTTONS (90% Container, Larger Text) */
         .card-efforts {
             display: flex;
             gap: 6px;
@@ -342,9 +343,9 @@
 
         .effort-chip {
             flex: 1;
-            padding: 8px;
+            padding: 7px;
             text-align: center;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             border-radius: 8px;
             border: 1.5px solid var(--border);
@@ -378,12 +379,12 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 9px;
+            padding: 8px;
             border: none;
             border-radius: 10px;
             background: var(--accent-soft);
             color: var(--accent);
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -421,12 +422,12 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 9px 14px;
+            padding: 8px 14px;
             border: 1.5px solid var(--border);
             border-radius: 100px;
             background: white;
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -437,10 +438,10 @@
             color: #2E7D32;
         }
 
-        /* --- THE CAT --- */
+        /* --- THE CAT (Raised for clear visibility) --- */
         #cat-container {
             position: fixed;
-            bottom: 72px;
+            bottom: 88px;
             width: 100%;
             height: 60px;
             pointer-events: none;
@@ -489,7 +490,7 @@
             font-weight: 800;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
             border: 2px solid var(--accent-outline);
-            animation: meow-float 1s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: meow-float 1.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
             opacity: 0;
         }
@@ -507,7 +508,7 @@
 
             100% {
                 opacity: 0;
-                transform: translateY(-35px) scale(0.9);
+                transform: translateY(-40px) scale(0.9);
             }
         }
 
@@ -822,6 +823,7 @@
             document.getElementById('catToggle').classList.toggle('active', theme === 'pink');
             if (theme === 'pink') { cat.x = -80; cat.targetX = 60; }
             else { cat.targetX = window.innerWidth + 80; }
+            render(); // Refresh cards to update avatar colors
         }
 
         function catMeow() {
@@ -832,7 +834,7 @@
             bubble.innerText = 'Meoww!';
             const el = document.getElementById('the-cat');
             el.appendChild(bubble);
-            setTimeout(() => bubble.remove(), 1000);
+            setTimeout(() => bubble.remove(), 1500);
             el.classList.add('cat-jumping');
             setTimeout(() => { el.classList.remove('cat-jumping'); cat.jumping = false; }, 500);
         }
@@ -859,14 +861,23 @@
         function switchSecondaryTab(toggle) { sToggle = toggle; Array.from(document.querySelectorAll('.s-toggle')).forEach(t => t.classList.toggle('active', t.id === 'sToggle' + toggle.charAt(0).toUpperCase() + toggle.slice(1))); render(); }
         function updateEffortSelection(val) { effortFilter = val; document.getElementById('effortLabel').innerText = val === 'All' ? 'All Efforts' : val; render(); }
 
-        const AVATAR_COLORS = ['#FF4785', '#0070F6', '#2E7D32', '#6200EE', '#FF9800', '#795548'];
+        const AVATAR_COLORS_BLUE = ['#0070F6', '#2E7D32', '#6200EE', '#0097A7', '#455A64', '#1565C0'];
+        const AVATAR_COLORS_PINK = ['#FC97CF', '#FF80AB', '#CE93D8', '#BA68C8', '#F48FB1', '#EF9A9A'];
+
         function getAvatarStyle(name) {
             let hash = 0;
             for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-            const color = AVATAR_COLORS[Math.abs(hash % AVATAR_COLORS.length)];
+            const palette = currentTheme === 'blue' ? AVATAR_COLORS_BLUE : AVATAR_COLORS_PINK;
+            const color = palette[Math.abs(hash % palette.length)];
             return `background-color: ${color};`;
         }
         function getInitials(name) { return name.split(' ').map(n => n[0]).join('').substring(0, 2); }
+
+        function setRandomTilt(el) {
+            if (currentTheme !== 'pink') return;
+            const tilt = (Math.random() * 1.6 - 0.8).toFixed(2);
+            el.style.setProperty('--tilt', tilt + 'deg');
+        }
 
         function render() {
             if (!latestData || !config.pat) {
@@ -914,7 +925,9 @@
         }
 
         function renderCard(t) {
-            return `<div class="task-card ${t.resolved ? 'resolved' : ''}" id="card-${t.commentId}" onclick="triggerPulse('${t.commentId}')">
+            return `<div class="task-card ${t.resolved ? 'resolved' : ''}" id="card-${t.commentId}" 
+                onmouseenter="setRandomTilt(this)"
+                onclick="triggerPulse('${t.commentId}')">
                 <div class="card-header" onclick="event.stopPropagation(); locate('${t.commentId}')">
                     <div class="author-avatar" style="${getAvatarStyle(t.author)}">
                         ${getInitials(t.author)}
@@ -975,7 +988,11 @@
             }
             parent.postMessage({ pluginMessage: { type: 'set-working', payload: id } }, '*');
         }
-        function setEffort(id, val) { parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: val } } }, '*'); }
+        function setEffort(id, val) {
+            const task = latestData.tasks.find(t => t.commentId === id);
+            const newVal = (task && task.effort === val) ? null : val;
+            parent.postMessage({ pluginMessage: { type: 'update-task', payload: { id, key: 'effort', value: newVal } } }, '*');
+        }
         function triggerSync() {
             const key = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
             if (key) fetch(`https://api.figma.com/v1/files/${key}/comments`, { headers: { 'X-Figma-Token': config.pat } }).then(r => r.json()).then(d => {
