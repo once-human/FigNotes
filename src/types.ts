@@ -17,6 +17,7 @@ export interface Task {
     frame: string;
     isCurrentlyWorking: boolean;
     mentions: string[];
+    ignored: boolean;
 }
 
 export interface SyncResult {
@@ -27,6 +28,6 @@ export interface SyncResult {
 }
 
 export interface PluginMessage {
-    type: "sync" | "update-task" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "resolve-comment" | "unresolve-comment" | "set-working" | "set-theme" | "set-hide-cat";
+    type: "sync" | "update-task" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "resolve-comment" | "unresolve-comment" | "ignore-comment" | "unignore-comment" | "set-working" | "set-theme" | "set-hide-cat";
     payload?: any;
 }

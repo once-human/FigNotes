@@ -84,6 +84,29 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 break;
             }
 
+            case "ignore-comment": {
+                if (!msg.payload) return;
+                const tasks = await StorageService.getTasks();
+                if (tasks[msg.payload]) {
+                    tasks[msg.payload].ignored = true;
+                    tasks[msg.payload].isCurrentlyWorking = false;
+                    await StorageService.saveTasks(tasks);
+                    await broadcastState();
+                }
+                break;
+            }
+
+            case "unignore-comment": {
+                if (!msg.payload) return;
+                const tasks = await StorageService.getTasks();
+                if (tasks[msg.payload]) {
+                    tasks[msg.payload].ignored = false;
+                    await StorageService.saveTasks(tasks);
+                    await broadcastState();
+                }
+                break;
+            }
+
             case "save-settings":
                 await figma.clientStorage.setAsync("figma_pat", msg.payload.pat);
                 await figma.clientStorage.setAsync("figma_file_url", msg.payload.fileUrl);

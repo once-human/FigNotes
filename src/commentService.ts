@@ -47,7 +47,8 @@ export class CommentService {
                     page: pageNode?.name || "Global",
                     frame: frameNode?.name || "Canvas",
                     isCurrentlyWorking: false,
-                    mentions: mentions
+                    mentions: mentions,
+                    ignored: false
                 });
             }
 
