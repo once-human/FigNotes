@@ -1142,11 +1142,13 @@
         }
 
         function setWorking(id) {
-            if (id && currentTheme === 'pink') {
-                const btn = document.getElementById('work-' + id);
-                if (btn) {
-                    btn.classList.add('popping');
-                    setTimeout(() => btn.classList.remove('popping'), 400);
+            if (id) {
+                if (currentTheme === 'pink') {
+                    const btn = document.getElementById('work-' + id);
+                    if (btn) {
+                        btn.classList.add('popping');
+                        setTimeout(() => btn.classList.remove('popping'), 400);
+                    }
                 }
                 const viewport = document.getElementById('content');
                 if (viewport) viewport.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1185,8 +1187,13 @@
                 config = payload || { pat: '', fileUrl: '' };
                 document.getElementById('patInput').value = config.pat || '';
                 document.getElementById('urlInput').value = config.fileUrl || '';
-                if (config.pat && config.fileUrl) triggerSync();
-                else render();
+
+                if (config.pat && config.fileUrl) {
+                    triggerSync();
+                } else {
+                    toggleSettings(true);
+                    render();
+                }
             }
             else if (type === 'sync-complete') {
                 latestData = payload;
