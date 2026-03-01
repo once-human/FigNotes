@@ -14,6 +14,7 @@ export class SyncService {
             if (stored) {
                 reconciledTasks.push({
                     ...live,
+                    resolved: stored.resolved ?? live.resolved,
                     effort: stored.effort || null,
                     isCurrentlyWorking: stored.isCurrentlyWorking || false,
                     assignee: stored.assignee || live.assignee

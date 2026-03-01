@@ -401,13 +401,13 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 9.5px;
+            padding: 10px;
             border: none;
             border-radius: 10px;
             background: var(--accent-soft);
             color: var(--accent);
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -444,13 +444,13 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 9.5px 16px;
+            padding: 10px 16px;
             border: 1.5px solid var(--border);
             border-radius: 100px;
             background: white;
             color: var(--text-muted);
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -503,7 +503,6 @@
         .meow-bubble {
             position: absolute;
             top: -35px;
-            left: 25px;
             background: white;
             color: var(--accent);
             padding: 5px 12px;
@@ -515,7 +514,7 @@
             animation: meow-float 1.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
             opacity: 0;
-            transform-origin: center;
+            transform-origin: bottom;
         }
 
         @keyframes meow-float {
@@ -762,6 +761,11 @@
 
     <div class="viewport" id="content"></div>
 
+    <script>
+        // Move cat container into viewport to ensure it scrolls or sticks correctly if needed,
+        // but since it's fixed, keeping it outside for now.
+    </script>
+
     <div id="cat-container">
         <div id="the-cat" class="cat" onclick="catMeow()">
             <svg class="cat-svg" viewBox="0 0 600 400">
@@ -860,12 +864,10 @@
             bubble.className = 'meow-bubble';
             bubble.innerText = 'Meoww!';
 
-            // Fix Bubble orientation: Un-scale the bubble so text is readable
-            // And position it on the "correct" side of the head
+            // Text direction fix: text is never mirrored, bubble stays on head
             if (cat.dir === -1) {
-                bubble.style.left = 'auto';
                 bubble.style.right = '25px';
-                bubble.style.transform = 'scaleX(-1)';
+                bubble.style.left = 'auto';
             } else {
                 bubble.style.left = '25px';
                 bubble.style.right = 'auto';
@@ -921,10 +923,9 @@
 
         function setRandomTilt(el) {
             if (currentTheme !== 'pink') return;
-            // Randomly pick left or right-ish tilt
-            const dir = Math.random() < 0.5 ? 1 : -1;
+            const side = Math.random() < 0.5 ? -1 : 1;
             const amount = Math.random() * 1.5 + 0.5;
-            const tilt = (dir * amount).toFixed(2);
+            const tilt = (side * amount).toFixed(2);
             el.style.setProperty('--tilt', tilt + 'deg');
         }
 
@@ -974,12 +975,13 @@
         }
 
         function renderCard(t) {
+            const initials = getInitials(t.author);
             return `<div class="task-card ${t.resolved ? 'resolved' : ''}" id="card-${t.commentId}" 
                 onmouseenter="setRandomTilt(this)"
                 onclick="triggerPulse('${t.commentId}')">
                 <div class="card-header" onclick="event.stopPropagation(); locate('${t.commentId}')">
                     <div class="author-avatar" style="${getAvatarStyle(t.author)}">
-                        ${getInitials(t.author)}
+                        ${initials}
                     </div>
                     <div class="author-info">
                         <div class="author-name">${t.author}</div>
@@ -1003,7 +1005,14 @@
                             Done
                         </button>
                     </div>
-                ` : `<div style="display:flex; align-items:center; gap:6px; color:#2E7D32; font-size:11px; font-weight:800;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg> COMPLETED</div>`}
+                ` : `
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:6px; color:#2E7D32; font-size:11px; font-weight:800;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg> COMPLETED
+                        </div>
+                        <button class="btn-resolve" style="padding:4px 10px; font-size:10px; border-color:transparent; background:#F0F0F0;" onclick="event.stopPropagation(); unresolve('${t.commentId}')">Not Done</button>
+                    </div>
+                `}
             </div>`;
         }
 
@@ -1021,10 +1030,11 @@
             const task = latestData.tasks.find(t => t.commentId === id);
             if (task) { task.resolved = true; task.isCurrentlyWorking = false; render(); }
             parent.postMessage({ pluginMessage: { type: 'resolve-comment', payload: id } }, '*');
-            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
-            if (fileKey) fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${id}`, {
-                method: 'POST', headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' }, body: JSON.stringify({ resolved: true })
-            }).catch(e => console.error(e));
+        }
+        function unresolve(id) {
+            const task = latestData.tasks.find(t => t.commentId === id);
+            if (task) { task.resolved = false; render(); }
+            parent.postMessage({ pluginMessage: { type: 'unresolve-comment', payload: id } }, '*');
         }
 
         function setWorking(id) {
@@ -1046,6 +1056,10 @@
             const key = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
             if (key) fetch(`https://api.figma.com/v1/files/${key}/comments`, { headers: { 'X-Figma-Token': config.pat } }).then(r => r.json()).then(d => {
                 parent.postMessage({ pluginMessage: { type: 'sync', payload: d.comments } }, '*');
+            }).catch(e => {
+                console.error("Sync error:", e);
+                // Even on error, broadcast to get what we have
+                parent.postMessage({ pluginMessage: { type: 'init' } }, '*');
             });
         }
         function toggleTheme() { const nt = currentTheme === 'blue' ? 'pink' : 'blue'; applyTheme(nt); parent.postMessage({ pluginMessage: { type: 'set-theme', payload: nt } }, '*'); }
