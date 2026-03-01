@@ -7,6 +7,7 @@ export class SyncService {
         let liveTasks = await CommentService.parseRestComments(rawComments, currentUserHandle);
         const storedTasksMap = await StorageService.getTasks();
         const theme = await StorageService.getTheme();
+        const hideCat = await StorageService.getHideCat();
         const reconciledTasks: Task[] = [];
 
         liveTasks.forEach(live => {
@@ -31,7 +32,8 @@ export class SyncService {
         return {
             tasks: reconciledTasks,
             currentUser: currentUserHandle || undefined,
-            theme: theme
+            theme: theme,
+            hideCat: hideCat
         };
     }
 
@@ -39,11 +41,17 @@ export class SyncService {
         const storedTasksMap = await StorageService.getTasks();
         const storedTasks = Object.values(storedTasksMap);
         const theme = await StorageService.getTheme();
+        const hideCat = await StorageService.getHideCat();
         return {
             tasks: storedTasks,
             currentUser: currentUserHandle || undefined,
-            theme: theme
+            theme: theme,
+            hideCat: hideCat
         };
+    }
+
+    static async setHideCat(hidden: boolean): Promise<void> {
+        await StorageService.saveHideCat(hidden);
     }
 
     static async setWorking(taskId: string): Promise<void> {

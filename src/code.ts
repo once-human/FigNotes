@@ -54,6 +54,13 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 break;
             }
 
+            case "set-hide-cat": {
+                if (msg.payload === undefined) return;
+                await SyncService.setHideCat(msg.payload);
+                await broadcastState();
+                break;
+            }
+
             case "resolve-comment": {
                 if (!msg.payload) return;
                 const tasks = await StorageService.getTasks();

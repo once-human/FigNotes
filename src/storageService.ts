@@ -2,6 +2,7 @@ import { Task, ThemeMode } from "./types";
 
 export const STORAGE_KEY = "fignotes_tasks_v7";
 export const THEME_KEY = "fignotes_theme";
+export const HIDE_CAT_KEY = "fignotes_hide_cat";
 
 export class StorageService {
     static async getTasks(): Promise<Record<string, Task>> {
@@ -40,5 +41,18 @@ export class StorageService {
 
     static async saveTheme(theme: ThemeMode): Promise<void> {
         await figma.clientStorage.setAsync(THEME_KEY, theme);
+    }
+
+    static async getHideCat(): Promise<boolean> {
+        try {
+            const hidden = await figma.clientStorage.getAsync(HIDE_CAT_KEY);
+            return !!hidden;
+        } catch {
+            return false;
+        }
+    }
+
+    static async saveHideCat(hidden: boolean): Promise<void> {
+        await figma.clientStorage.setAsync(HIDE_CAT_KEY, hidden);
     }
 }

@@ -23,9 +23,10 @@ export interface SyncResult {
     tasks: Task[];
     currentUser?: string;
     theme?: ThemeMode;
+    hideCat?: boolean;
 }
 
 export interface PluginMessage {
-    type: "sync" | "update-task" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "resolve-comment" | "unresolve-comment" | "set-working" | "set-theme";
+    type: "sync" | "update-task" | "notify" | "save-settings" | "get-settings" | "init" | "locate-node" | "resolve-comment" | "unresolve-comment" | "set-working" | "set-theme" | "set-hide-cat";
     payload?: any;
 }
