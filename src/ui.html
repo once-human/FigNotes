@@ -1030,11 +1030,29 @@
             const task = latestData.tasks.find(t => t.commentId === id);
             if (task) { task.resolved = true; task.isCurrentlyWorking = false; render(); }
             parent.postMessage({ pluginMessage: { type: 'resolve-comment', payload: id } }, '*');
+
+            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            if (fileKey && config.pat) {
+                fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${id}`, {
+                    method: 'POST',
+                    headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resolved: true })
+                }).catch(e => console.error("Figma resolve error:", e));
+            }
         }
         function unresolve(id) {
             const task = latestData.tasks.find(t => t.commentId === id);
             if (task) { task.resolved = false; render(); }
             parent.postMessage({ pluginMessage: { type: 'unresolve-comment', payload: id } }, '*');
+
+            const fileKey = config.fileUrl.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/)?.[1];
+            if (fileKey && config.pat) {
+                fetch(`https://api.figma.com/v1/files/${fileKey}/comments/${id}`, {
+                    method: 'POST',
+                    headers: { 'X-Figma-Token': config.pat, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resolved: false })
+                }).catch(e => console.error("Figma unresolve error:", e));
+            }
         }
 
         function setWorking(id) {
