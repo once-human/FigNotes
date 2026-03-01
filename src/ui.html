@@ -518,7 +518,7 @@
         /* --- THE CAT --- */
         #cat-container {
             position: fixed;
-            bottom: 75px;
+            bottom: 70px;
             width: 100%;
             height: 60px;
             pointer-events: none;
@@ -788,7 +788,7 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path
-                            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l-.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
                         <circle cx="12" cy="12" r="3" />
                     </svg>
                 </div>
@@ -837,28 +837,32 @@
 
     <div id="cat-container">
         <div id="the-cat" class="cat" onclick="catMeow()">
-            <svg class="cat-svg" viewBox="0 0 600 400">
-                <g class="cat-legs">
-                    <path d="M225,260v105" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
-                    <path d="M340,260v105" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
-                </g>
-                <g class="cat-body">
-                    <path class="cat-tail" d="M208,240s-35.8-1.5-46-42c-5.5-25.3-9.2-40.5-32-48"
-                        style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
-                    <rect x="190" y="201" width="200" height="118" rx="58.9" style="fill:#eba13d" />
-                    <g class="cat-head" id="cat-head">
-                        <path d="M330,121c5,16-1,34-14,38s-29-5-34-22c-8-25,1-49,10-52,8-2,30,11,38,36z"
-                            style="fill:#eba13d" />
-                        <path d="M372,121c-5,16,1,34,14,38s29-5,34-22c8-25-1-49-10-52-8-2-30,11-38,36z"
-                            style="fill:#eba13d" />
-                        <path d="M430,164c0,43-35,67-78,67s-78-23-78-66,41-75,78-75,78,32,78,74z"
-                            style="fill:#eba13d" />
-                        <circle cx="320" cy="156" r="10" style="fill:#33281b" />
-                        <circle cx="382" cy="156" r="10" style="fill:#33281b" />
-                        <path d="M373,200c0,2-4,6-9,6s-9-4-9-6,4-4,9-4,9,2,9,4z" style="fill:#33281b" />
+            <div id="cat-graphics" style="transition: transform 0.3s var(--transition-type);">
+                <svg class="cat-svg" viewBox="0 0 600 400">
+                    <g class="cat-legs">
+                        <path d="M225,260v105"
+                            style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                        <path d="M340,260v105"
+                            style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
                     </g>
-                </g>
-            </svg>
+                    <g class="cat-body">
+                        <path class="cat-tail" d="M208,240s-35.8-1.5-46-42c-5.5-25.3-9.2-40.5-32-48"
+                            style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                        <rect x="190" y="201" width="200" height="118" rx="58.9" style="fill:#eba13d" />
+                        <g class="cat-head" id="cat-head">
+                            <path d="M330,121c5,16,-1,34,-14,38s-29,-5,-34,-22c-8,-25,1,-49,10,-52,8,-2,30,11,38,36z"
+                                style="fill:#eba13d" />
+                            <path d="M372,121c-5,16,1,34,14,38s29,-5,34,-22c8,-25,-1,-49,-10,-52,-8,-2,-30,11,-38,36z"
+                                style="fill:#eba13d" />
+                            <path d="M430,164c0,43,-35,67,-78,67s-78,-23,-78,-66,41,-75,78,-75,78,32,78,74z"
+                                style="fill:#eba13d" />
+                            <circle cx="320" cy="156" r="10" style="fill:#33281b" />
+                            <circle cx="382" cy="156" r="10" style="fill:#33281b" />
+                            <path d="M373,200c0,2,-4,6,-9,6s-9,-4,-9,-6,4,-4,9,-4,9,2,9,4z" style="fill:#33281b" />
+                        </g>
+                    </g>
+                </svg>
+            </div>
         </div>
     </div>
 
@@ -949,14 +953,13 @@
             bubble.className = 'meow-bubble';
             bubble.innerText = 'Meoww!';
 
-            // Counter-scale the bubble so text is never mirrored
-            bubble.style.transform = `scaleX(${cat.dir})`;
-
+            // Graphics flip is now separate, so bubble text is stable.
+            // We just need to nudge the bubble based on side.
             if (cat.dir === -1) {
-                bubble.style.right = '10px';
+                bubble.style.right = '45px';
                 bubble.style.left = 'auto';
             } else {
-                bubble.style.left = '35px';
+                bubble.style.left = '45px';
                 bubble.style.right = 'auto';
             }
 
@@ -969,6 +972,7 @@
 
         function animate() {
             const el = document.getElementById('the-cat');
+            const graphics = document.getElementById('cat-graphics');
             const legs = el.querySelector('.cat-legs');
             let dx = cat.targetX - cat.x;
             if (Math.abs(dx) > 2) {
@@ -978,14 +982,23 @@
             } else {
                 legs.classList.remove('cat-legs-walking');
                 if (currentTheme === 'pink' && !isCatHidden && Math.random() < 0.005) {
-                    cat.targetX = Math.random() * (window.innerWidth - 80);
+                    cat.targetX = 40 + Math.random() * (window.innerWidth - 80);
                 }
             }
             el.style.left = cat.x + 'px';
-            el.style.transform = `scaleX(${cat.dir})`;
+            graphics.style.transform = `scaleX(${cat.dir})`;
+
+            if (currentTheme === 'pink' && !isCatHidden) {
+                const head = document.getElementById('cat-head');
+                const catRect = el.getBoundingClientRect();
+                const centerX = catRect.left + (cat.dir === 1 ? 40 : 20);
+                const centerY = catRect.top + 20;
+                const angle = Math.atan2(500 - centerY, (mouseX - centerX)) * (180 / Math.PI);
+                head.style.transformOrigin = cat.dir === 1 ? '350px 160px' : '250px 160px';
+                head.style.transform = `rotate(${angle * 0.2}deg)`;
+            }
             requestAnimationFrame(animate);
         }
-        requestAnimationFrame(animate);
 
         function triggerTabAnimation() {
             const v = document.getElementById('content');
