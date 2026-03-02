@@ -362,10 +362,11 @@
         }
 
         .task-card.resolved {
-            background: #FAFAFA;
+            background: rgba(46, 125, 50, 0.05);
+            /* Soft green tint */
             border-style: solid;
-            /* Changed from dashed for cleaner resolution timeline */
-            border-left: 4px solid #2E7D32;
+            border-left: none;
+            /* Removed the aggressive bar */
         }
 
         .timeline-header {
@@ -565,7 +566,7 @@
             font-weight: 700;
             border-radius: 10px;
             border: 1.5px solid var(--border);
-            background: #FAFAFA;
+            background: color-mix(in srgb, var(--accent), transparent 95%);
             cursor: pointer;
             transition: all 0.2s ease;
             color: var(--text-muted);
@@ -575,16 +576,16 @@
         }
 
         .effort-chip:hover {
-            border-color: var(--accent);
+            border-color: var(--accent-outline);
+            background: color-mix(in srgb, var(--accent), transparent 85%);
             color: var(--accent);
-            background: white;
         }
 
         .effort-chip.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            box-shadow: 0 4px 8px rgba(var(--accent-rgb), 0.2);
+            background: color-mix(in srgb, var(--accent), transparent 75%);
+            color: var(--accent);
+            border-color: var(--accent-outline);
+            box-shadow: none;
         }
 
         .card-actions {
@@ -596,26 +597,33 @@
             flex: 1;
         }
 
-        .btn-work {
-            flex: 1;
+        .btn-work,
+        .btn-resolve,
+        .btn-sync {
+            height: 38px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 10px;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s var(--transition-type);
+            box-shadow: none;
+            /* Removed heavy shadows */
+        }
+
+        .btn-work {
             border: 1.5px solid var(--accent-outline);
-            border-radius: 10px;
             background: color-mix(in srgb, var(--accent), transparent 85%);
             color: var(--accent);
-            font-size: 13px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
 
         .btn-work:hover {
-            background: color-mix(in srgb, var(--accent), transparent 65%);
-            border-color: color-mix(in srgb, var(--accent) 5%, var(--accent-outline));
+            background: color-mix(in srgb, var(--accent), transparent 70%);
+            transform: translateY(-1px);
         }
 
         .btn-work.active {
@@ -623,46 +631,30 @@
             color: white;
         }
 
-        @keyframes work-pop {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.15) rotate(-2deg);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .theme-pink .btn-work.popping {
-            animation: var(--work-bounce);
-        }
-
         .btn-resolve {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 10px 16px;
             border: 1.5px solid #C8E6C9;
-            --accent: #18A0FB;
-            --accent-rgb: 24, 160, 251;
-            --accent-soft: rgba(24, 160, 251, 0.08);
+            background: rgba(46, 125, 50, 0.1);
             color: #2E7D32;
-            font-size: 13px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
 
         .btn-resolve:hover {
-            border-color: color-mix(in srgb, #2E7D32 5%, #C8E6C9);
-            background: rgba(46, 125, 50, 0.3);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background: rgba(46, 125, 50, 0.2);
+            transform: translateY(-1px);
         }
+
+        .btn-sync {
+            background: var(--accent-soft);
+            color: var(--accent);
+            width: auto;
+            padding: 0 24px;
+            margin: 0 auto;
+        }
+
+        .btn-sync:hover {
+            background: var(--accent);
+            color: white;
+        }
+
 
         .btn-ignore-top {
             position: absolute;
@@ -1118,7 +1110,7 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                     <path d="m6 9 6 6 6-6" />
                 </svg>
-                <span id="effortLabel">All Efforts</span>
+                <span id="effortLabel">Efforts</span>
                 <select id="effortSelect" style="position:absolute; opacity:0; width:100%; left:0; cursor:pointer;"
                     onchange="updateEffortSelection(this.value)">
                     <option value="All">All Efforts</option>
@@ -1939,7 +1931,8 @@
         }
 
         function renderAnalytics(container) {
-            const allResolved = latestData.tasks.filter(t => t.resolved);
+            const allTasks = latestData.tasks;
+            const allResolved = allTasks.filter(t => t.resolved);
             const now = new Date();
 
             const countToday = allResolved.filter(t => {
@@ -1953,71 +1946,78 @@
             }).length;
 
             const countTotal = allResolved.length;
+            const resRate = allTasks.length > 0 ? (countTotal / allTasks.length * 100).toFixed(1) : 0;
 
-            // Most Active Author
-            const authors = {};
-            allResolved.forEach(t => authors[t.author] = (authors[t.author] || 0) + 1);
-            let topAuthor = "None";
-            let topCount = 0;
-            for (let a in authors) {
-                if (authors[a] > topCount) {
-                    topCount = authors[a];
-                    topAuthor = a;
-                }
+            // Avg Resolution Time
+            let avgResTimeStr = "N/A";
+            if (countTotal > 0) {
+                const totalTime = allResolved.reduce((sum, t) => {
+                    const rTime = new Date(t.resolvedAt || t.createdAt).getTime();
+                    const cTime = new Date(t.createdAt).getTime();
+                    return sum + Math.max(0, rTime - cTime);
+                }, 0);
+                const avgMs = totalTime / countTotal;
+                const hours = avgMs / (1000 * 60 * 60);
+                if (hours < 1) avgResTimeStr = `${Math.round(hours * 60)}m`;
+                else if (hours < 24) avgResTimeStr = `${hours.toFixed(1)}h`;
+                else avgResTimeStr = `${(hours / 24).toFixed(1)}d`;
             }
 
-            // Total Task Effort (Sum of Small=1, Medium=3, Large=5)
-            const effortMap = { 'Small': 1, 'Medium': 3, 'Large': 5 };
-            const totalEffort = allResolved.reduce((sum, t) => sum + (effortMap[t.effort] || 0), 0);
+            // Project Health
+            const pendingCount = allTasks.length - countTotal;
+            let health = "Good";
+            let healthEmoji = "🟢";
+            if (pendingCount > 15) { health = "Busy"; healthEmoji = "🔴"; }
+            else if (pendingCount > 5) { health = "Steady"; healthEmoji = "🟡"; }
 
             container.innerHTML = `
                 <div class="analytics-view">
-                    <h2 style="font-weight:900; margin-bottom:20px; font-size:22px; letter-spacing:-0.5px;">Resolution Insights</h2>
+                    <h2 style="font-weight:900; margin-bottom:20px; font-size:22px; letter-spacing:-0.5px;">Performance Insights</h2>
                     
                     <div style="margin-bottom:20px; padding:28px; background:white; border:1.5px solid var(--border); border-radius:20px; text-align:center; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
-                        <div class="stat-val" style="font-size:48px; color:var(--accent); line-height:1;">${countWeek}</div>
-                        <div class="stat-lbl" style="font-size:14px; font-weight:700; color:var(--text-main); margin-top:8px;">Completed This Week</div>
+                        <div class="stat-val" style="font-size:48px; color:var(--accent); line-height:1;">${resRate}%</div>
+                        <div class="stat-lbl" style="font-size:14px; font-weight:700; color:var(--text-main); margin-top:8px;">Resolution Rate</div>
                     </div>
 
                     <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-val" style="font-size:20px;">${countWeek}</div>
+                            <div class="stat-lbl" style="font-size:10px;">This Week</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-val" style="font-size:20px;">${avgResTimeStr}</div>
+                            <div class="stat-lbl" style="font-size:10px;">Avg. Speed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-val" style="font-size:20px; color:${health === 'Good' ? '#2E7D32' : (health === 'Steady' ? '#FBC02D' : '#D32F2F')}">${healthEmoji}</div>
+                            <div class="stat-lbl" style="font-size:10px;">${health}</div>
+                        </div>
                         <div class="stat-card">
                             <div class="stat-val" style="font-size:20px;">${countToday}</div>
                             <div class="stat-lbl" style="font-size:10px;">Today</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-val" style="font-size:20px;">${(countWeek / 7).toFixed(1)}</div>
-                            <div class="stat-lbl" style="font-size:10px;">Velocity</div>
-                        </div>
-                        <div class="stat-card">
                             <div class="stat-val" style="font-size:20px;">${countTotal}</div>
-                            <div class="stat-lbl" style="font-size:10px;">Total</div>
+                            <div class="stat-lbl" style="font-size:10px;">Lifetime</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-val" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 4px;">${topAuthor}</div>
-                            <div class="stat-lbl" style="font-size:10px;">Top Hero</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-val" style="font-size:20px;">${totalEffort}</div>
-                            <div class="stat-lbl" style="font-size:10px;">Effort Pts</div>
-                        </div>
-                        <div class="stat-card" style="background:var(--accent-soft); border-color:var(--accent-outline);">
-                            <div class="stat-val" style="font-size:20px; color:var(--accent);">🏆</div>
-                            <div class="stat-lbl" style="font-size:10px; color:var(--accent);">Active</div>
+                         <div class="stat-card">
+                            <div class="stat-val" style="font-size:20px;">${pendingCount}</div>
+                            <div class="stat-lbl" style="font-size:10px;">Open</div>
                         </div>
                     </div>
 
-                    <h3 style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px; letter-spacing:0.05em;">Recent Completions</h3>
+                    <h3 style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px; letter-spacing:0.05em;">Recent Activity</h3>
                     <div class="recent-res-list">
                         ${allResolved.slice(0, 5).map(t => `
                             <div class="recent-res-item" style="padding:12px; background:white; border:1px solid var(--border); border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-weight:600; color:var(--text-main); font-size:12px;">${t.message.slice(0, 35)}${t.message.length > 35 ? '...' : ''}</span>
                                 <span style="color:var(--text-muted); font-size:11px; font-weight:500;">${formatRelativeTime(t.resolvedAt || t.createdAt)}</span>
                             </div>
-                        `).join('') || '<div style="padding:24px; text-align:center; color:#888; font-size:13px">No resolved tasks yet.</div>'}
+                        `).join('') || '<div style="padding:24px; text-align:center; color:#888; font-size:13px">No activity tracked yet.</div>'}
                     </div>
 
-                    <div style="margin-top:32px; padding:24px; background:var(--accent-soft); border-radius:20px; text-align:center; border:1px solid var(--accent-outline);">
-                        <p style="font-size:13px; color:var(--accent); font-weight:700; line-height:1.4;">You've mastered ${countTotal} tasks so far.<br/>The team is crushing it!</p>
+                    <div style="margin-top:32px; padding:24px; background:white; border:1.5px solid var(--border); border-radius:20px; text-align:center;">
+                        <p style="font-size:13px; color:var(--text-muted); font-weight:700; line-height:1.4;">Project health is currently <b>${health}</b>.<br/>Keep focus on the ${pendingCount} open items!</p>
                     </div>
                 </div>
             `;
