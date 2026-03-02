@@ -1710,11 +1710,6 @@
             if (diffMin < 60) return `${diffMin} ${diffMin === 1 ? 'minute' : 'minutes'} ago`;
             if (diffHour < 24) return `${diffHour} ${diffHour === 1 ? 'hour' : 'hours'} ago`;
 
-            if (diffDay === 1) {
-                const remainingHours = diffHour % 24;
-                return `1 day ${remainingHours} ${remainingHours === 1 ? 'hour' : 'hours'} ago`;
-            }
-
             if (diffDay < 7) return `${diffDay} ${diffDay === 1 ? 'day' : 'days'} ago`;
             if (diffDay < 30) return `${Math.floor(diffDay / 7)}w ago`;
             if (diffDay < 365) return `${Math.floor(diffDay / 30)}mo ago`;
