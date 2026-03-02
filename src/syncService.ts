@@ -17,6 +17,7 @@ export class SyncService {
                     ...live,
                     resolved: stored.resolved ?? live.resolved,
                     effort: stored.effort || null,
+                    ignored: stored.ignored || false,
                     isCurrentlyWorking: stored.isCurrentlyWorking || false,
                     assignee: stored.assignee || live.assignee
                 });

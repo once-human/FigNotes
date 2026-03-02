@@ -165,6 +165,7 @@
 
         /* --- Control Row --- */
         .control-row {
+            position: relative;
             display: flex;
             padding: 12px 16px;
             background: #FAFAFA;
@@ -172,6 +173,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            overflow: visible;
         }
 
         .status-toggle {
@@ -271,7 +273,7 @@
         }
 
         .progress-box {
-            padding: 10px 16px;
+            padding: 10px 0;
             background: white;
         }
 
@@ -280,7 +282,8 @@
             justify-content: space-between;
             font-size: 10px;
             font-weight: 800;
-            margin-bottom: 4px;
+            margin-top: 4px;
+            padding: 0 16px;
             color: var(--text-muted);
             text-transform: uppercase;
         }
@@ -288,7 +291,6 @@
         .progress-bar-bg {
             height: 4px;
             background: #F0F0F0;
-            border-radius: 100px;
             overflow: hidden;
         }
 
@@ -381,8 +383,26 @@
             }
         }
 
+        @keyframes button-pulse {
+            0% {
+                box-shadow: 0 0 0 0 transparent;
+            }
+
+            50% {
+                box-shadow: 0 0 8px 2px var(--btn-pulse-color, var(--accent));
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 transparent;
+            }
+        }
+
         .task-card.pulsing {
             animation: shadow-pulse 0.4s ease-out;
+        }
+
+        .btn-pulsing {
+            animation: button-pulse 0.3s ease-out;
         }
 
         .card-header {
@@ -408,13 +428,21 @@
         }
 
         .author-info {
-            flex: 1;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
         }
 
         .author-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .author-time {
             font-size: 11px;
-            font-weight: 600;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         .meta {
@@ -447,28 +475,32 @@
             font-weight: 800;
             border-radius: 8px;
             border: 1.5px solid var(--border);
-            background: #FCFCFC;
+            background: color-mix(in srgb, color-mix(in srgb, var(--accent), #888888), transparent 90%);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             color: var(--text-muted);
         }
 
         .effort-chip:hover {
             border-color: var(--accent-outline);
-            background: #fff;
+            background: color-mix(in srgb, color-mix(in srgb, var(--accent), #888888), transparent 70%);
             color: var(--accent);
         }
 
         .effort-chip.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            background: color-mix(in srgb, var(--accent), transparent 50%);
+            color: var(--accent);
+            border-color: var(--accent-outline);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
         }
 
         .card-actions {
             display: flex;
             gap: 8px;
+        }
+
+        .card-actions button {
+            flex: 1;
         }
 
         .btn-work {
@@ -478,19 +510,19 @@
             justify-content: center;
             gap: 6px;
             padding: 10px;
-            border: none;
+            border: 1.5px solid var(--accent-outline);
             border-radius: 10px;
-            background: var(--accent-soft);
+            background: color-mix(in srgb, var(--accent), transparent 85%);
             color: var(--accent);
             font-size: 13px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
 
         .btn-work:hover {
-            background: var(--accent);
-            color: white;
+            background: color-mix(in srgb, var(--accent), transparent 65%);
+            border-color: color-mix(in srgb, var(--accent) 5%, var(--accent-outline));
         }
 
         .btn-work.active {
@@ -519,29 +551,56 @@
         .btn-resolve {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             padding: 10px 16px;
-            border: 1.5px solid var(--border);
-            border-radius: 100px;
-            background: white;
-            color: var(--text-muted);
+            border: 1.5px solid #C8E6C9;
+            border-radius: 10px;
+            background: rgba(46, 125, 50, 0.1);
+            color: #2E7D32;
             font-size: 13px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
 
         .btn-resolve:hover {
-            border-color: #A5D6A7;
-            color: #2E7D32;
+            border-color: color-mix(in srgb, #2E7D32 5%, #C8E6C9);
+            background: rgba(46, 125, 50, 0.3);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-ignore-top {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .btn-ignore-top:hover {
+            background: #F5F5F5;
+            color: var(--text-main);
+            border-color: var(--border);
         }
 
         /* --- THE CAT --- */
         #cat-container {
-            position: fixed;
-            bottom: 88px;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 60px;
+            height: 100%;
             pointer-events: none;
             z-index: 500;
             display: none;
@@ -559,13 +618,49 @@
             pointer-events: none;
         }
 
+        .cat-track {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 12px;
+        }
+
+        .cat-track.top {
+            display: none;
+        }
+
+        .cat-track.bottom {
+            bottom: 5px;
+        }
+
         .cat {
             position: absolute;
-            width: 68px;
-            height: 50px;
+            width: 48px;
+            height: 32px;
             cursor: pointer;
             pointer-events: auto;
-            will-change: transform, left;
+            will-change: transform, left, right;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .cat-food {
+            position: absolute;
+            bottom: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 499;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+            animation: food-bounce 0.8s infinite alternate ease-in-out;
+        }
+
+        @keyframes food-bounce {
+            from {
+                transform: translateY(0) scale(1);
+            }
+
+            to {
+                transform: translateY(-4px) scale(1.1);
+            }
         }
 
         .cat-svg {
@@ -576,22 +671,49 @@
         }
 
         .cat-legs {
-            transform-origin: top;
+            transform-box: fill-box;
+            transform-origin: 50% 5%;
         }
 
         .cat-legs-walking {
-            animation: leg-wiggle 0.35s infinite alternate ease-in-out;
+            animation: leg-wiggle 0.3s infinite alternate ease-in-out;
+        }
+
+        .cat-tail {
+            transform-origin: 200px 240px;
+            animation: tail-wag 1.5s infinite ease-in-out;
+        }
+
+        .cat-eye {
+            transform-origin: center;
+            animation: eye-blink 4s infinite;
+        }
+
+        .cat-mouth {
+            transform-origin: center;
+            animation: mouth-twitch 5s infinite;
         }
 
         .meow-bubble {
             position: absolute;
-            top: -35px;
+            top: -24px;
             background: white;
             color: var(--accent);
-            padding: 5px 12px;
-            border-radius: 12px;
-            font-size: 13px;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 10px;
             font-weight: 800;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            border: 1px solid var(--accent-outline);
+            z-index: 100;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.2s;
+        }
+
+        .meow-bubble.showing {
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
             border: 2px solid var(--accent-outline);
             animation: meow-float 1.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -619,16 +741,68 @@
 
         @keyframes leg-wiggle {
             0% {
-                transform: rotate(-7deg);
+                transform: rotate(-8deg);
             }
 
             100% {
-                transform: rotate(7deg);
+                transform: rotate(8deg);
+            }
+        }
+
+        @keyframes tail-wag {
+            0% {
+                transform: rotate(-10deg);
+            }
+
+            50% {
+                transform: rotate(20deg);
+            }
+
+            100% {
+                transform: rotate(-10deg);
+            }
+        }
+
+        @keyframes eye-blink {
+
+            0%,
+            90%,
+            100% {
+                transform: scaleY(1);
+            }
+
+            95% {
+                transform: scaleY(0.1);
+            }
+        }
+
+        @keyframes mouth-twitch {
+
+            0%,
+            90%,
+            100% {
+                transform: scale(1);
+            }
+
+            95% {
+                transform: scale(1.2);
             }
         }
 
         .cat-jumping {
-            animation: jump 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: cat-jump 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes cat-jump {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
         }
 
         .footer {
@@ -816,6 +990,9 @@
             </div>
         </div>
         <div class="control-row">
+            <div id="cat-container">
+                <div class="cat-track bottom" id="catTrackBottom"></div>
+            </div>
             <div class="status-toggle">
                 <div class="s-toggle active" id="sTogglePending" onclick="switchSecondaryTab('pending')">Pending <span
                         class="s-count" id="countPending">0</span></div>
@@ -850,41 +1027,16 @@
             </div>
         </div>
         <div class="progress-box">
-            <div class="progress-stats"><span id="statText">0 pending</span><span id="statPercent">0%</span></div>
             <div class="progress-bar-bg">
                 <div id="progressBar" class="progress-fill" style="width: 0%;"></div>
             </div>
+            <div class="progress-stats"><span id="statText">0 pending</span><span id="statPercent">0%</span></div>
         </div>
     </div>
 
     <div class="viewport" id="content"></div>
 
-    <div id="cat-container">
-        <div id="the-cat" class="cat" onclick="catMeow()">
-            <svg class="cat-svg" viewBox="0 0 600 400">
-                <g class="cat-legs">
-                    <path d="M225,260v105" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
-                    <path d="M340,260v105" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
-                </g>
-                <g class="cat-body">
-                    <path class="cat-tail" d="M208,240s-35.8-1.5-46-42c-5.5-25.3-9.2-40.5-32-48"
-                        style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
-                    <rect x="190" y="201" width="200" height="118" rx="58.9" style="fill:#eba13d" />
-                    <g class="cat-head" id="cat-head">
-                        <path d="M330,121c5,16-1,34-14,38s-29-5-34-22c-8-25,1-49,10-52,8-2,30,11,38,36z"
-                            style="fill:#eba13d" />
-                        <path d="M372,121c-5,16,1,34,14,38s29-5,34-22c8-25-1-49-10-52-8-2-30,11-38,36z"
-                            style="fill:#eba13d" />
-                        <path d="M430,164c0,43-35,67-78,67s-78-23-78-66,41-75,78-75,78,32,78,74z"
-                            style="fill:#eba13d" />
-                        <circle cx="320" cy="156" r="10" style="fill:#33281b" />
-                        <circle cx="382" cy="156" r="10" style="fill:#33281b" />
-                        <path d="M373,200c0,2-4,6-9,6s-9-4-9-6,4-4,9-4,9,2,9,4z" style="fill:#33281b" />
-                    </g>
-                </g>
-            </svg>
-        </div>
-    </div>
+
 
     <div class="footer"><button class="btn-sync" onclick="triggerSync()"><svg width="16" height="16" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -946,11 +1098,7 @@
         let sToggle = 'pending';
         let effortFilter = 'All';
         let isCatHidden = false;
-
-        let cat = { x: 20, targetX: 20, dir: 1, jumping: false };
-        let mouseX = 0;
-
-        window.addEventListener('mousemove', (e) => { mouseX = e.clientX; });
+        let catInterval = null;
 
         function applyTheme(theme) {
             if (currentTheme === theme && document.body.classList.contains('theme-' + theme)) return;
@@ -959,15 +1107,23 @@
             document.body.classList.add('theme-' + theme);
             document.getElementById('catToggle').classList.toggle('active', theme === 'pink');
             if (theme === 'pink') {
-                cat.x = -80; cat.targetX = 60;
                 document.body.classList.toggle('hide-cat', isCatHidden);
+                if (!catInterval && !isCatHidden) {
+                    spawnCat();
+                    catInterval = setInterval(spawnCat, 12000);
+                }
             }
             else {
-                cat.targetX = window.innerWidth + 80;
                 document.body.classList.remove('hide-cat');
+                if (catInterval) {
+                    clearInterval(catInterval);
+                    catInterval = null;
+                }
             }
             render();
         }
+
+        const MAX_CATS = 3;
 
         function toggleHideCat(checked) {
             if (checked !== undefined) isCatHidden = !checked;
@@ -976,50 +1132,537 @@
             document.body.classList.toggle('hide-cat', isCatHidden);
             const cb = document.getElementById('catCheckbox');
             if (cb) cb.checked = !isCatHidden;
+            if (isCatHidden && catInterval) {
+                clearInterval(catInterval);
+                catInterval = null;
+            } else if (!isCatHidden && currentTheme === 'pink' && !catInterval) {
+                if (activeCats.length === 0) spawnCat();
+                catInterval = setInterval(() => {
+                    if (activeCats.length < MAX_CATS) {
+                        const roll = Math.random();
+                        if (activeCats.length === 0) {
+                            if (roll < 0.01) spawnCat(true); // 1% chance for dual start
+                            else if (roll < 0.95) spawnCat(); // Single cat common
+                        } else if (activeCats.length === 1) {
+                            if (roll < 0.01) spawnCat(); // 1% for 2nd cat
+                        } else if (activeCats.length === 2) {
+                            if (roll < 0.001) spawnCat(); // 0.1% for 3rd cat
+                        }
+                    }
+                    if (Math.random() < 0.15) spawnFood();
+                }, 15000);
+            }
+
             parent.postMessage({ pluginMessage: { type: 'set-hide-cat', payload: isCatHidden } }, '*');
         }
 
-        function catMeow() {
-            if (cat.jumping || isCatHidden) return;
-            cat.jumping = true;
-            const bubble = document.createElement('div');
-            bubble.className = 'meow-bubble';
-            bubble.innerText = 'Meoww!';
+        // Global meow removed as per user request (focus mode)
 
-            if (cat.dir === -1) {
-                bubble.style.right = '25px';
-                bubble.style.left = 'auto';
-            } else {
-                bubble.style.left = '25px';
-                bubble.style.right = 'auto';
-            }
+        function spawnFood() {
+            if (document.body.classList.contains('hide-cat') || currentTheme !== 'pink') return;
+            const track = document.getElementById('catTrackBottom');
+            if (!track || track.querySelectorAll('.cat-food').length >= 1) return;
 
-            const el = document.getElementById('the-cat');
-            el.appendChild(bubble);
-            setTimeout(() => bubble.remove(), 1500);
-            el.classList.add('cat-jumping');
-            setTimeout(() => { el.classList.remove('cat-jumping'); cat.jumping = false; }, 500);
+            const food = document.createElement('div');
+            food.className = 'cat-food';
+            food.innerHTML = ['🍗', '🐟', '🥛', '🍪'][Math.floor(Math.random() * 4)];
+            const leftPos = 80 + Math.random() * (track.offsetWidth - 160);
+            food.style.left = leftPos + 'px';
+            track.appendChild(food);
+            setTimeout(() => {
+                food.style.opacity = '0';
+                food.style.transition = 'opacity 1s';
+                setTimeout(() => food.remove(), 1000);
+            }, 12000);
         }
 
-        function animate() {
-            const el = document.getElementById('the-cat');
-            const legs = el.querySelector('.cat-legs');
-            let dx = cat.targetX - cat.x;
-            if (Math.abs(dx) > 2) {
-                cat.x += Math.sign(dx) * 2;
-                legs.classList.add('cat-legs-walking');
-                cat.dir = Math.sign(dx);
+        let activeCats = [];
+
+        function spawnCat(isDual = false) {
+            if (document.body.classList.contains('hide-cat') || currentTheme !== 'pink') return;
+            if (activeCats.length >= MAX_CATS) return;
+            const track = document.getElementById('catTrackBottom');
+            if (!track) return;
+
+            const createOne = (side) => {
+                if (activeCats.length >= MAX_CATS) return;
+                const cat = document.createElement('div');
+                cat.className = 'cat';
+
+                let pos = side === 'left' ? -60 : track.offsetWidth + 60;
+                let dir = side === 'left' ? 1 : -1;
+                let state = 'walking'; // walking, sitting, waiting, eating, approaching, staring, fighting, loving, retreating
+                let speed = 0.6 + Math.random() * 0.4;
+                let waitTicks = 0;
+                let socialTicks = 0; // Track social fatigue
+                let interactionCooldown = 0; // Cooldown after specific actions
+                let socialTarget = null;
+                let isFatigued = false;
+
+                cat.style.left = pos + 'px';
+                cat.style.transition = 'transform 0.1s, top 0.1s';
+                cat.innerHTML = `
+                    <div class="meow-bubble"></div>
+                    <svg class="cat-svg" viewBox="0 0 600 400">
+                        <g class="cat-legs cat-legs-walking">
+                            <path d="M225,268v97" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                            <path d="M340,268v97" style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                        </g>
+                        <g class="cat-body">
+                            <path class="cat-tail" d="M208,240s-35.8-1.5-46-42c-5.5-25.3-9.2-40.5-32-48"
+                                style="fill:none;stroke:#eba13d;stroke-linecap:round;stroke-width:28px" />
+                            <rect x="190" y="201" width="200" height="118" rx="58.9" style="fill:#eba13d" />
+                            <g class="cat-head">
+                                <path d="M330,121c5,16-1,34-14,38s-29-5-34-22c-8-25,1-49,10-52,8-2,30,11,38,36z"
+                                    style="fill:#eba13d" />
+                                <path d="M372,121c-5,16,1,34,14,38s29-5,34-22c8-25-1-49-10-52-8-2-30,11-38,36z"
+                                    style="fill:#eba13d" />
+                                <path d="M430,164c0,43-35,67-78,67s-78-23-78-66,41-75,78-75,78,32,78,74z"
+                                    style="fill:#eba13d" />
+                                <circle class="cat-eye" cx="320" cy="156" r="10" style="fill:#33281b" />
+                                <circle class="cat-eye" cx="382" cy="156" r="10" style="fill:#33281b" />
+                                <path class="cat-mouth" d="M373,200c0,2-4,6-9,6s-9-4-9-6,4-4,9-4,9,2,9,4z" style="fill:#33281b" />
+                            </g>
+                        </g>
+                    </svg>
+                `;
+
+                const svg = cat.querySelector('.cat-svg');
+                const legs = cat.querySelector('.cat-legs');
+                const bubble = cat.querySelector('.meow-bubble');
+
+                const updateFlip = (scale = 1) => {
+                    svg.style.transform = dir === -1 ? `scaleX(-${scale}) scaleY(${scale})` : `scaleX(${scale}) scaleY(${scale})`;
+                };
+                updateFlip();
+
+                const triggerMeow = (text) => {
+                    const shorts = ['Meow!', 'Nya!', 'Mew?', 'Purr!', '!!', '??', '❤', '✿', '★', '✨', '💢'];
+                    bubble.innerText = text || shorts[Math.floor(Math.random() * shorts.length)];
+                    bubble.classList.remove('showing');
+                    void bubble.offsetWidth;
+                    bubble.classList.add('showing');
+                };
+
+                const setExternalState = (newState, target, ticks = 0) => {
+                    state = newState;
+                    socialTarget = target;
+                    waitTicks = ticks;
+                    if (newState === 'fighting' && ticks > 100) isFatigued = true;
+                    legs.classList.remove('cat-legs-walking');
+                };
+
+                cat.onclick = (e) => {
+                    e.stopPropagation();
+                    cat.classList.add('cat-jumping');
+                    setTimeout(() => cat.classList.remove('cat-jumping'), 500);
+                    triggerMeow();
+                };
+
+                track.appendChild(cat);
+
+                const catObj = { el: cat, pos, dir, side, setExternalState };
+                activeCats.push(catObj);
+
+                const interval = setInterval(() => {
+                    // Smart proximity check
+                    let nearestDist = 1000;
+                    let targetObj = null;
+                    activeCats.forEach(other => {
+                        if (other.el !== cat) {
+                            const d = Math.abs(pos - other.pos);
+                            if (d < nearestDist) { nearestDist = d; targetObj = other; }
+                        }
+                    });
+
+                    const isVerySocial = nearestDist < 120;
+                    if (isVerySocial) {
+                        socialTicks++;
+                        if (socialTicks > 3600) { // ~60s fatigue limit
+                            state = 'fighting';
+                            waitTicks = 200; // Extra long retreat
+                            isFatigued = true;
+                            triggerMeow('💢');
+                            if (targetObj) targetObj.setExternalState('fighting', catObj, 200);
+                            socialTicks = 0;
+                        }
+                    } else if (nearestDist > 200) {
+                        socialTicks = Math.max(0, socialTicks - 5); // Recover distance
+                    }
+
+                    if (interactionCooldown > 0) interactionCooldown--;
+
+                    if (state === 'walking') {
+                        pos += (speed * dir);
+                        cat.style.left = pos + 'px';
+                        cat.style.transform = '';
+                        cat.style.top = '0px';
+                        legs.classList.add('cat-legs-walking');
+
+                        if (nearestDist < 120 && nearestDist > 40 && Math.random() < 0.05 && socialTicks < 2000 && interactionCooldown <= 0) {
+                            state = 'approaching';
+                            socialTarget = targetObj;
+                        }
+
+                        // Food check
+                        const foods = Array.from(track.querySelectorAll('.cat-food'));
+                        foods.forEach(f => {
+                            if (Math.abs(pos - parseFloat(f.style.left)) < 15) {
+                                state = 'eating';
+                                waitTicks = 120;
+                                legs.classList.remove('cat-legs-walking');
+                                triggerMeow('Yum!');
+                                setTimeout(() => f.remove(), 500);
+                            }
+                        });
+
+                        if (Math.random() < 0.008) {
+                            const roll = Math.random();
+                            if (roll < 0.3) {
+                                state = 'sitting';
+                                waitTicks = 150 + Math.random() * 200;
+                            } else if (roll < 0.45) {
+                                state = 'waiting';
+                                waitTicks = 100 + Math.random() * 100;
+                            } else if (roll < 0.55) {
+                                state = 'stretching';
+                                waitTicks = 80;
+                            } else if (roll < 0.65) {
+                                state = 'grooming';
+                                waitTicks = 120;
+                            } else if (roll < 0.70) {
+                                state = 'yawning';
+                                waitTicks = 60;
+                            } else if (roll < 0.72) { // Rarer
+                                state = 'scratching';
+                                waitTicks = 120;
+                                triggerMeow('*scritch*');
+                            } else if (roll < 0.80) {
+                                state = 'bird_watching';
+                                waitTicks = 150;
+                                triggerMeow('k-k-k');
+                            } else if (roll < 0.85) {
+                                state = 'zoomies';
+                                waitTicks = 60;
+                                triggerMeow('💨');
+                            } else if (roll < 0.90) {
+                                state = 'belly_roll';
+                                waitTicks = 120;
+                                triggerMeow('✨');
+                            } else if (roll < 0.95) {
+                                state = 'sneaking';
+                                waitTicks = 100 + Math.random() * 100;
+                            } else {
+                                state = 'chasing_tail';
+                                waitTicks = 120;
+                            }
+                            legs.classList.remove('cat-legs-walking');
+                        }
+
+                        if (pos > track.offsetWidth + 150 || pos < -150) {
+                            clearInterval(interval);
+                            cat.remove();
+                            activeCats = activeCats.filter(c => c.el !== cat);
+                        }
+                    } else if (state === 'approaching') {
+                        if (!socialTarget || !activeCats.includes(socialTarget)) {
+                            state = 'walking';
+                        } else {
+                            const dist = Math.abs(pos - socialTarget.pos);
+                            if (dist < 40) {
+                                state = 'staring';
+                                waitTicks = 100 + Math.random() * 80;
+                                legs.classList.remove('cat-legs-walking');
+                                triggerMeow(['??', '!!', 'Mew?'][Math.floor(Math.random() * 3)]);
+                                // Synchronize staring if target is walking/sitting
+                                socialTarget.setExternalState('staring', catObj, waitTicks);
+                            } else {
+                                dir = pos < socialTarget.pos ? 1 : -1;
+                                updateFlip();
+                                pos += (speed * 0.5 * dir);
+                                cat.style.left = pos + 'px';
+                                legs.classList.add('cat-legs-walking');
+                            }
+                        }
+                    } else if (state === 'staring') {
+                        waitTicks--;
+                        if (socialTarget && activeCats.includes(socialTarget)) {
+                            dir = pos < socialTarget.pos ? 1 : -1;
+                            updateFlip();
+                            cat.style.transform = `translateX(${(waitTicks % 6 - 3) * 0.4}px)`;
+                        } else {
+                            state = 'walking';
+                        }
+
+                        if (waitTicks <= 0) {
+                            const roll = Math.random();
+                            if (roll < 0.18) { // Sync Fight (Slightly reduced to fit love boost)
+                                state = 'fighting';
+                                waitTicks = 60;
+                                triggerMeow('💢');
+                                if (socialTarget) socialTarget.setExternalState('fighting', catObj, 60);
+                            } else if (roll < 0.43) { // Sync Love (Boosted to 25%)
+                                state = 'loving';
+                                waitTicks = 180;
+                                triggerMeow('❤');
+                                if (socialTarget) socialTarget.setExternalState('loving', catObj, 180);
+                            } else if (roll < 0.53) { // Sync Sniff
+                                state = 'sniffing';
+                                waitTicks = 150;
+                                triggerMeow('??');
+                                if (socialTarget) socialTarget.setExternalState('idle_sniffed', catObj, 150);
+                            } else if (roll < 0.63) { // Sync Group Sleep
+                                state = 'sleeping_group';
+                                waitTicks = 400;
+                                triggerMeow('💤');
+                                if (socialTarget) socialTarget.setExternalState('sleeping_group', catObj, 400);
+                            } else if (roll < 0.78) { // Sync Nuzzle / Head Bunt
+                                const subRoll = Math.random();
+                                if (subRoll < 0.5) {
+                                    state = 'nuzzling';
+                                    waitTicks = 150;
+                                    triggerMeow('❤');
+                                    if (socialTarget) socialTarget.setExternalState('nuzzling', catObj, 150);
+                                } else {
+                                    state = 'head_bunting';
+                                    waitTicks = 120;
+                                    triggerMeow('❤');
+                                    if (socialTarget) socialTarget.setExternalState('head_bunting', catObj, 120);
+                                }
+                            } else if (roll < 0.88) { // Sync Sharing Meow
+                                state = 'sharing_meow';
+                                waitTicks = 160;
+                                triggerMeow('Meow!');
+                                if (socialTarget) socialTarget.setExternalState('sharing_meow', catObj, 160);
+                            } else if (roll < 0.94) { // Sync Playing Bug
+                                state = 'playing_bug';
+                                waitTicks = 120;
+                                triggerMeow('!!');
+                                if (socialTarget) socialTarget.setExternalState('playing_bug', catObj, 120);
+                            } else if (roll < 0.97) { // Sync Groom Each Other
+                                state = 'grooming';
+                                waitTicks = 120;
+                                triggerMeow('✿');
+                                if (socialTarget) socialTarget.setExternalState('grooming', catObj, 120);
+                            } else {
+                                state = 'retreating';
+                                waitTicks = 60;
+                                dir *= -1;
+                                updateFlip();
+                                triggerMeow('💨');
+                            }
+                        }
+                    } else if (state === 'head_bunting') {
+                        waitTicks--;
+                        if (socialTarget && activeCats.includes(socialTarget)) {
+                            const approachDir = pos < socialTarget.pos ? 1 : -1;
+                            pos += (speed * 0.3 * approachDir);
+                            cat.style.left = pos + 'px';
+                            const head = cat.querySelector('.cat-head');
+                            if (head) head.style.transform = `rotate(${approachDir * 20}deg) translateX(${approachDir * 10}px)`;
+                        }
+                        if (waitTicks <= 0) {
+                            const head = cat.querySelector('.cat-head');
+                            if (head) head.style.transform = '';
+                            state = 'walking';
+                        }
+                    } else if (state === 'scratching') {
+                        waitTicks--;
+                        // Rapid digging leg movement
+                        if (waitTicks % 2 === 0) legs.classList.add('cat-legs-walking');
+                        else legs.classList.remove('cat-legs-walking');
+                        // Rhythmic body tilting for "digging" look
+                        const tilt = Math.sin(waitTicks * 0.6) * 4;
+                        const jitter = (waitTicks % 2 === 0) ? 1 : 0;
+                        svg.style.transform = (dir === -1 ? `scaleX(-1) rotate(${-tilt}deg)` : `scaleX(1) rotate(${tilt}deg)`);
+                        cat.style.top = jitter + 'px';
+                        if (waitTicks <= 0) {
+                            cat.style.top = '0px';
+                            updateFlip();
+                            state = 'walking';
+                        }
+                    } else if (state === 'bird_watching') {
+                        waitTicks--;
+                        const head = cat.querySelector('.cat-head');
+                        // gentler rotate, ignore translateY to keep head seated
+                        if (head) head.style.transform = 'rotate(-15deg)';
+                        // Tail wiggle
+                        const tail = cat.querySelector('.cat-tail');
+                        if (tail) tail.style.transform = `rotate(${Math.sin(waitTicks * 0.5) * 10}deg)`;
+                        if (waitTicks % 40 === 0) triggerMeow('k-k-k');
+                        if (waitTicks <= 0) {
+                            if (head) head.style.transform = '';
+                            if (tail) tail.style.transform = '';
+                            interactionCooldown = 60; // 1s cooldown
+                            state = 'walking';
+                        }
+                    } else if (state === 'zoomies') {
+                        waitTicks--;
+                        pos += (speed * 6 * dir);
+                        cat.style.left = pos + 'px';
+                        legs.classList.add('cat-legs-walking');
+                        if (waitTicks % 20 === 0) triggerMeow('💨');
+                        if (waitTicks <= 0) state = 'walking';
+                    } else if (state === 'belly_roll') {
+                        waitTicks--;
+                        const angle = Math.min(180, (120 - waitTicks) * 6);
+                        svg.style.transform = (dir === -1 ? 'scaleX(-1)' : 'scaleX(1)') + ` rotate(${angle}deg)`;
+                        if (waitTicks <= 0) {
+                            updateFlip();
+                            state = 'walking';
+                        }
+                    } else if (state === 'sneaking') {
+                        waitTicks--;
+                        pos += (speed * 0.4 * dir);
+                        cat.style.left = pos + 'px';
+                        // Fast legs, slow body
+                        if (waitTicks % 6 < 3) legs.classList.add('cat-legs-walking');
+                        else legs.classList.remove('cat-legs-walking');
+                        cat.style.top = '5px'; // Crouched
+                        if (waitTicks <= 0) state = 'walking';
+                    } else if (state === 'nuzzling') {
+                        waitTicks--;
+                        if (socialTarget && activeCats.includes(socialTarget)) {
+                            // Lean in closer
+                            pos += (speed * 0.2 * (pos < socialTarget.pos ? 1 : -1));
+                            cat.style.left = pos + 'px';
+                            cat.style.transform = `rotate(${(pos < socialTarget.pos ? 5 : -5)}deg)`;
+                        }
+                        if (waitTicks <= 0) {
+                            cat.style.transform = '';
+                            state = 'walking';
+                        }
+                    } else if (state === 'sharing_meow') {
+                        waitTicks--;
+                        if (waitTicks % 40 === 0) {
+                            triggerMeow(waitTicks % 80 === 0 ? 'Meow!' : 'Nya!');
+                        }
+                        if (waitTicks <= 0) state = 'walking';
+                    } else if (state === 'playing_bug') {
+                        waitTicks--;
+                        // Bat at the air
+                        cat.style.top = (waitTicks % 20 < 10) ? '-10px' : '0px';
+                        cat.style.transform = `rotate(${(waitTicks % 10 - 5) * 2}deg)`;
+                        if (waitTicks % 60 === 0) triggerMeow('!!');
+                        if (waitTicks <= 0) {
+                            cat.style.top = '0px';
+                            cat.style.transform = '';
+                            state = 'walking';
+                        }
+                    } else if (state === 'grooming') {
+                        waitTicks--;
+                        cat.style.transform = `rotate(${(waitTicks % 20 < 10) ? 10 : -10}deg)`;
+                        if (waitTicks <= 0) {
+                            cat.style.transform = '';
+                            state = 'walking';
+                        }
+                    } else if (state === 'yawning') {
+                        waitTicks--;
+                        const yawh = 1 + Math.sin((60 - waitTicks) * 0.05) * 0.2;
+                        cat.style.transform = `scaleY(${yawh})`;
+                        if (waitTicks === 30) triggerMeow('~*');
+                        if (waitTicks <= 0) {
+                            cat.style.transform = '';
+                            state = 'walking';
+                        }
+                    } else if (state === 'pouncing') {
+                        waitTicks--;
+                        if (waitTicks > 30) cat.style.top = '-5px';
+                        else if (waitTicks > 10) {
+                            cat.style.top = '-20px';
+                            pos += (speed * 4 * dir);
+                            cat.style.left = pos + 'px';
+                        } else cat.style.top = '0px';
+                        if (waitTicks <= 0) state = 'walking';
+                    } else if (state === 'stretching') {
+                        waitTicks--;
+                        const stretch = 1 + Math.sin((80 - waitTicks) * 0.04) * 0.15;
+                        svg.style.transform = (dir === -1 ? 'scaleX(-1)' : 'scaleX(1)') + ` scaleY(${stretch})`;
+                        if (waitTicks <= 0) state = 'walking';
+                    } else if (state === 'chasing_tail') {
+                        waitTicks--;
+                        cat.style.transform = `rotate(${(120 - waitTicks) * 15}deg)`;
+                        if (waitTicks <= 0) {
+                            cat.style.transform = '';
+                            state = 'walking';
+                        }
+                    } else if (state === 'sniffing') {
+                        waitTicks--;
+                        if (socialTarget && activeCats.includes(socialTarget)) {
+                            // Gentle wiggle near target
+                            cat.style.transform = `translateX(${(waitTicks % 10 - 5) * 0.3}px)`;
+                        }
+                        if (waitTicks <= 0) state = 'walking';
+                    } else if (state === 'idle_sniffed') {
+                        waitTicks--;
+                        if (waitTicks <= 0) state = 'walking';
+                    } else if (state === 'sleeping_group') {
+                        waitTicks--;
+                        if (waitTicks % 100 === 0) triggerMeow('💤');
+                        if (waitTicks <= 0) state = 'walking';
+                    } else if (state === 'loving') {
+                        waitTicks--;
+                        if (socialTarget && activeCats.includes(socialTarget)) {
+                            // Stay close but wiggle a bit
+                            pos += (speed * 0.1 * (pos < socialTarget.pos ? 1 : -1));
+                            cat.style.left = pos + 'px';
+                            if (waitTicks % 40 === 0) triggerMeow('❤');
+                        }
+                        if (waitTicks <= 0) {
+                            state = 'walking';
+                            dir *= -1; updateFlip();
+                        }
+                    } else if (state === 'fighting') {
+                        waitTicks--;
+                        // Jump at start
+                        if (waitTicks > 180 || (waitTicks > 40 && !isFatigued)) cat.style.top = '-15px';
+                        else cat.style.top = '0px';
+
+                        if (socialTarget && activeCats.includes(socialTarget)) {
+                            dir = pos < socialTarget.pos ? -1 : 1;
+                        }
+                        updateFlip(1.2);
+                        pos += (speed * (isFatigued ? 3.5 : 2.2) * dir);
+                        cat.style.left = pos + 'px';
+                        legs.classList.add('cat-legs-walking');
+                        if (waitTicks <= 0) {
+                            updateFlip(1);
+                            state = 'walking';
+                            isFatigued = false;
+                            speed *= 1.5;
+                            setTimeout(() => speed /= 1.5, 3000);
+                        }
+                    } else if (state === 'retreating') {
+                        waitTicks--;
+                        pos += (speed * 1.5 * dir);
+                        cat.style.left = pos + 'px';
+                        legs.classList.add('cat-legs-walking');
+                        if (waitTicks <= 0) state = 'walking';
+                    } else {
+                        waitTicks--;
+                        if (waitTicks <= 0) {
+                            state = 'walking';
+                            if (Math.random() < 0.3) { dir *= -1; updateFlip(); }
+                        }
+                    }
+
+                    catObj.pos = pos;
+                    catObj.dir = dir;
+
+                    const chatterChance = isVerySocial ? 0.01 : 0.00001;
+                    if (state !== 'eating' && state !== 'staring' && state !== 'fighting' && state !== 'loving' && Math.random() < chatterChance) {
+                        triggerMeow();
+                    }
+                }, 16);
+            };
+
+            if (isDual) {
+                createOne('left');
+                setTimeout(() => createOne('right'), 1500);
             } else {
-                legs.classList.remove('cat-legs-walking');
-                if (currentTheme === 'pink' && !isCatHidden && Math.random() < 0.005) {
-                    cat.targetX = Math.random() * (window.innerWidth - 80);
-                }
+                createOne(Math.random() < 0.5 ? 'left' : 'right');
             }
-            el.style.left = cat.x + 'px';
-            el.style.transform = `scaleX(${cat.dir})`;
-            requestAnimationFrame(animate);
         }
-        requestAnimationFrame(animate);
 
         function triggerTabAnimation() {
             const v = document.getElementById('content');
@@ -1051,6 +1694,25 @@
             const amount = Math.random() * 1.5 + 0.5;
             const tilt = (side * amount).toFixed(2);
             el.style.setProperty('--tilt', tilt + 'deg');
+        }
+
+        function formatRelativeTime(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now.getTime() - date.getTime();
+            const diffSec = Math.floor(diffMs / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHour / 24);
+
+            if (diffSec < 60) return 'just now';
+            if (diffMin < 60) return `${diffMin}m ago`;
+            if (diffHour < 24) return `${diffHour}h ago`;
+            if (diffDay < 7) return `${diffDay}d ago`;
+            if (diffDay < 30) return `${Math.floor(diffDay / 7)}w ago`;
+            if (diffDay < 365) return `${Math.floor(diffDay / 30)}mo ago`;
+            return `${Math.floor(diffDay / 365)}y ago`;
         }
 
         function render() {
@@ -1102,6 +1764,9 @@
                 return true;
             });
 
+            // Sort by createdAt (newest first)
+            displayTasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
             const working = displayTasks.find(t => t.isCurrentlyWorking);
             const others = displayTasks.filter(t => !t.isCurrentlyWorking);
 
@@ -1118,32 +1783,35 @@
             return `<div class="task-card ${t.resolved ? 'resolved' : ''}" id="card-${t.commentId}" 
                 onmouseenter="setRandomTilt(this)"
                 onclick="triggerPulse('${t.commentId}')">
-                <div class="card-header" onclick="event.stopPropagation(); locate('${t.commentId}')">
+                ${!t.resolved && !t.ignored ? `
+                    <button class="btn-ignore-top" onclick="event.stopPropagation(); ignore('${t.commentId}'); triggerButtonPulse(event, 'var(--text-muted)')" title="Ignore">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                ` : ''}
+                <div class="card-header" onclick="event.stopPropagation(); triggerPulse('${t.commentId}')">
                     <div class="author-avatar" style="${getAvatarStyle(t.author)}">
                         ${initials}
                     </div>
                     <div class="author-info">
                         <div class="author-name">${t.author}</div>
+                        <div class="author-time">${formatRelativeTime(t.createdAt)}</div>
                     </div>
                 </div>
                 <div class="message">${t.message}</div>
                 ${!t.resolved && !t.ignored ? `
                     <div class="card-efforts" onclick="event.stopPropagation()">
-                        <div class="effort-chip ${t.effort === 'Small' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Small')">Small</div>
-                        <div class="effort-chip ${t.effort === 'Medium' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Medium')">Medium</div>
-                        <div class="effort-chip ${t.effort === 'Large' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Large')">Large</div>
+                        <div class="effort-chip ${t.effort === 'Small' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Small'); triggerButtonPulse(event, 'var(--accent)')">Small</div>
+                        <div class="effort-chip ${t.effort === 'Medium' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Medium'); triggerButtonPulse(event, 'var(--accent)')">Medium</div>
+                        <div class="effort-chip ${t.effort === 'Large' ? 'active' : ''}" onclick="setEffort('${t.commentId}','Large'); triggerButtonPulse(event, 'var(--accent)')">Large</div>
                     </div>
                     <div class="card-actions" onclick="event.stopPropagation()">
-                        <button id="work-${t.commentId}" class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`})">
+                        <button id="work-${t.commentId}" class="btn-work ${t.isCurrentlyWorking ? 'active' : ''}" onclick="setWorking(${t.isCurrentlyWorking ? 'null' : `'${t.commentId}'`}); triggerButtonPulse(event, 'var(--accent)')">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                             ${t.isCurrentlyWorking ? 'Focusing' : 'Work'}
                         </button>
-                        <button class="btn-resolve" onclick="resolve('${t.commentId}')" title="Mark as Done">
+                        <button class="btn-resolve" onclick="resolve('${t.commentId}'); triggerButtonPulse(event, '#2E7D32')" title="Mark as Done">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                             Done
-                        </button>
-                        <button class="btn-resolve" onclick="ignore('${t.commentId}')" title="Ignore" style="padding: 10px 12px;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
                         </button>
                     </div>
                 ` : t.resolved ? `
@@ -1151,25 +1819,35 @@
                         <div style="display:flex; align-items:center; gap:6px; color:#2E7D32; font-size:11px; font-weight:800;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg> COMPLETED
                         </div>
-                        <button class="btn-resolve" style="padding:4px 10px; font-size:10px; border-color:transparent; background:#F0F0F0;" onclick="event.stopPropagation(); unresolve('${t.commentId}')">Not Done</button>
+                        <button class="btn-resolve" style="padding:6px 14px; font-size:11px; border-color:var(--border); background:#F5F5F5; color:var(--text-muted);" onclick="event.stopPropagation(); unresolve('${t.commentId}'); triggerButtonPulse(event, '#2E7D32')">Not Done</button>
                     </div>
                 ` : `
                     <div style="display:flex; align-items:center; justify-content:space-between;">
                         <div style="display:flex; align-items:center; gap:6px; color:var(--text-muted); font-size:11px; font-weight:800;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> IGNORED
                         </div>
-                        <button class="btn-resolve" style="padding:4px 10px; font-size:10px; border-color:transparent; background:#F0F0F0;" onclick="event.stopPropagation(); unignore('${t.commentId}')">Restore</button>
+                        <button class="btn-resolve" style="padding:6px 14px; font-size:11px; border-color:var(--border); background:#F5F5F5; color:var(--text-muted);" onclick="event.stopPropagation(); unignore('${t.commentId}'); triggerButtonPulse(event, 'var(--text-muted)')">Restore</button>
                     </div>
                 `}
             </div>`;
         }
 
+        function applyPulse(el, className) {
+            if (!el) return;
+            el.classList.remove(className);
+            void el.offsetWidth;
+            el.classList.add(className);
+        }
+
+        function triggerButtonPulse(e, color) {
+            const btn = e.currentTarget;
+            if (color) btn.style.setProperty('--btn-pulse-color', color);
+            applyPulse(btn, 'btn-pulsing');
+        }
+
         function triggerPulse(id) {
             const card = document.getElementById('card-' + id);
-            if (!card) return;
-            card.classList.remove('pulsing');
-            void card.offsetWidth;
-            card.classList.add('pulsing');
+            if (card) applyPulse(card, 'pulsing');
             locate(id);
         }
 
