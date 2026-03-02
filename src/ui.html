@@ -147,21 +147,21 @@
         .primary-tabs {
             display: flex;
             gap: 4px;
-            /* Reduced gap to fit more tabs */
+            /* Reduced gap */
         }
 
         .p-tab {
-            padding: 8px 12px;
+            padding: 8px 8px;
+            /* Reduced padding */
             font-size: 13px;
-            /* Increased size */
             letter-spacing: -0.1px;
             font-weight: 700;
-            /* Bolder */
             cursor: pointer;
             border-bottom: 2px solid transparent;
             color: #000;
-            /* Darker/Blacker */
             opacity: 0.7;
+            display: flex;
+            align-items: center;
         }
 
         .p-tab.active {
@@ -1120,6 +1120,8 @@
                 </svg>
                 <span class="s-count" id="countIgnored" style="margin-left: 0;">0</span>
             </div>
+        </div>
+        <div class="status-toggle" style="margin-left: 4px;">
             <div class="s-toggle" id="sToggleAnalytics" onclick="switchSecondaryTab('analytics')" title="Analytics">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
                     style="margin-right: 2px;">
@@ -1878,16 +1880,16 @@
             const container = document.getElementById('content');
             const currentUser = latestData.currentUser;
 
-            if (sToggle === 'analytics') {
-                renderAnalytics(container, filtered, currentUser);
-                return;
-            }
-
             let filtered = latestData.tasks.filter(t => {
                 if (pTab === 'assigned') return t.assignee === currentUser;
                 if (pTab === 'discussion') return t.mentions.includes(currentUser) && t.mentions.length > 1;
                 return true;
             });
+
+            if (sToggle === 'analytics') {
+                renderAnalytics(container, filtered, currentUser);
+                return;
+            }
 
             const totalList = filtered.filter(t => !t.ignored);
             const total = totalList.length;
