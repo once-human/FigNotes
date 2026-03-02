@@ -1120,7 +1120,7 @@
                 </svg>
                 <span class="s-count" id="countIgnored" style="margin-left: 0;">0</span>
             </div>
-            <div class="s-toggle" id="sToggleAnalytics" onclick="switchPrimaryTab('analytics')" title="Analytics">
+            <div class="s-toggle" id="sToggleAnalytics" onclick="switchSecondaryTab('analytics')" title="Analytics">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
                     style="margin-right: 2px;">
                     <line x1="18" y1="20" x2="18" y2="10" />
@@ -1798,19 +1798,9 @@
 
         function switchPrimaryTab(tab) {
             pTab = tab;
-            // Clear active from both textual tabs and the analytics toggle
-            document.querySelectorAll('.p-tab, .s-toggle').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.p-tab').forEach(el => el.classList.remove('active'));
             const activeEl = document.getElementById('pTab' + tab.charAt(0).toUpperCase() + tab.slice(1));
             if (activeEl) activeEl.classList.add('active');
-
-            if (tab === 'analytics') {
-                const sTab = document.getElementById('sToggleAnalytics');
-                if (sTab) sTab.classList.add('active');
-            }
-
-            // Control row always visible now
-            const controlRow = document.querySelector('.control-row');
-            if (controlRow) controlRow.style.display = 'flex';
 
             triggerTabAnimation();
             render();
@@ -1888,8 +1878,8 @@
             const container = document.getElementById('content');
             const currentUser = latestData.currentUser;
 
-            if (pTab === 'analytics') {
-                renderAnalytics(container);
+            if (sToggle === 'analytics') {
+                renderAnalytics(container, filtered, currentUser);
                 return;
             }
 
@@ -1972,8 +1962,8 @@
             container.innerHTML = html || '<div style="padding:100px 40px; text-align:center; color:#888; font-size:12px">All clear. Enjoy the day.</div>';
         }
 
-        function renderAnalytics(container) {
-            const allTasks = latestData.tasks;
+        function renderAnalytics(container, tasks, currentUser) {
+            const allTasks = tasks;
             const allResolved = allTasks.filter(t => t.resolved);
             const now = new Date();
 
@@ -1987,14 +1977,17 @@
                 return (now - rDate) < (1000 * 60 * 60 * 24 * 7);
             }).length;
 
-            const countTotal = allResolved.length;
+            const countTotalResolved = allResolved.length;
+            const countTotalTasks = allTasks.length;
             const pendingCount = allTasks.filter(t => !t.resolved && !t.ignored).length;
-            const assignedCount = allTasks.filter(t => !t.resolved && !t.ignored && t.assignee === currentUser).length;
-            const mentionCount = allTasks.filter(t => !t.resolved && !t.ignored && t.mentions.includes(currentUser)).length;
+            const assignedCount = allTasks.filter(t => t.assignee === currentUser && !t.resolved).length;
+            const discussionCount = allTasks.filter(t => t.mentions.includes(currentUser) && t.mentions.length > 1 && !t.resolved).length;
 
             container.innerHTML = `
                 <div class="analytics-view" style="padding-top: 10px;">
-                    <h2 style="font-weight:900; margin-bottom:20px; font-size:20px; letter-spacing:-0.5px; color: var(--text-main);">Performance Insights</h2>
+                    <h2 style="font-weight:900; margin-bottom:20px; font-size:20px; letter-spacing:-0.5px; color: var(--text-main);">
+                        ${pTab === 'all' ? 'Performance Insights' : (pTab === 'assigned' ? 'My Insights' : 'Discussion Stats')}
+                    </h2>
                     
                     <div style="margin-bottom:20px; padding:24px; background:white; border:1.5px solid var(--border); border-radius:18px; text-align:center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
                         <div class="stat-val" style="font-size:42px; color:var(--accent); line-height:1;">${countWeek}</div>
@@ -2002,6 +1995,10 @@
                     </div>
 
                     <div class="stat-grid" style="gap: 8px;">
+                        <div class="stat-card" style="padding: 12px;">
+                            <div class="stat-val" style="font-size:18px;">${countTotalTasks}</div>
+                            <div class="stat-lbl" style="font-size:9px;">Total</div>
+                        </div>
                         <div class="stat-card" style="padding: 12px;">
                             <div class="stat-val" style="font-size:18px;">${pendingCount}</div>
                             <div class="stat-lbl" style="font-size:9px;">Pending</div>
@@ -2011,20 +2008,16 @@
                             <div class="stat-lbl" style="font-size:9px;">Assigned</div>
                         </div>
                         <div class="stat-card" style="padding: 12px;">
-                            <div class="stat-val" style="font-size:18px;">${mentionCount}</div>
-                            <div class="stat-lbl" style="font-size:9px;">Mentions</div>
+                            <div class="stat-val" style="font-size:18px;">${discussionCount}</div>
+                            <div class="stat-lbl" style="font-size:9px;">Discussion</div>
+                        </div>
+                        <div class="stat-card" style="padding: 12px;">
+                            <div class="stat-val" style="font-size:18px;">${countTotalResolved}</div>
+                            <div class="stat-lbl" style="font-size:9px;">Resolved</div>
                         </div>
                         <div class="stat-card" style="padding: 12px;">
                             <div class="stat-val" style="font-size:18px;">${countToday}</div>
                             <div class="stat-lbl" style="font-size:9px;">Today</div>
-                        </div>
-                        <div class="stat-card" style="padding: 12px;">
-                            <div class="stat-val" style="font-size:18px;">${countTotal}</div>
-                            <div class="stat-lbl" style="font-size:9px;">Lifetime</div>
-                        </div>
-                         <div class="stat-card" style="padding: 12px; background: var(--accent-soft); border-color: var(--accent-outline);">
-                            <div class="stat-val" style="font-size:18px; color: var(--accent);">🏆</div>
-                            <div class="stat-lbl" style="font-size:9px; color: var(--accent);">Goals</div>
                         </div>
                     </div>
 
