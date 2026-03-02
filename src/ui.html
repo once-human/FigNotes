@@ -144,6 +144,19 @@
             background: var(--accent-soft);
         }
 
+        .primary-tabs {
+            display: flex;
+            gap: 4px;
+            /* Reduced gap to fit more tabs */
+        }
+
+        .p-tab {
+            padding: 6px 8px;
+            /* Slightly reduced padding */
+            font-size: 11px;
+            /* Slightly smaller font */
+        }
+
         .icon-btn:active,
         .no-meow-btn:active {
             transform: scale(0.9) rotate(-5deg);
@@ -1873,22 +1886,18 @@
 
             let html = '';
             if (sToggle === 'resolved') {
-                // Grouping Logic
-                const groups = { today: [], yesterday: [], week: [], older: [] };
-                const now = new Date();
+                // Granular Grouping Logic
+                const groups = new Map();
                 displayTasks.forEach(t => {
-                    const rDate = new Date(t.resolvedAt || t.createdAt);
-                    const diffDays = Math.floor((now - rDate) / (1000 * 60 * 60 * 24));
-                    if (diffDays === 0) groups.today.push(t);
-                    else if (diffDays === 1) groups.yesterday.push(t);
-                    else if (diffDays < 7) groups.week.push(t);
-                    else groups.older.push(t);
+                    const header = getTimelineHeader(t.resolvedAt || t.createdAt);
+                    if (!groups.has(header)) groups.set(header, []);
+                    groups.get(header).push(t);
                 });
 
-                if (groups.today.length) html += `<div class="timeline-header"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Today</div>` + groups.today.map(t => renderCard(t)).join('');
-                if (groups.yesterday.length) html += `<div class="timeline-header">Yesterday</div>` + groups.yesterday.map(t => renderCard(t)).join('');
-                if (groups.week.length) html += `<div class="timeline-header">Earlier this Week</div>` + groups.week.map(t => renderCard(t)).join('');
-                if (groups.older.length) html += `<div class="timeline-header">Older</div>` + groups.older.map(t => renderCard(t)).join('');
+                groups.forEach((tasks, header) => {
+                    html += `<div class="timeline-header">${header === 'Today' ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>` : ''}${header}</div>`;
+                    html += tasks.map(t => renderCard(t)).join('');
+                });
             } else {
                 if (working && sToggle === 'pending') {
                     html += `<div class="pinned-section"><span class="label"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="10"/></svg> Currently Working</span>${renderCard(working)}</div>`;

@@ -19,7 +19,8 @@ export class SyncService {
                     effort: stored.effort || null,
                     ignored: stored.ignored || false,
                     isCurrentlyWorking: stored.isCurrentlyWorking || false,
-                    assignee: stored.assignee || live.assignee
+                    assignee: stored.assignee || live.assignee,
+                    resolvedAt: stored.resolvedAt || live.resolvedAt
                 });
             } else {
                 reconciledTasks.push(live);

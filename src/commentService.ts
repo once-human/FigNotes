@@ -41,6 +41,7 @@ export class CommentService {
                     authorAvatarUrl: commentObj.user?.img_url || null,
                     createdAt: commentObj.created_at,
                     resolved: commentObj.resolved_at !== null && commentObj.resolved_at !== undefined,
+                    resolvedAt: commentObj.resolved_at || undefined,
                     effort: null, // Default
                     assignee: assignee,
                     message: message,
