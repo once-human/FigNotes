@@ -390,8 +390,11 @@
             padding: 24px 16px;
         }
 
-
-        margin-bottom: 24px;
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
@@ -956,12 +959,6 @@
             margin-bottom: 40px;
         }
 
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 24px;
-        }
 
         .setup-item {
             margin-bottom: 24px;
