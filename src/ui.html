@@ -347,10 +347,85 @@
         }
 
         .task-card.resolved {
-            opacity: 0.5;
             background: #FAFAFA;
-            border-style: dashed;
+            border-style: solid;
+            /* Changed from dashed for cleaner resolution timeline */
+            border-left: 4px solid #2E7D32;
         }
+
+        .timeline-header {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            padding: 16px 16px 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            opacity: 0.5;
+        }
+
+        .analytics-view {
+            padding: 24px 16px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .stat-lbl {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .recent-res-list {
+            background: white;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            overflow: hidden;
+        }
+
+        .recent-res-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .recent-res-item:last-child {
+            border-bottom: none;
+        }
+
 
         @keyframes tab-bounce {
             0% {
@@ -968,6 +1043,12 @@
                         height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg> Discussion <span class="s-count" id="countDiscussion">0</span></div>
+                <div class="p-tab" id="pTabAnalytics" onclick="switchPrimaryTab('analytics')"><svg width="14"
+                        height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                    </svg> Analytics</div>
             </div>
             <div class="header-actions">
                 <div class="icon-btn" id="catToggle" onclick="toggleTheme()" title="Meow Mode 🐾">
@@ -1672,7 +1753,17 @@
             setTimeout(() => v.classList.remove('animating'), 1000);
         }
 
-        function switchPrimaryTab(tab) { pTab = tab; Array.from(document.querySelectorAll('.p-tab')).forEach(t => t.classList.toggle('active', t.id === 'pTab' + tab.charAt(0).toUpperCase() + tab.slice(1))); triggerTabAnimation(); render(); }
+        function switchPrimaryTab(tab) {
+            pTab = tab;
+            Array.from(document.querySelectorAll('.p-tab')).forEach(t => t.classList.toggle('active', t.id === 'pTab' + tab.charAt(0).toUpperCase() + tab.slice(1)));
+
+            // Hide control row for analytics
+            const controlRow = document.querySelector('.control-row');
+            if (controlRow) controlRow.style.display = (tab === 'analytics' ? 'none' : 'flex');
+
+            triggerTabAnimation();
+            render();
+        }
         function switchSecondaryTab(toggle) { sToggle = toggle; Array.from(document.querySelectorAll('.s-toggle')).forEach(t => t.classList.toggle('active', t.id === 'sToggle' + toggle.charAt(0).toUpperCase() + toggle.slice(1))); triggerTabAnimation(); render(); }
         function updateEffortSelection(val) { effortFilter = val; document.getElementById('effortLabel').innerText = val === 'All' ? 'All Efforts' : val; render(); }
 
@@ -1730,6 +1821,11 @@
             const container = document.getElementById('content');
             const currentUser = latestData.currentUser;
 
+            if (pTab === 'analytics') {
+                renderAnalytics(container);
+                return;
+            }
+
             let filtered = latestData.tasks.filter(t => {
                 if (pTab === 'assigned') return t.assignee === currentUser;
                 if (pTab === 'discussion') return t.mentions.includes(currentUser) && t.mentions.length > 1;
@@ -1765,22 +1861,96 @@
                 return true;
             });
 
-            // Sort by createdAt (newest first)
-            displayTasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            // Sort by createdAt (newest first) for pending, or resolvedAt for resolved
+            if (sToggle === 'resolved') {
+                displayTasks.sort((a, b) => new Date(b.resolvedAt || b.createdAt).getTime() - new Date(a.resolvedAt || a.createdAt).getTime());
+            } else {
+                displayTasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            }
 
             const working = displayTasks.find(t => t.isCurrentlyWorking);
             const others = displayTasks.filter(t => !t.isCurrentlyWorking);
 
             let html = '';
-            if (working && sToggle === 'pending') {
-                html += `<div class="pinned-section"><span class="label"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="10"/></svg> Currently Working</span>${renderCard(working)}</div>`;
+            if (sToggle === 'resolved') {
+                // Grouping Logic
+                const groups = { today: [], yesterday: [], week: [], older: [] };
+                const now = new Date();
+                displayTasks.forEach(t => {
+                    const rDate = new Date(t.resolvedAt || t.createdAt);
+                    const diffDays = Math.floor((now - rDate) / (1000 * 60 * 60 * 24));
+                    if (diffDays === 0) groups.today.push(t);
+                    else if (diffDays === 1) groups.yesterday.push(t);
+                    else if (diffDays < 7) groups.week.push(t);
+                    else groups.older.push(t);
+                });
+
+                if (groups.today.length) html += `<div class="timeline-header"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Today</div>` + groups.today.map(t => renderCard(t)).join('');
+                if (groups.yesterday.length) html += `<div class="timeline-header">Yesterday</div>` + groups.yesterday.map(t => renderCard(t)).join('');
+                if (groups.week.length) html += `<div class="timeline-header">Earlier this Week</div>` + groups.week.map(t => renderCard(t)).join('');
+                if (groups.older.length) html += `<div class="timeline-header">Older</div>` + groups.older.map(t => renderCard(t)).join('');
+            } else {
+                if (working && sToggle === 'pending') {
+                    html += `<div class="pinned-section"><span class="label"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="10"/></svg> Currently Working</span>${renderCard(working)}</div>`;
+                }
+                html += others.map(t => renderCard(t)).join('');
             }
-            html += others.map(t => renderCard(t)).join('');
+
             container.innerHTML = html || '<div style="padding:100px 40px; text-align:center; color:#888; font-size:12px">All clear. Enjoy the day.</div>';
+        }
+
+        function renderAnalytics(container) {
+            const allResolved = latestData.tasks.filter(t => t.resolved);
+            const now = new Date();
+
+            const countToday = allResolved.filter(t => {
+                const rDate = new Date(t.resolvedAt || t.createdAt);
+                return Math.floor((now - rDate) / (1000 * 60 * 60 * 24)) === 0;
+            }).length;
+
+            const countWeek = allResolved.filter(t => {
+                const rDate = new Date(t.resolvedAt || t.createdAt);
+                return Math.floor((now - rDate) / (1000 * 60 * 60 * 24)) < 7;
+            }).length;
+
+            const countTotal = allResolved.length;
+
+            container.innerHTML = `
+                <div class="analytics-view">
+                    <h2 style="font-weight:900; margin-bottom:20px; font-size:20px;">Resolution Insights</h2>
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-val">${countToday}</div>
+                            <div class="stat-lbl">Resolved Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-val">${countWeek}</div>
+                            <div class="stat-lbl">Resolved This Week</div>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px;">Recent Completions</h3>
+                    <div class="recent-res-list">
+                        ${allResolved.slice(0, 5).map(t => `
+                            <div class="recent-res-item">
+                                <span style="font-weight:600; color:var(--text-main); font-size:11px;">${t.message.slice(0, 30)}${t.message.length > 30 ? '...' : ''}</span>
+                                <span style="color:var(--text-muted); font-size:10px;">${formatRelativeTime(t.resolvedAt || t.createdAt)}</span>
+                            </div>
+                        `).join('') || '<div style="padding:20px; text-align:center; color:#888; font-size:12px">No resolved tasks yet.</div>'}
+                    </div>
+
+                    <div style="margin-top:32px; padding:20px; background:var(--accent-soft); border-radius:12px; text-align:center;">
+                        <span style="font-size:32px; display:block; margin-bottom:8px;">🏆</span>
+                        <p style="font-size:12px; color:var(--accent); font-weight:700;">You've resolved ${countTotal} comments in total. Keep it up!</p>
+                    </div>
+                </div>
+            `;
         }
 
         function renderCard(t) {
             const initials = getInitials(t.author);
+            const timeLabel = t.resolved ? `Resolved ${formatRelativeTime(t.resolvedAt || t.createdAt)}` : formatRelativeTime(t.createdAt);
+
             return `<div class="task-card ${t.resolved ? 'resolved' : ''}" id="card-${t.commentId}" 
                 onmouseenter="setRandomTilt(this)"
                 onclick="triggerPulse('${t.commentId}')">
@@ -1795,7 +1965,7 @@
                     </div>
                     <div class="author-info">
                         <div class="author-name">${t.author}</div>
-                        <div class="author-time">${formatRelativeTime(t.createdAt)}</div>
+                        <div class="author-time">${timeLabel}</div>
                     </div>
                 </div>
                 <div class="message">${t.message}</div>

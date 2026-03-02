@@ -66,6 +66,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 const tasks = await StorageService.getTasks();
                 if (tasks[msg.payload]) {
                     tasks[msg.payload].resolved = true;
+                    tasks[msg.payload].resolvedAt = new Date().toISOString();
                     tasks[msg.payload].isCurrentlyWorking = false;
                     await StorageService.saveTasks(tasks);
                     await broadcastState();
@@ -78,6 +79,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
                 const tasks = await StorageService.getTasks();
                 if (tasks[msg.payload]) {
                     tasks[msg.payload].resolved = false;
+                    delete tasks[msg.payload].resolvedAt;
                     await StorageService.saveTasks(tasks);
                     await broadcastState();
                 }

@@ -18,6 +18,7 @@ export interface Task {
     isCurrentlyWorking: boolean;
     mentions: string[];
     ignored: boolean;
+    resolvedAt?: string;
 }
 
 export interface SyncResult {
