@@ -151,10 +151,11 @@
         }
 
         .p-tab {
-            padding: 6px 8px;
-            /* Slightly reduced padding */
-            font-size: 11px;
-            /* Slightly smaller font */
+            padding: 6px 4px;
+            /* Even tighter for stakeholders */
+            font-size: 10px;
+            letter-spacing: -0.2px;
+            font-weight: 600;
         }
 
         .icon-btn:active,
@@ -1820,6 +1821,21 @@
             return `${Math.floor(diffDay / 365)}y ago`;
         }
 
+        function getTimelineHeader(date) {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+
+            const diffDays = Math.round((now - d) / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays === 2) return 'Day before Yesterday';
+
+            return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
         function render() {
             if (!latestData || !config.pat) {
                 document.getElementById('content').innerHTML = `
@@ -1927,14 +1943,22 @@
             container.innerHTML = `
                 <div class="analytics-view">
                     <h2 style="font-weight:900; margin-bottom:20px; font-size:20px;">Resolution Insights</h2>
+                    <div style="margin-bottom:20px; padding:20px; background:white; border:1.5px solid var(--border); border-radius:12px; text-align:center; border-left:6px solid var(--accent);">
+                        <div class="stat-val" style="font-size:36px;">${countWeek}</div>
+                        <div class="stat-lbl" style="font-size:12px;">Resolved This Week</div>
+                    </div>
                     <div class="stat-grid">
                         <div class="stat-card">
                             <div class="stat-val">${countToday}</div>
                             <div class="stat-lbl">Resolved Today</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-val">${countWeek}</div>
-                            <div class="stat-lbl">Resolved This Week</div>
+                            <div class="stat-val">${(countWeek / 7).toFixed(1)}</div>
+                            <div class="stat-lbl">Daily Velocity</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-val">${countTotal}</div>
+                            <div class="stat-lbl">Total Lifetime</div>
                         </div>
                     </div>
 
