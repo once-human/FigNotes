@@ -2,7 +2,7 @@ import { SyncService } from "./syncService";
 import { StorageService } from "./storageService";
 import { PluginMessage, Task } from "./types";
 
-figma.showUI(__html__, { width: 480, height: 740, themeColors: true });
+figma.showUI(__html__, { width: 484, height: 740, themeColors: true });
 
 async function broadcastState(rawComments?: any[]) {
     try {
