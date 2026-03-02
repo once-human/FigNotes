@@ -1097,17 +1097,17 @@
                 </svg>
                 <span class="s-count" id="countIgnored" style="margin-left: 0;">0</span>
             </div>
-        </div>
-
-        <div class="header-actions-inline" style="display:flex; gap:8px; margin-left:auto; align-items:center;">
-            <div class="icon-btn" id="pTabAnalytics" onclick="switchPrimaryTab('analytics')" title="Analytics">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <div class="s-toggle" id="sToggleAnalytics" onclick="switchPrimaryTab('analytics')" title="Analytics">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    style="margin-right: 2px;">
                     <line x1="18" y1="20" x2="18" y2="10" />
                     <line x1="12" y1="20" x2="12" y2="4" />
                     <line x1="6" y1="20" x2="6" y2="14" />
                 </svg>
+                <span class="s-count" id="countResolvedWeek" style="margin-left: 0;">0</span>
             </div>
         </div>
+
 
 
 
@@ -1775,14 +1775,19 @@
 
         function switchPrimaryTab(tab) {
             pTab = tab;
-            // Clear active from both textual tabs and the analytics icon
-            document.querySelectorAll('.p-tab, #pTabAnalytics').forEach(el => el.classList.remove('active'));
+            // Clear active from both textual tabs and the analytics toggle
+            document.querySelectorAll('.p-tab, .s-toggle').forEach(el => el.classList.remove('active'));
             const activeEl = document.getElementById('pTab' + tab.charAt(0).toUpperCase() + tab.slice(1));
             if (activeEl) activeEl.classList.add('active');
 
-            // Hide control row for analytics
+            if (tab === 'analytics') {
+                const sTab = document.getElementById('sToggleAnalytics');
+                if (sTab) sTab.classList.add('active');
+            }
+
+            // Control row always visible now
             const controlRow = document.querySelector('.control-row');
-            if (controlRow) controlRow.style.display = (tab === 'analytics' ? 'none' : 'flex');
+            if (controlRow) controlRow.style.display = 'flex';
 
             triggerTabAnimation();
             render();
@@ -1886,6 +1891,11 @@
             document.getElementById('countResolved').innerText = resCount;
             document.getElementById('countIgnored').innerText = ignoreCount;
 
+            // Weekly Resolved Count for Analytics Toggle
+            const nowTime = new Date().getTime();
+            const resWeek = latestData.tasks.filter(t => t.resolved && (nowTime - new Date(t.resolvedAt || t.createdAt).getTime()) < (1000 * 60 * 60 * 24 * 7)).length;
+            document.getElementById('countResolvedWeek').innerText = resWeek;
+
             // Primary Tab Counts (all active non-ignored for each category)
             const activeTasks = latestData.tasks.filter(t => !t.ignored && !t.resolved);
             document.getElementById('countAll').innerText = activeTasks.length;
@@ -1955,78 +1965,61 @@
             }).length;
 
             const countTotal = allResolved.length;
-            const resRate = allTasks.length > 0 ? (countTotal / allTasks.length * 100).toFixed(1) : 0;
-
-            // Avg Resolution Time
-            let avgResTimeStr = "N/A";
-            if (countTotal > 0) {
-                const totalTime = allResolved.reduce((sum, t) => {
-                    const rTime = new Date(t.resolvedAt || t.createdAt).getTime();
-                    const cTime = new Date(t.createdAt).getTime();
-                    return sum + Math.max(0, rTime - cTime);
-                }, 0);
-                const avgMs = totalTime / countTotal;
-                const hours = avgMs / (1000 * 60 * 60);
-                if (hours < 1) avgResTimeStr = `${Math.round(hours * 60)}m`;
-                else if (hours < 24) avgResTimeStr = `${hours.toFixed(1)}h`;
-                else avgResTimeStr = `${(hours / 24).toFixed(1)}d`;
-            }
-
-            // Project Health
-            const pendingCount = allTasks.length - countTotal;
-            let health = "Good";
-            let healthEmoji = "🟢";
-            if (pendingCount > 15) { health = "Busy"; healthEmoji = "🔴"; }
-            else if (pendingCount > 5) { health = "Steady"; healthEmoji = "🟡"; }
+            const pendingCount = allTasks.filter(t => !t.resolved && !t.ignored).length;
+            const assignedCount = allTasks.filter(t => !t.resolved && !t.ignored && t.assignee === currentUser).length;
+            const mentionCount = allTasks.filter(t => !t.resolved && !t.ignored && t.mentions.includes(currentUser)).length;
 
             container.innerHTML = `
-                <div class="analytics-view">
-                    <h2 style="font-weight:900; margin-bottom:20px; font-size:22px; letter-spacing:-0.5px;">Performance Insights</h2>
+                <div class="analytics-view" style="padding-top: 10px;">
+                    <h2 style="font-weight:900; margin-bottom:20px; font-size:20px; letter-spacing:-0.5px; color: var(--text-main);">Performance Insights</h2>
                     
-                    <div style="margin-bottom:20px; padding:28px; background:white; border:1.5px solid var(--border); border-radius:20px; text-align:center; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
-                        <div class="stat-val" style="font-size:48px; color:var(--accent); line-height:1;">${resRate}%</div>
-                        <div class="stat-lbl" style="font-size:14px; font-weight:700; color:var(--text-main); margin-top:8px;">Resolution Rate</div>
+                    <div style="margin-bottom:20px; padding:24px; background:white; border:1.5px solid var(--border); border-radius:18px; text-align:center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                        <div class="stat-val" style="font-size:42px; color:var(--accent); line-height:1;">${countWeek}</div>
+                        <div class="stat-lbl" style="font-size:12px; font-weight:700; color:var(--text-muted); margin-top:8px;">Resolved This Week</div>
                     </div>
 
-                    <div class="stat-grid">
-                        <div class="stat-card">
-                            <div class="stat-val" style="font-size:20px;">${countWeek}</div>
-                            <div class="stat-lbl" style="font-size:10px;">This Week</div>
+                    <div class="stat-grid" style="gap: 8px;">
+                        <div class="stat-card" style="padding: 12px;">
+                            <div class="stat-val" style="font-size:18px;">${pendingCount}</div>
+                            <div class="stat-lbl" style="font-size:9px;">Pending</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-val" style="font-size:20px;">${avgResTimeStr}</div>
-                            <div class="stat-lbl" style="font-size:10px;">Avg. Speed</div>
+                        <div class="stat-card" style="padding: 12px;">
+                            <div class="stat-val" style="font-size:18px;">${assignedCount}</div>
+                            <div class="stat-lbl" style="font-size:9px;">Assigned</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-val" style="font-size:20px; color:${health === 'Good' ? '#2E7D32' : (health === 'Steady' ? '#FBC02D' : '#D32F2F')}">${healthEmoji}</div>
-                            <div class="stat-lbl" style="font-size:10px;">${health}</div>
+                        <div class="stat-card" style="padding: 12px;">
+                            <div class="stat-val" style="font-size:18px;">${mentionCount}</div>
+                            <div class="stat-lbl" style="font-size:9px;">Mentions</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-val" style="font-size:20px;">${countToday}</div>
-                            <div class="stat-lbl" style="font-size:10px;">Today</div>
+                        <div class="stat-card" style="padding: 12px;">
+                            <div class="stat-val" style="font-size:18px;">${countToday}</div>
+                            <div class="stat-lbl" style="font-size:9px;">Today</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-val" style="font-size:20px;">${countTotal}</div>
-                            <div class="stat-lbl" style="font-size:10px;">Lifetime</div>
+                        <div class="stat-card" style="padding: 12px;">
+                            <div class="stat-val" style="font-size:18px;">${countTotal}</div>
+                            <div class="stat-lbl" style="font-size:9px;">Lifetime</div>
                         </div>
-                         <div class="stat-card">
-                            <div class="stat-val" style="font-size:20px;">${pendingCount}</div>
-                            <div class="stat-lbl" style="font-size:10px;">Open</div>
+                         <div class="stat-card" style="padding: 12px; background: var(--accent-soft); border-color: var(--accent-outline);">
+                            <div class="stat-val" style="font-size:18px; color: var(--accent);">🏆</div>
+                            <div class="stat-lbl" style="font-size:9px; color: var(--accent);">Goals</div>
                         </div>
                     </div>
 
-                    <h3 style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px; letter-spacing:0.05em;">Recent Activity</h3>
+                    <h3 style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:10px; letter-spacing:0.05em; margin-top: 24px;">Recent Activity</h3>
                     <div class="recent-res-list">
-                        ${allResolved.slice(0, 5).map(t => `
-                            <div class="recent-res-item" style="padding:12px; background:white; border:1px solid var(--border); border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-weight:600; color:var(--text-main); font-size:12px;">${t.message.slice(0, 35)}${t.message.length > 35 ? '...' : ''}</span>
-                                <span style="color:var(--text-muted); font-size:11px; font-weight:500;">${formatRelativeTime(t.resolvedAt || t.createdAt)}</span>
+                        ${allResolved.slice(0, 3).map(t => `
+                            <div class="recent-res-item" style="padding:10px; background:white; border:1px solid var(--border); border-radius:10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:600; color:var(--text-main); font-size:11px;">${t.message.slice(0, 30)}${t.message.length > 30 ? '...' : ''}</span>
+                                <span style="color:var(--text-muted); font-size:10px; font-weight:500;">${formatRelativeTime(t.resolvedAt || t.createdAt)}</span>
                             </div>
-                        `).join('') || '<div style="padding:24px; text-align:center; color:#888; font-size:13px">No activity tracked yet.</div>'}
+                        `).join('') || '<div style="padding:20px; text-align:center; color:#888; font-size:12px">No recent work tracked.</div>'}
                     </div>
 
-                    <div style="margin-top:32px; padding:24px; background:white; border:1.5px solid var(--border); border-radius:20px; text-align:center;">
-                        <p style="font-size:13px; color:var(--text-muted); font-weight:700; line-height:1.4;">Project health is currently <b>${health}</b>.<br/>Keep focus on the ${pendingCount} open items!</p>
+                    <div style="margin-top:24px; padding:16px; background:white; border:1.5px solid var(--border); border-radius:18px; text-align:center;">
+                        <p style="font-size:12px; color:var(--text-muted); font-weight:700; line-height:1.4;">
+                            Keep up the great work!<br/>
+                            <span style="color: var(--accent); font-size: 11px;">${pendingCount} active threads need your attention.</span>
+                        </p>
                     </div>
                 </div>
             `;
